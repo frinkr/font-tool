@@ -42,6 +42,7 @@ extern NSString * UNDEFINED_UNICODE_CODEPOINT;
 // input mix of U+ notation and chars, ABCU+AFFEF.
 +(NSString*)decodeUnicodeMixed:(NSString*)string;
 
++(NSArray<NSNumber*>*)canonicalDecomposition:(NSUInteger)unicode;
 @end
 
 

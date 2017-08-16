@@ -90,6 +90,19 @@
         [items addRowWithKey:@"UTF8" stringValue:[CharEncoding utf8HexStringForUnicode:self.glyph.charcode]];
         [items addRowWithKey:@"UTF16" stringValue:[CharEncoding utf16HexStringForUnicode:self.glyph.charcode]];
         
+        
+        NSArray<NSNumber*> * nfd = [CharEncoding canonicalDecomposition:self.glyph.charcode];
+        if (nfd.count) {
+            NSMutableString * nfdStr = [[NSMutableString alloc] init];
+            for (NSUInteger i = 0; i < nfd.count; ++ i) {
+                if (i) [nfdStr appendString:@", "];
+                [nfdStr appendString:[CharEncoding hexForCharcode:[[nfd objectAtIndex:i] unsignedIntegerValue]
+                                                    unicodeFlavor: isUnicode]];
+            }
+        
+            [items addRowWithKey:@"NFD" stringValue:nfdStr];
+        }
+        
         if (altCharcodes.count) {
             NSMutableArray<NSString*> * altStrings = [[NSMutableArray<NSString*> alloc] init];
             for (NSNumber * num in altCharcodes) {

@@ -13,12 +13,20 @@ include_directories(${CMAKE_SOURCE_DIR}/harfbuzz/src)
 include_directories(${PROJECT_BINARY_DIR}/../harfbuzz/src)
 include_directories(${CMAKE_SOURCE_DIR})
 
+# icu
+find_package(PkgConfig)
+pkg_check_modules(PC_ICU QUIET icu-uc)
+find_path(ICU_INCLUDE_DIR NAMES unicode/utypes.h HINTS ${PC_ICU_INCLUDE_DIRS} ${PC_ICU_INCLUDEDIR})
+find_library(ICU_LIBRARY NAMES libicuuc cygicuuc cygicuuc32 icuuc HINTS ${PC_ICU_LIBRARY_DIRS} ${PC_ICU_LIBDIR})
+include_directories(${ICU_INCLUDE_DIR})
+
+
 file(GLOB HEADER_FILES "*.h")
 
 set(SOURCE_FILES
   main.m
   AppDelegate.m
-  CharEncoding.m
+  CharEncoding.mm
   HtmlTableView.m
   GlyphImageView.m
   GlyphLookupWindowController.m
@@ -74,7 +82,11 @@ add_executable(
     ${RESOURCE_FILES}
 )
 
-target_link_libraries(${APP_NAME} freetype harfbuzz)
+target_link_libraries(${APP_NAME}
+  freetype
+  harfbuzz
+  ${ICU_LIBRARY}
+  )
 
 set_target_properties(
     ${APP_NAME}
