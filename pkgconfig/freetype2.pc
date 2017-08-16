@@ -1,7 +1,7 @@
-prefix=/Data/typesetting/font-tool/freetype-2.8
-exec_prefix=/Data/typesetting/font-tool/freetype-2.8
-libdir=/Data/typesetting/font-tool/freetype-2.8/lib
-includedir=/Data/typesetting/font-tool/freetype-2.8/include
+prefix=/Data/typesetting/font-tool/freetype
+exec_prefix=${prefix}
+libdir=${prefix}/freetype/lib
+includedir=${prefix}/include
 
 Name: FreeType 2
 URL: http://freetype.org

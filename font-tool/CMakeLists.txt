@@ -8,9 +8,9 @@ set(HARFBUZZ_BUILD_ICU ON CACHE BOOL "Enable building of ICU")
 set(HARFBUZZ_BUILD_UCDN OFF CACHE BOOL "Enable building of UCDN")
 
 
-include_directories(${CMAKE_SOURCE_DIR}/freetype-2.8/include)
-include_directories(${CMAKE_SOURCE_DIR}/harfbuzz-1.4.8/src)
-include_directories(${PROJECT_BINARY_DIR}/../harfbuzz-1.4.8/src)
+include_directories(${CMAKE_SOURCE_DIR}/freetype/include)
+include_directories(${CMAKE_SOURCE_DIR}/harfbuzz/src)
+include_directories(${PROJECT_BINARY_DIR}/../harfbuzz/src)
 include_directories(${CMAKE_SOURCE_DIR})
 
 file(GLOB HEADER_FILES "*.h")
