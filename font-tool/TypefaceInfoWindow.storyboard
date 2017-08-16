@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="12118" systemVersion="16C67" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="ct7-7n-swy">
+    <dependencies>
+        <deployment identifier="macosx"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="12118"/>
+        <plugIn identifier="com.apple.WebKit2IBPlugin" version="12118"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <scenes>
+        <!--Typeface Info View Controller-->
+        <scene sceneID="BgD-1h-9ch">
+            <objects>
+                <viewController id="ftV-hd-Iut" customClass="TypefaceInfoViewController" sceneMemberID="viewController">
+                    <view key="view" id="lAU-qM-5O1">
+                        <rect key="frame" x="0.0" y="0.0" width="550" height="509"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                        <subviews>
+                            <segmentedControl verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="etD-ee-ShX">
+                                <rect key="frame" x="29" y="477" width="493" height="20"/>
+                                <segmentedCell key="cell" controlSize="small" borderStyle="border" alignment="left" style="rounded" trackingMode="selectOne" id="1H0-2J-npJ">
+                                    <font key="font" metaFont="smallSystem"/>
+                                    <segments>
+                                        <segment label="basic" selected="YES"/>
+                                        <segment label="face" tag="1"/>
+                                        <segment label="head"/>
+                                        <segment label="hhea"/>
+                                        <segment label="hmtx"/>
+                                        <segment label="maxp"/>
+                                        <segment label="name"/>
+                                        <segment label="post"/>
+                                        <segment label="OS/2"/>
+                                        <segment label="GSUB"/>
+                                        <segment label="GPOS"/>
+                                    </segments>
+                                </segmentedCell>
+                                <connections>
+                                    <action selector="doChangeCurrentSegment:" target="ftV-hd-Iut" id="DF0-Tn-vAe"/>
+                                </connections>
+                            </segmentedControl>
+                            <wkWebView wantsLayer="YES" translatesAutoresizingMaskIntoConstraints="NO" id="G8F-TB-0I6" userLabel="Table View" customClass="HtmlTableView">
+                                <rect key="frame" x="0.0" y="0.0" width="550" height="471"/>
+                                <wkWebViewConfiguration key="configuration">
+                                    <audiovisualMediaTypes key="mediaTypesRequiringUserActionForPlayback" none="YES"/>
+                                    <wkPreferences key="preferences"/>
+                                </wkWebViewConfiguration>
+                            </wkWebView>
+                        </subviews>
+                        <constraints>
+                            <constraint firstItem="G8F-TB-0I6" firstAttribute="leading" secondItem="lAU-qM-5O1" secondAttribute="leading" id="8un-fS-Zxf"/>
+                            <constraint firstItem="G8F-TB-0I6" firstAttribute="top" secondItem="etD-ee-ShX" secondAttribute="bottom" constant="8" id="Agy-ER-cUg"/>
+                            <constraint firstItem="etD-ee-ShX" firstAttribute="top" secondItem="lAU-qM-5O1" secondAttribute="top" constant="12" id="RBH-jB-v51"/>
+                            <constraint firstAttribute="bottom" secondItem="G8F-TB-0I6" secondAttribute="bottom" id="cny-5k-Lfv"/>
+                            <constraint firstItem="etD-ee-ShX" firstAttribute="centerX" secondItem="lAU-qM-5O1" secondAttribute="centerX" id="dAx-lm-qEx"/>
+                            <constraint firstAttribute="trailing" secondItem="G8F-TB-0I6" secondAttribute="trailing" id="ibK-Ew-d2r"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="infoSegments" destination="etD-ee-ShX" id="rpc-K6-1Z5"/>
+                        <outlet property="tableView" destination="G8F-TB-0I6" id="nry-ZP-6CN"/>
+                    </connections>
+                </viewController>
+                <customObject id="ezm-gH-SCM" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-2044" y="-103"/>
+        </scene>
+        <!--Window Controller-->
+        <scene sceneID="Glz-No-yHn">
+            <objects>
+                <windowController storyboardIdentifier="typefaceInfoWindowController" id="ct7-7n-swy" customClass="TypefaceInfoWindowController" sceneMemberID="viewController">
+                    <window key="window" title="Typeface Info" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" oneShot="NO" releasedWhenClosed="NO" showsToolbarButton="NO" visibleAtLaunch="NO" frameAutosaveName="" animationBehavior="default" id="c1O-cL-2Dc" customClass="NSPanel">
+                        <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES" utility="YES"/>
+                        <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
+                        <rect key="contentRect" x="1734" y="62" width="480" height="270"/>
+                        <rect key="screenRect" x="1440" y="-300" width="1920" height="1177"/>
+                        <connections>
+                            <outlet property="delegate" destination="ct7-7n-swy" id="zch-cj-kFz"/>
+                        </connections>
+                    </window>
+                    <connections>
+                        <segue destination="ftV-hd-Iut" kind="relationship" relationship="window.shadowedContentViewController" id="Jhe-85-hdR"/>
+                    </connections>
+                </windowController>
+                <customObject id="eeo-7c-VcI" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-2044" y="-696"/>
+        </scene>
+    </scenes>
+</document>

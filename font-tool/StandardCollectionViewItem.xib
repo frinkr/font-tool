@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="12118" systemVersion="16C67" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+    <dependencies>
+        <deployment identifier="macosx"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="12118"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <customObject id="-2" userLabel="File's Owner"/>
+        <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
+        <customObject id="-3" userLabel="Application" customClass="NSObject"/>
+        <customView id="c22-O7-iKe">
+            <rect key="frame" x="0.0" y="0.0" width="259" height="237"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+            <subviews>
+                <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="Rff-CF-Z8F">
+                    <rect key="frame" x="0.0" y="0.0" width="259" height="237"/>
+                    <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" id="xyY-1J-Atq"/>
+                </imageView>
+                <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" allowsCharacterPickerTouchBarItem="NO" translatesAutoresizingMaskIntoConstraints="NO" id="6QX-Wi-OkK">
+                    <rect key="frame" x="-2" y="0.0" width="263" height="17"/>
+                    <textFieldCell key="cell" selectable="YES" sendsActionOnEndEditing="YES" alignment="center" title="Multiline Label" id="Jih-QD-Ctk">
+                        <font key="font" metaFont="system"/>
+                        <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                </textField>
+            </subviews>
+            <constraints>
+                <constraint firstAttribute="bottom" secondItem="Rff-CF-Z8F" secondAttribute="bottom" id="3Ol-UJ-9sb"/>
+                <constraint firstItem="Rff-CF-Z8F" firstAttribute="leading" secondItem="c22-O7-iKe" secondAttribute="leading" id="4ic-S0-Pnz"/>
+                <constraint firstItem="6QX-Wi-OkK" firstAttribute="leading" secondItem="c22-O7-iKe" secondAttribute="leading" id="UV9-Te-xCe"/>
+                <constraint firstAttribute="bottom" secondItem="6QX-Wi-OkK" secondAttribute="bottom" id="cb5-eV-fuQ"/>
+                <constraint firstAttribute="trailing" secondItem="Rff-CF-Z8F" secondAttribute="trailing" id="hmH-k6-HfR"/>
+                <constraint firstItem="Rff-CF-Z8F" firstAttribute="top" secondItem="c22-O7-iKe" secondAttribute="top" id="sb4-1Y-GhX"/>
+                <constraint firstAttribute="trailing" secondItem="6QX-Wi-OkK" secondAttribute="trailing" id="uug-o1-wdA"/>
+            </constraints>
+            <point key="canvasLocation" x="28.5" y="150.5"/>
+        </customView>
+        <collectionViewItem id="sno-mh-ahF">
+            <connections>
+                <outlet property="imageView" destination="Rff-CF-Z8F" id="yKi-R9-6eb"/>
+                <outlet property="textField" destination="6QX-Wi-OkK" id="gpg-3z-Rib"/>
+                <outlet property="view" destination="c22-O7-iKe" id="pL7-tA-vPk"/>
+            </connections>
+        </collectionViewItem>
+    </objects>
+</document>

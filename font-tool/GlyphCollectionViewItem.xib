@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="12118" systemVersion="16C67" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+    <dependencies>
+        <deployment identifier="macosx"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="12118"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <customObject id="-2" userLabel="File's Owner" customClass="GlyphCollectionViewItem">
+            <connections>
+                <outlet property="glyphImageView" destination="c8i-Kd-Yy1" id="TB8-py-IrS"/>
+                <outlet property="glyphNameLabel" destination="K23-eQ-4lH" id="KHO-m9-AZy"/>
+                <outlet property="imageView" destination="c8i-Kd-Yy1" id="uCV-Hd-rvm"/>
+                <outlet property="textField" destination="K23-eQ-4lH" id="FID-Bh-Epw"/>
+                <outlet property="view" destination="Hz6-mo-xeY" id="0bl-1N-x8E"/>
+            </connections>
+        </customObject>
+        <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
+        <customObject id="-3" userLabel="Application" customClass="NSObject"/>
+        <customView id="Hz6-mo-xeY">
+            <rect key="frame" x="0.0" y="0.0" width="191" height="148"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+            <subviews>
+                <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="c8i-Kd-Yy1" customClass="GlyphImageView">
+                    <rect key="frame" x="0.0" y="0.0" width="191" height="148"/>
+                    <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" id="gU1-Tl-76u"/>
+                    <connections>
+                        <outlet property="delegate" destination="-2" id="WsG-Bd-3PJ"/>
+                    </connections>
+                </imageView>
+                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" translatesAutoresizingMaskIntoConstraints="NO" id="K23-eQ-4lH">
+                    <rect key="frame" x="-2" y="0.0" width="195" height="17"/>
+                    <textFieldCell key="cell" lineBreakMode="charWrapping" sendsActionOnEndEditing="YES" alignment="center" title="Label" id="FR0-Od-eKL">
+                        <font key="font" metaFont="system"/>
+                        <color key="textColor" name="keyboardFocusIndicatorColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                </textField>
+            </subviews>
+            <constraints>
+                <constraint firstItem="K23-eQ-4lH" firstAttribute="leading" secondItem="Hz6-mo-xeY" secondAttribute="leading" id="3EH-IH-PvF"/>
+                <constraint firstAttribute="trailing" secondItem="c8i-Kd-Yy1" secondAttribute="trailing" id="a4u-o3-G5P"/>
+                <constraint firstAttribute="trailing" secondItem="K23-eQ-4lH" secondAttribute="trailing" id="bBY-eg-Vie"/>
+                <constraint firstItem="c8i-Kd-Yy1" firstAttribute="top" secondItem="Hz6-mo-xeY" secondAttribute="top" id="bJy-nv-k6n"/>
+                <constraint firstAttribute="bottom" secondItem="K23-eQ-4lH" secondAttribute="bottom" id="bpM-dK-3km"/>
+                <constraint firstAttribute="bottom" secondItem="c8i-Kd-Yy1" secondAttribute="bottom" id="w7b-7a-dKC"/>
+                <constraint firstItem="c8i-Kd-Yy1" firstAttribute="leading" secondItem="Hz6-mo-xeY" secondAttribute="leading" id="zQY-Eg-tmk"/>
+            </constraints>
+            <point key="canvasLocation" x="-257.5" y="10"/>
+        </customView>
+    </objects>
+</document>

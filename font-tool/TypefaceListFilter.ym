@@ -1,0 +1,41 @@
+%{
+#include <stdio.h>
+#include <string.h>
+#include <math.h>
+int yylex(void);
+void yyerror(char *s);
+%}
+
+%union {
+    float     value;
+    char     *identifier;
+}
+
+%token <value> INTEGER
+%token <value> FLOAT
+
+%token <identifier> IDENTIFIER
+
+%type <value> expr
+%type <value> number
+
+%destructor { free($$); } IDENTIFIER
+
+%left '+' '-'
+%left '*' '/'
+
+%%
+
+calc : expr { printf("%f", $1); }
+
+expr : number { $$ = $1; }
+| expr '*' expr { $$ = $1 * $3; }
+| expr '/' expr { $$ = $1 / $3; }
+| expr '+' expr { $$ = $1 + $3; }
+| expr '-' expr { $$ = $1 - $3; }
+
+number : INTEGER { $$ = $1; }
+| FLOAT { $$ = $1; }
+| IDENTIFIER { if (!strcmp($1, "pi")) $$ = M_PI; else $$ = 0.0; }
+
+%%

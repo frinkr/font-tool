@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<array>
+	<string>List of Typographic Features</string>
+	<string>https://en.wikipedia.org/wiki/List_of_typographic_features</string>
+	<string>OpenType Specification</string>
+	<string>https://www.microsoft.com/typography/otspec160/default.htm</string>
+	<string>OpenType Script Tags</string>
+	<string>https://www.microsoft.com/typography/otspec/scripttags.htm</string>
+	<string>Search Unicode Codepoint</string>
+	<string>https://codepoints.net/</string>
+	<string>汉字字符集编码查询</string>
+	<string>http://www.qqxiuzi.cn/bianma/zifuji.php</string>
+</array>
+</plist>

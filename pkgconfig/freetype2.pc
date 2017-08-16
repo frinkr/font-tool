@@ -1,0 +1,13 @@
+prefix=/Data/typesetting/font-tool/freetype-2.8
+exec_prefix=/Data/typesetting/font-tool/freetype-2.8
+libdir=/Data/typesetting/font-tool/freetype-2.8/lib
+includedir=/Data/typesetting/font-tool/freetype-2.8/include
+
+Name: FreeType 2
+URL: http://freetype.org
+Description: A free, high-quality, and portable font engine.
+Version: 20.0.14
+Requires:
+Requires.private: 
+Libs: -lfreetype
+Cflags: -I${includedir}/freetype
