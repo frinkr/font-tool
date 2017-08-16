@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.2)
 project(tx-master)
 
-option(BUILD_FREETYPE_HARFBUZZ "Enable building of Freetype and harfbuzz" ON)
+option(BUILD_FREETYPE_HARFBUZZ "Enable building of Freetype and harfbuzz" OFF)
 
 if (BUILD_FREETYPE_HARFBUZZ) 
   set(FONT_TOOL_BUILD_FREETYPE ON)
