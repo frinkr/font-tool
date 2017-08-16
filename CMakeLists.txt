@@ -1,17 +1,31 @@
-cmake_minimum_required(VERSION 3.2.2)
-project(tx-research)
+cmake_minimum_required(VERSION 3.2)
+project(tx-master)
 
-set(ENV{PKG_CONFIG_PATH} "$ENV{PKG_CONFIG_PATH}:${CMAKE_SOURCE_DIR}/pkgconfig")
+option(BUILD_FREETYPE_HARFBUZZ "Enable building of Freetype and harfbuzz" ON)
 
-set(HB_HAVE_FREETYPE ON CACHE BOOL "Enable building of Freetype")
-set(HB_HAVE_ICU ON CACHE BOOL "Enable building of ICU")
+if (BUILD_FREETYPE_HARFBUZZ) 
+  set(FONT_TOOL_BUILD_FREETYPE ON)
+  set(FONT_TOOL_BUILD_HARFBUZZ ON)
+else()
+  set(FONT_TOOL_BUILD_FREETYPE OFF)
+  set(FONT_TOOL_BUILD_HARFBUZZ OFF)
+endif()
 
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-#add_subdirectory(font-demo)
-add_subdirectory(freetype)
-#add_subdirectory(SDL2)
-add_subdirectory(harfbuzz)
-#add_subdirectory(fontconfig-2.12.3)
+# freetype
+if(FONT_TOOL_BUILD_FREETYPE)
+  add_subdirectory(freetype)
+endif()
+
+# harfbuzz
+if(FONT_TOOL_BUILD_HARFBUZZ)
+  set(ENV{PKG_CONFIG_PATH} "$ENV{PKG_CONFIG_PATH}:${CMAKE_SOURCE_DIR}/pkgconfig")
+  set(HB_HAVE_FREETYPE ON CACHE BOOL "Enable building of Freetype")
+  set(HB_HAVE_ICU ON CACHE BOOL "Enable building of ICU")
+  add_subdirectory(harfbuzz)
+endif()
+
+# font-tool
 add_subdirectory(font-tool)

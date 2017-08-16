@@ -1,24 +1,70 @@
-cmake_minimum_required(VERSION 2.6)
+cmake_minimum_required(VERSION 3.2)
 set(APP_NAME font-tool)
 project(font-tool)
 
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-nullability-completeness")
 
-set(HARFBUZZ_BUILD_ICU ON CACHE BOOL "Enable building of ICU")
-set(HARFBUZZ_BUILD_UCDN OFF CACHE BOOL "Enable building of UCDN")
+option(FONT_TOOL_BUILD_HARFBUZZ "Enable building of harfbuzz" ON)
+option(FONT_TOOL_BUILD_FREETYPE "Enable building of freetype" ON)
+
+set(FONT_TOOL_BUILD_ICU OFF)
 
 
-include_directories(${CMAKE_SOURCE_DIR}/freetype/include)
-include_directories(${CMAKE_SOURCE_DIR}/harfbuzz/src)
-include_directories(${PROJECT_BINARY_DIR}/../harfbuzz/src)
-include_directories(${CMAKE_SOURCE_DIR})
+# Freeetype
+if(FONT_TOOL_BUILD_FREETYPE)
+  include_directories(${CMAKE_SOURCE_DIR}/freetype/include)
+  list(APPEND THIRD_PARTY_LIBS freetype)
+else()
+  find_package(PkgConfig)
+  pkg_check_modules(PC_FREETYPE2 QUIET freetype2)
+
+  find_path(FREETYPE2_HEADER_DIR NAMES freetype.h HINTS ${PC_FREETYPE2_INCLUDE_DIRS} ${PC_FREETYPE2_INCLUDEDIR} $ENV{FREETYPE_DIR}/include PATH_SUFFIXES freetype)
+  find_path(FREETYPE2_ROOT_INCLUDE_DIR NAMES freetype/freetype.h HINTS ${PC_FREETYPE2_INCLUDE_DIRS} ${PC_FREETYPE2_INCLUDEDIR} $ENV{FREETYPE_DIR}/include)
+  if (CMAKE_BUILD_TYPE MATCHES Debug)
+    set(FREETYPE2_LIBRARY_NAME freetyped)
+  else ()
+    set(FREETYPE2_LIBRARY_NAME freetype)
+  endif ()
+  find_library(FREETYPE2_LIBRARIES ${FREETYPE2_LIBRARY_NAME} HINTS ${PC_FREETYPE2_LIBDIR} ${PC_FREETYPE2_LIBRARY_DIRS} $ENV{FREETYPE_DIR}/lib)
+
+  include_directories(AFTER ${FREETYPE2_HEADER_DIR} ${FREETYPE2_ROOT_INCLUDE_DIR})
+
+  list(APPEND THIRD_PARTY_LIBS ${FREETYPE2_LIBRARIES})
+endif()
+
+
+# Harfbuzz
+if(FONT_TOOL_BUILD_HARFBUZZ)
+  include_directories(${CMAKE_SOURCE_DIR}/harfbuzz/src)
+  include_directories(${PROJECT_BINARY_DIR}/../harfbuzz/src)
+  list(APPEND THIRD_PARTY_LIBS harfbuzz)
+else()
+  find_package(PkgConfig)  
+  pkg_check_modules(PC_HARFBUZZ QUIET harfbuzz)
+
+  find_path(HARFBUZZ_INCLUDE_DIR NAMES hb.h HINTS ${PC_HARFBUZZ_INCLUDE_DIRS} ${PC_HARFBUZZ_INCLUDEDIR})
+  find_library(HARFBUZZ_LIBRARY NAMES harfbuzz HINTS ${PC_HARFBUZZ_LIBRARY_DIRS} ${PC_HARFBUZZ_LIBDIR})
+
+  include_directories(${HARFBUZZ_INCLUDE_DIR})
+  list(APPEND THIRD_PARTY_LIBS ${HARFBUZZ_LIBRARY}) 
+endif()
+
 
 # icu
-find_package(PkgConfig)
-pkg_check_modules(PC_ICU QUIET icu-uc)
-find_path(ICU_INCLUDE_DIR NAMES unicode/utypes.h HINTS ${PC_ICU_INCLUDE_DIRS} ${PC_ICU_INCLUDEDIR})
-find_library(ICU_LIBRARY NAMES libicuuc cygicuuc cygicuuc32 icuuc HINTS ${PC_ICU_LIBRARY_DIRS} ${PC_ICU_LIBDIR})
-include_directories(${ICU_INCLUDE_DIR})
+if(FONT_TOOL_BUILD_ICU) 
+else()
+  find_package(PkgConfig)
+  pkg_check_modules(PC_ICU QUIET icu-uc)
+
+  find_path(ICU_INCLUDE_DIR NAMES unicode/utypes.h HINTS ${PC_ICU_INCLUDE_DIRS} ${PC_ICU_INCLUDEDIR})
+  find_library(ICU_LIBRARY NAMES libicuuc cygicuuc cygicuuc32 icuuc HINTS ${PC_ICU_LIBRARY_DIRS} ${PC_ICU_LIBDIR})
+
+  include_directories(${ICU_INCLUDE_DIR})
+  list(APPEND THIRD_PARTY_LIBS ${ICU_LIBRARY})
+endif()
+
 
 
 file(GLOB HEADER_FILES "*.h")
@@ -83,9 +129,7 @@ add_executable(
 )
 
 target_link_libraries(${APP_NAME}
-  freetype
-  harfbuzz
-  ${ICU_LIBRARY}
+  ${THIRD_PARTY_LIBS}
   )
 
 set_target_properties(
