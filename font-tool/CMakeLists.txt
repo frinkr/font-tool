@@ -37,6 +37,7 @@ endif()
 
 # Harfbuzz
 if(FONT_TOOL_BUILD_HARFBUZZ)
+  add_definitions(-DHAVE_HB_SOURCE=1)
   include_directories(${CMAKE_SOURCE_DIR}/harfbuzz/src)
   include_directories(${PROJECT_BINARY_DIR}/../harfbuzz/src)
   list(APPEND THIRD_PARTY_LIBS harfbuzz)
