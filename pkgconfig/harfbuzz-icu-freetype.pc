@@ -1,0 +1,16 @@
+prefix=/Data/typesetting/font-tool/harfbuzz-icu-freetype
+ft_prefix=${prefix}/freetype
+hb_prefix=${prefix}/harfbuzz
+icu_prefix=${prefix}/icu
+exec_prefix=${prefix}
+libdir=${prefix}/freetype/lib
+includedir=${ft_prefix}/include ${hb_prefix}/src ${prefix}/harfbuzz-generated
+
+Name: Harfbuzz-ICU-FreeType
+URL: http://freetype.org
+Description: A free, high-quality, and portable font engine.
+Version: 20.0.14
+Requires:
+Requires.private: 
+Libs: -lfreetype -lharfbuzz
+Cflags: -I${ft_prefix}/include -I${hb_prefix}/src -I${prefix}/harfbuzz-generated

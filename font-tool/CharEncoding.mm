@@ -8,8 +8,7 @@
 
 
 #import "CharEncoding.h"
-#include <unicode/utypes.h>
-#include <unicode/normalizer2.h>
+
 
 /**
  * U+BEEF, Uniocde flavor
@@ -215,15 +214,8 @@ NSString * UNDEFINED_UNICODE_CODEPOINT = @"<undefined>";
 }
 
 +(NSArray<NSNumber*>*)canonicalDecomposition:(NSUInteger)unicode {
-    UErrorCode error = U_ZERO_ERROR;
-    const icu::Normalizer2 * nfd = icu::Normalizer2::getNFDInstance(error);
-    icu::UnicodeString d = nfd->normalize(icu::UnicodeString(UChar32(unicode)), error);
-    
     NSMutableArray<NSNumber*> * decomposition = [[NSMutableArray<NSNumber*> alloc] init];
-    for (int32_t i = 0; i < d.countChar32(0); ++ i) {
-        UChar32 cp = d.char32At(i);
-        [decomposition addObject:[NSNumber numberWithUnsignedInteger:cp]];
-    }
+    
     return decomposition;
 }
 @end

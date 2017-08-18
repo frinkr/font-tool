@@ -4,3 +4,6 @@
 [submodule "harfbuzz"]
 	path = harfbuzz
 	url = https://github.com/behdad/harfbuzz.git
+[submodule "harfbuzz-icu-freetype"]
+	path = harfbuzz-icu-freetype
+	url = https://github.com/frinkr/harfbuzz-icu-freetype.git
