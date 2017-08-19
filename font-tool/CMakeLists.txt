@@ -4,13 +4,15 @@ project(font-tool)
 
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-nullability-completeness")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-nullability-completeness")
+
+add_compile_options("-Wno-nullability-completeness")
 
 option(BUILD_FREETYPE_HARFBUZZ "Enable building of Freetype and harfbuzz" ON)
 
 if(BUILD_FREETYPE_HARFBUZZ)
-  add_definitions(-DHAVE_HARFBUZZ_SOURCE=1 -DHAVE_OT -DHAVE_UCDN -DHB_NO_MT)
+  
+  add_definitions(-DHAVE_HARFBUZZ_SOURCE=1)
+  
   find_package(PkgConfig)
   pkg_check_modules(PC_HBFT REQUIRED harfbuzz-icu-freetype)
   include_directories(AFTER ${PC_HBFT_INCLUDE_DIRS})
@@ -78,6 +80,8 @@ set(SOURCE_FILES
   )
 
 if(BUILD_FREETYPE_HARFBUZZ)
+  # same compiler defines for HarfbuzzEx.cpp to avoid crashing
+  set_property(SOURCE HarfbuzzEx.cpp APPEND_STRING PROPERTY COMPILE_FLAGS "-DHAVE_OT -DHAVE_UCDN -DHB_NO_MT")
   list(APPEND SOURCE_FILES HarfbuzzEx.cpp)
 endif()
 
