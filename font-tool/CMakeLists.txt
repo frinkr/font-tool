@@ -4,12 +4,13 @@ project(font-tool)
 
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-nullability-completeness")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-nullability-completeness")
 
 option(BUILD_FREETYPE_HARFBUZZ "Enable building of Freetype and harfbuzz" ON)
 
 if(BUILD_FREETYPE_HARFBUZZ)
-  add_definitions(-DHAVE_HARFBUZZ_SOURCE=1 -DHAVE_OT=1)
+  add_definitions(-DHAVE_HARFBUZZ_SOURCE=1 -DHAVE_OT -DHAVE_UCDN -DHB_NO_MT)
   find_package(PkgConfig)
   pkg_check_modules(PC_HBFT REQUIRED harfbuzz-icu-freetype)
   include_directories(AFTER ${PC_HBFT_INCLUDE_DIRS})
