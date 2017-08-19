@@ -9,7 +9,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-nullability-completeness")
 option(BUILD_FREETYPE_HARFBUZZ "Enable building of Freetype and harfbuzz" ON)
 
 if(BUILD_FREETYPE_HARFBUZZ)
-  
+  add_definitions(-DHAVE_HARFBUZZ_SOURCE=1 -DHAVE_OT=1)
   find_package(PkgConfig)
   pkg_check_modules(PC_HBFT REQUIRED harfbuzz-icu-freetype)
   include_directories(AFTER ${PC_HBFT_INCLUDE_DIRS})
@@ -75,6 +75,10 @@ set(SOURCE_FILES
   TypefaceListWindowController.m
   ToolBox.m
   )
+
+if(BUILD_FREETYPE_HARFBUZZ)
+  list(APPEND SOURCE_FILES HarfbuzzEx.cpp)
+endif()
 
 set(LEXYACC_FILES
   TypefaceListFilter.lm

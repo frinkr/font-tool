@@ -22,6 +22,7 @@
 #import "TypefaceNames.h"
 #import "TypefaceInfoViewController.h"
 #import "Shapper.h"
+#include "HarfbuzzEx.h"
 
 #define TF_TABLE_BASIC   'basc'
 #define TF_TABLE_FACE    'face'
@@ -43,6 +44,7 @@
 #define SWAP_ENDIAN_32(u) ((((u) & 0xFF) << 24) + (((u) & 0xFF00) << 8) + (((u) & 0xFF0000) >> 8) + (((u) & 0xFF000000) >> 24))
 
 
+
 NSSet<NSNumber*> * HBSet2NSSet(hb_set_t *set) {
     NSMutableSet<NSNumber*>* newSet = [[NSMutableSet<NSNumber*> alloc] init];
     hb_codepoint_t c = HB_SET_VALUE_INVALID;
@@ -51,7 +53,6 @@ NSSet<NSNumber*> * HBSet2NSSet(hb_set_t *set) {
     }
     return newSet;
 }
-
 
 
 @interface TypefaceInfoWindowController()
@@ -758,7 +759,7 @@ NSSet<NSNumber*> * HBSet2NSSet(hb_set_t *set) {
     }
     free(hbTags);
     
-#if 0
+#if HAVE_HARFBUZZ_SOURCE
     // lookups
     unsigned int lookupCount = hb_ot_layout_table_get_lookup_count(hbFace, table);
     for (unsigned int lookupIndex = 0; lookupIndex < lookupCount; ++ lookupIndex) {
@@ -822,7 +823,6 @@ NSSet<NSNumber*> * HBSet2NSSet(hb_set_t *set) {
             hb_set_destroy(glyphs_output);
         }
     }
-
 #endif
     return items;
 }
