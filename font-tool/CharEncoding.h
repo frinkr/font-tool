@@ -11,6 +11,7 @@
 
 #define INVALID_CODE_POINT (0x110000)
 
+extern NSString * UNI_CODEPOINT_REGEX;
 extern NSString * UNI_CODEPOINT_LOOKUP_REGEX;
 extern NSString * GLYPH_INDEX_LOOKUP_REGEX;
 extern NSString * UNDEFINED_UNICODE_CODEPOINT;
@@ -38,11 +39,10 @@ extern NSString * UNDEFINED_UNICODE_CODEPOINT;
 
 
 +(NSString*)infoLinkOfUnicode:(NSUInteger)unicode;
++(NSString*)infoLinkOfUnicodeHex:(NSString*)unicodeHex;
 
 // input mix of U+ notation and chars, ABCU+AFFEF.
 +(NSString*)decodeUnicodeMixed:(NSString*)string;
-
-+(NSArray<NSNumber*>*)canonicalDecomposition:(NSUInteger)unicode;
 @end
 
 
@@ -74,10 +74,14 @@ typedef UnicodeBlock UnicodePropListBlock;
 @end
 
 
-@interface UnicodeCharAttributes : NSObject
+@interface UnicodeCharCoreAttributes : NSObject
 @property uint32_t codepoint;
 @property (strong) NSString * name;
 @property (strong) UnicodeGeneralCategory * generalCategory;
+@property (strong) NSString * decomposition;
+@property NSUInteger simpleUppercase;
+@property NSUInteger simpleLowercase;
+@property NSUInteger simpleTitlecase;
 @end
 
 
@@ -89,7 +93,7 @@ typedef UnicodeBlock UnicodePropListBlock;
 @property (readonly, strong) NSArray<UnicodeDerivedAgeBlock*> * derivedAgeBlocks;
 @property (readonly, strong) NSArray<UnicodePropListBlock*> * propListBlocks;
 
-@property (readonly, strong) NSDictionary<NSNumber*, UnicodeCharAttributes*>* charAttributesDictionary;
+@property (readonly, strong) NSDictionary<NSNumber*, UnicodeCharCoreAttributes*>* coreAttributesDictionary;
 
 - (instancetype)initWithRootDirectory:(NSString*)rootDirectory;
 + (instancetype)standardDatabase;
@@ -97,7 +101,7 @@ typedef UnicodeBlock UnicodePropListBlock;
 - (UnicodeBlock*)unicodeBlockWithName:(NSString*)blockName;
 
 
-- (UnicodeCharAttributes*)attributesOfChar:(uint32_t)unicode;
+- (UnicodeCharCoreAttributes*)coreAttributesOfChar:(uint32_t)unicode;
 - (UnicodeBlock*)blockOfChar:(uint32_t)unicode;
 - (NSString*)scriptOfChar:(uint32_t)unicode;
 - (NSString*)derivedAgeOfChar:(uint32_t)unicode;

@@ -9,6 +9,7 @@
 
 #import "CharEncoding.h"
 
+NSString * UNI_CODEPOINT_REGEX = @"[0-9a-fA-F]{4,6}";
 
 /**
  * U+BEEF, Uniocde flavor
@@ -176,6 +177,10 @@ NSString * UNDEFINED_UNICODE_CODEPOINT = @"<undefined>";
     return [NSString stringWithFormat:@"https://codepoints.net/U+%lX", unicode];
 }
 
++(NSString*)infoLinkOfUnicodeHex:(NSString*)unicodeHex {
+    return [NSString stringWithFormat:@"https://codepoints.net/U+%@", unicodeHex];
+}
+
 
 + (NSString*)decodeUnicodeMixed:(NSString*)string {
     NSError * error = nil;
@@ -213,13 +218,7 @@ NSString * UNDEFINED_UNICODE_CODEPOINT = @"<undefined>";
     return [subs componentsJoinedByString:@""];
 }
 
-+(NSArray<NSNumber*>*)canonicalDecomposition:(NSUInteger)unicode {
-    NSMutableArray<NSNumber*> * decomposition = [[NSMutableArray<NSNumber*> alloc] init];
-    
-    return decomposition;
-}
 @end
-
 
 static NSMutableArray<UnicodeBlock*> * blocks;
 
@@ -319,7 +318,7 @@ static NSMutableDictionary<NSString*, UnicodeGeneralCategory *> * generalCategor
 
 @end
 
-@implementation UnicodeCharAttributes
+@implementation UnicodeCharCoreAttributes
 
 @end
 
@@ -328,7 +327,6 @@ static NSMutableDictionary<NSString*, UnicodeGeneralCategory *> * generalCategor
 static UnicodeDatabase *standardUnicodDatabase = nil;
 
 @interface UnicodeDatabase ()
-
 @property NSMutableDictionary<NSString*, NSNumber*> * nameCodeMapping;
 
 @end
@@ -337,7 +335,7 @@ static UnicodeDatabase *standardUnicodDatabase = nil;
 @synthesize unicodeBlocks = _unicodeBlocks;
 @synthesize scriptBlocks = _scriptBlocks;
 @synthesize derivedAgeBlocks = _derivedAgeBlocks;
-@synthesize charAttributesDictionary = _charAttributesDictionary;
+@synthesize coreAttributesDictionary = _coreAttributesDictionary;
 @synthesize propListBlocks = _propListBlocks;
 
 - (instancetype)initWithRootDirectory:(NSString *)rootDirectory {
@@ -386,9 +384,9 @@ static UnicodeDatabase *standardUnicodDatabase = nil;
     return _propListBlocks;
 }
 
-- (NSDictionary<NSNumber*, UnicodeCharAttributes*>* ) charAttributesDictionary {
-    if (!_charAttributesDictionary) {
-        NSMutableDictionary<NSNumber*, UnicodeCharAttributes*>* dict = [[NSMutableDictionary<NSNumber*, UnicodeCharAttributes*> alloc] init];
+- (NSDictionary<NSNumber*, UnicodeCharCoreAttributes*>* ) coreAttributesDictionary {
+    if (!_coreAttributesDictionary) {
+        NSMutableDictionary<NSNumber*, UnicodeCharCoreAttributes*>* dict = [[NSMutableDictionary<NSNumber*, UnicodeCharCoreAttributes*> alloc] init];
         _nameCodeMapping = [[NSMutableDictionary<NSString*, NSNumber*> alloc] init];
         
         NSString * unicodeDataTxt = [NSString pathWithComponents:@[self.rootDirectory, @"UnicodeData.txt"]];
@@ -414,10 +412,15 @@ static UnicodeDatabase *standardUnicodDatabase = nil;
             NSString * lowercaseMappingStr = [components objectAtIndex:13];
             NSString * titleCaseMappingStr = [components objectAtIndex:14];
             
-            UnicodeCharAttributes * charAttrs = [[UnicodeCharAttributes alloc] init];
+            UnicodeCharCoreAttributes * charAttrs = [[UnicodeCharCoreAttributes alloc] init];
             charAttrs.codepoint = [self scanUnicodeStr:codeStr];
             charAttrs.name = nameStr;
             charAttrs.generalCategory = [UnicodeGeneralCategory categoryByAbbreviation:categoryStr];
+            charAttrs.decomposition = decompositionMappingStr;
+            charAttrs.simpleUppercase = [self scanUnicodeStr:upperCaseMappingStr];
+            charAttrs.simpleLowercase = [self scanUnicodeStr:lowercaseMappingStr];
+            charAttrs.simpleTitlecase = [self scanUnicodeStr:titleCaseMappingStr];
+            
             
             [dict setObject:charAttrs forKey:[NSNumber numberWithInteger:charAttrs.codepoint]];
             [_nameCodeMapping setObject:[NSNumber numberWithInteger:charAttrs.codepoint] forKey:charAttrs.name];
@@ -426,9 +429,9 @@ static UnicodeDatabase *standardUnicodDatabase = nil;
         }];
         
 
-        _charAttributesDictionary = dict;
+        _coreAttributesDictionary = dict;
     }
-    return _charAttributesDictionary;
+    return _coreAttributesDictionary;
 }
 
 -(UnicodeBlock*)unicodeBlockWithName:(NSString*)blockName {
@@ -440,8 +443,8 @@ static UnicodeDatabase *standardUnicodDatabase = nil;
     return nil;
 }
 
-- (UnicodeCharAttributes*)attributesOfChar:(uint32_t)unicode {
-    return [self.charAttributesDictionary objectForKey:[NSNumber numberWithInteger:unicode]];
+- (UnicodeCharCoreAttributes*)coreAttributesOfChar:(uint32_t)unicode {
+    return [self.coreAttributesDictionary objectForKey:[NSNumber numberWithInteger:unicode]];
 }
 
 - (UnicodeBlock*)blockOfChar:(uint32_t)unicode {
@@ -573,14 +576,14 @@ static UnicodeDatabase *standardUnicodDatabase = nil;
     NSScanner * scanner = [NSScanner scannerWithString:str];
     unsigned long long value = -1;
     if (![scanner scanHexLongLong:&value])
-        return -1;
+        return INVALID_CODE_POINT;
     return value;
 }
 
 
 - (BOOL)scanUnicodeStr:(NSString *)str code:(uint32_t*)code{
     NSScanner * scanner = [NSScanner scannerWithString:str];
-    unsigned long long value = -1;
+    unsigned long long value = INVALID_CODE_POINT;
     if (![scanner scanHexLongLong:&value])
         return NO;
     *code = value;

@@ -77,32 +77,18 @@
         [items addRowWithKey:@"Glyph Name" stringValue:self.glyph.name];
         [items addRowWithKey:@"Glyph Index" unsignedIntegerValue:self.glyph.GID];
         
+        NSString * hex = [CharEncoding hexForCharcode:self.glyph.charcode unicodeFlavor:isUnicode];
+        
+        [items addRowWithKey:@"Unicode" stringValue:hex? [NSString stringWithFormat:@"<a href=%@>%@</a>", [CharEncoding infoLinkOfUnicode:self.glyph.charcode], hex]: nil];
+        [items addRowWithKey:@"UTF8" stringValue:[CharEncoding utf8HexStringForUnicode:self.glyph.charcode]];
+        [items addRowWithKey:@"UTF16" stringValue:[CharEncoding utf16HexStringForUnicode:self.glyph.charcode]];
+        
         NSMutableArray<NSNumber*> * altCharcodes = [[NSMutableArray<NSNumber*> alloc] init];
         for (NSNumber * num in self.glyph.charcodes) {
             if (num.unsignedIntegerValue != self.glyph.charcode) {
                 [altCharcodes addObject:num];
             }
         }
-        
-        NSString * hex = [CharEncoding hexForCharcode:self.glyph.charcode unicodeFlavor:isUnicode];
-
-        [items addRowWithKey:@"Unicode" stringValue:hex? [NSString stringWithFormat:@"<a href=%@>%@</a>", [CharEncoding infoLinkOfUnicode:self.glyph.charcode], hex]: nil];
-        [items addRowWithKey:@"UTF8" stringValue:[CharEncoding utf8HexStringForUnicode:self.glyph.charcode]];
-        [items addRowWithKey:@"UTF16" stringValue:[CharEncoding utf16HexStringForUnicode:self.glyph.charcode]];
-        
-        
-        NSArray<NSNumber*> * nfd = [CharEncoding canonicalDecomposition:self.glyph.charcode];
-        if (nfd.count) {
-            NSMutableString * nfdStr = [[NSMutableString alloc] init];
-            for (NSUInteger i = 0; i < nfd.count; ++ i) {
-                if (i) [nfdStr appendString:@", "];
-                [nfdStr appendString:[CharEncoding hexForCharcode:[[nfd objectAtIndex:i] unsignedIntegerValue]
-                                                    unicodeFlavor: isUnicode]];
-            }
-        
-            [items addRowWithKey:@"NFD" stringValue:nfdStr];
-        }
-        
         if (altCharcodes.count) {
             NSMutableArray<NSString*> * altStrings = [[NSMutableArray<NSString*> alloc] init];
             for (NSNumber * num in altCharcodes) {
@@ -116,11 +102,50 @@
             [items addRowWithKey:@"Alternate" stringValue:[altStrings componentsJoinedByString:@"<br>"]];
         }
         
-        [items addRowWithKey:@"Unicode Name" stringValue:[[UnicodeDatabase standardDatabase] attributesOfChar:self.glyph.charcode].name];
+        UnicodeCharCoreAttributes * coreAttrs = [[UnicodeDatabase standardDatabase] coreAttributesOfChar:self.glyph.charcode];
+
+        [items addRowWithKey:@"Unicode Name" stringValue:coreAttrs.name];
+        
+        if (true) {
+            NSError * error = nil;
+        
+            NSRegularExpression * regex = [NSRegularExpression regularExpressionWithPattern:UNI_CODEPOINT_REGEX
+                                                                                    options:NSRegularExpressionCaseInsensitive
+                                                                                      error:&error];
+        
+            NSMutableArray<NSValue*> * matchRanges = [[NSMutableArray<NSValue*> alloc] init];
+            [regex enumerateMatchesInString:coreAttrs.decomposition
+                                    options:0
+                                      range:NSMakeRange(0, coreAttrs.decomposition.length)
+                                 usingBlock:^(NSTextCheckingResult * _Nullable result, NSMatchingFlags flags, BOOL * _Nonnull stop) {
+                                     [matchRanges addObject:[NSValue valueWithRange:result.range]];
+                                 }];
+            
+            NSMutableArray<NSString*> * subs = [[NSMutableArray<NSString*> alloc] init];
+            
+            NSUInteger start = 0;
+            for (NSValue * r in matchRanges) {
+                NSRange range = r.rangeValue;
+                if (start < range.location) {
+                    NSRange free = NSMakeRange(start, range.location - start);
+                    [subs addObject:[coreAttrs.decomposition substringWithRange:free]];
+                }
+                start = range.location + range.length;
+                [subs addObject:[CharEncoding infoLinkOfUnicodeHex:[coreAttrs.decomposition substringWithRange:range]]];
+            }
+            
+            if (start < coreAttrs.decomposition.length) {
+                [subs addObject:[coreAttrs.decomposition substringWithRange:NSMakeRange(start, coreAttrs.decomposition.length - start)]];
+            }
+            
+            
+            [items addRowWithKey:@"Decomposition" stringValue:[subs componentsJoinedByString:@""]];
+        }
+        
         [items addRowWithKey:@"Block" stringValue:[[UnicodeDatabase standardDatabase] blockOfChar:self.glyph.charcode].name];
         [items addRowWithKey:@"Script" stringValue:[[UnicodeDatabase standardDatabase] scriptOfChar:self.glyph.charcode]];
         [items addRowWithKey:@"Derived Age" stringValue:[[UnicodeDatabase standardDatabase] derivedAgeOfChar:self.glyph.charcode]];
-        [items addRowWithKey:@"General Category" stringValue:[[UnicodeDatabase standardDatabase] attributesOfChar:self.glyph.charcode].generalCategory.fullDescription];
+        [items addRowWithKey:@"General Category" stringValue:coreAttrs.generalCategory.fullDescription];
 
     }
     else {
