@@ -230,6 +230,13 @@ NSString * RegexReplace(NSString * string,
     return [NSString stringWithFormat:@"https://codepoints.net/U+%@", unicodeHex];
 }
 
++(NSString*)gotoLinkOfUnicode:(NSUInteger)unicode {
+    return [NSString stringWithFormat:@"lookup://U+%lX", unicode];
+}
+
++(NSString*)gotoLinkOfUnicodeHex:(NSString*)unicodeHex {
+    return [NSString stringWithFormat:@"lookup://U+%@", unicodeHex];
+}
 
 + (NSString*)decodeUnicodeMixed:(NSString*)string {
     return RegexReplace(string, UNI_CODEPOINT_LOOKUP_REGEX, ^NSString *(NSRange range, BOOL *stop) {

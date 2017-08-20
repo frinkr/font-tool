@@ -51,6 +51,9 @@ NSString * RegexReplace(NSString * string,
 +(NSString*)infoLinkOfUnicode:(NSUInteger)unicode;
 +(NSString*)infoLinkOfUnicodeHex:(NSString*)unicodeHex;
 
++(NSString*)gotoLinkOfUnicode:(NSUInteger)unicode;
++(NSString*)gotoLinkOfUnicodeHex:(NSString*)unicodeHex;
+
 // input mix of U+ notation and chars, ABCU+AFFEF.
 +(NSString*)decodeUnicodeMixed:(NSString*)string;
 @end

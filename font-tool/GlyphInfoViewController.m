@@ -114,7 +114,7 @@
             string = RegexReplace(string, UNI_CODEPOINT_REGEX, ^NSString *(NSRange range, BOOL *stop) {
                 NSString * sub = [string substringWithRange:range];
                 return [NSString stringWithFormat:@"<a href=%@>U+%@</a>",
-                        [CharEncoding infoLinkOfUnicodeHex:sub],
+                        [CharEncoding gotoLinkOfUnicodeHex:sub],
                         sub];
             });
             [items addRowWithKey:@"Decomposition" stringValue:string];
