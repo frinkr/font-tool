@@ -25,6 +25,55 @@ NSString * UNDEFINED_UNICODE_CODEPOINT = @"<undefined>";
 
 #define UNI_CODEPOINT_PREFIXES @[ @"U+", @"u", @"uni", @"\\u", @"0x"]
 
+NSString * RegexReplace(NSString * string,
+                        NSString * regexStr,
+                        NSString * (^handler)(NSRange range, BOOL * stop)) {
+    NSError * error = nil;
+    
+    NSRegularExpression * regex = [NSRegularExpression regularExpressionWithPattern:regexStr
+                                                                            options:NSRegularExpressionCaseInsensitive
+                                                                              error:&error];
+    
+    NSMutableArray<NSValue*> * matchRanges = [[NSMutableArray<NSValue*> alloc] init];
+    [regex enumerateMatchesInString:string
+                            options:0
+                              range:NSMakeRange(0, string.length)
+                         usingBlock:^(NSTextCheckingResult * _Nullable result, NSMatchingFlags flags, BOOL * _Nonnull stop) {
+        [matchRanges addObject:[NSValue valueWithRange:result.range]];
+    }];
+    
+    if (!matchRanges.count)
+        return string;
+    
+    NSMutableString * newString = [[NSMutableString alloc] init];
+        
+    NSUInteger start = 0;
+    for (NSValue * r in matchRanges) {
+        NSRange range = r.rangeValue;
+        if (start < range.location) {
+            // un-matched
+            NSRange free = NSMakeRange(start, range.location - start);
+            [newString appendString:[string substringWithRange:free]];
+        }
+        
+        start = range.location + range.length;
+        BOOL stop = NO;
+        NSString * replace = handler(range, &stop);
+        if (replace)
+            [newString appendString:replace];
+        
+        if (stop)
+            break;
+    }
+    
+    if (start < string.length) {
+        [newString appendString:[string substringWithRange:NSMakeRange(start, string.length - start)]];
+    }
+    
+    return newString;
+}
+
+
 
 @implementation CharEncoding
 
@@ -183,39 +232,10 @@ NSString * UNDEFINED_UNICODE_CODEPOINT = @"<undefined>";
 
 
 + (NSString*)decodeUnicodeMixed:(NSString*)string {
-    NSError * error = nil;
-    
-    NSRegularExpression * regex = [NSRegularExpression regularExpressionWithPattern:UNI_CODEPOINT_LOOKUP_REGEX options:NSRegularExpressionCaseInsensitive error:&error];
-    
-    NSMutableArray<NSValue*> * matchRanges = [[NSMutableArray<NSValue*> alloc] init];
-    [regex enumerateMatchesInString:string options:0 range:NSMakeRange(0, string.length) usingBlock:^(NSTextCheckingResult * _Nullable result, NSMatchingFlags flags, BOOL * _Nonnull stop) {
-        NSLog(@"%@",result);
-        [matchRanges addObject:[NSValue valueWithRange:result.range]];
-    }];
-    
-    if (!matchRanges.count)
-        return string;
-    
-    NSMutableArray<NSString*> * subs = [[NSMutableArray<NSString*> alloc] init];
-    
-    NSUInteger start = 0;
-    for (NSValue * r in matchRanges) {
-        NSRange range = r.rangeValue;
-        if (start < range.location) {
-            NSRange free = NSMakeRange(start, range.location - start);
-            [subs addObject:[string substringWithRange:free]];
-        }
-        start = range.location + range.length;
+    return RegexReplace(string, UNI_CODEPOINT_LOOKUP_REGEX, ^NSString *(NSRange range, BOOL *stop) {
         unichar unichar = [CharEncoding unicodeOfString:[string substringWithRange:range]];
-        [subs addObject:[[NSString alloc] initWithCharacters:&unichar length:1]];
-    }
-    
-    if (start < string.length) {
-        [subs addObject:[string substringWithRange:NSMakeRange(start, string.length - start)]];
-    }
-    
-    
-    return [subs componentsJoinedByString:@""];
+        return [[NSString alloc] initWithCharacters:&unichar length:1];
+    });
 }
 
 @end

@@ -106,40 +106,18 @@
 
         [items addRowWithKey:@"Unicode Name" stringValue:coreAttrs.name];
         
-        if (true) {
-            NSError * error = nil;
-        
-            NSRegularExpression * regex = [NSRegularExpression regularExpressionWithPattern:UNI_CODEPOINT_REGEX
-                                                                                    options:NSRegularExpressionCaseInsensitive
-                                                                                      error:&error];
-        
-            NSMutableArray<NSValue*> * matchRanges = [[NSMutableArray<NSValue*> alloc] init];
-            [regex enumerateMatchesInString:coreAttrs.decomposition
-                                    options:0
-                                      range:NSMakeRange(0, coreAttrs.decomposition.length)
-                                 usingBlock:^(NSTextCheckingResult * _Nullable result, NSMatchingFlags flags, BOOL * _Nonnull stop) {
-                                     [matchRanges addObject:[NSValue valueWithRange:result.range]];
-                                 }];
+        if (true) {        
+            NSString * string = [[coreAttrs.decomposition
+                                  stringByReplacingOccurrencesOfString:@"<" withString:@"&lt;"]
+                                  stringByReplacingOccurrencesOfString:@">" withString:@"&gt;"];
             
-            NSMutableArray<NSString*> * subs = [[NSMutableArray<NSString*> alloc] init];
-            
-            NSUInteger start = 0;
-            for (NSValue * r in matchRanges) {
-                NSRange range = r.rangeValue;
-                if (start < range.location) {
-                    NSRange free = NSMakeRange(start, range.location - start);
-                    [subs addObject:[coreAttrs.decomposition substringWithRange:free]];
-                }
-                start = range.location + range.length;
-                [subs addObject:[CharEncoding infoLinkOfUnicodeHex:[coreAttrs.decomposition substringWithRange:range]]];
-            }
-            
-            if (start < coreAttrs.decomposition.length) {
-                [subs addObject:[coreAttrs.decomposition substringWithRange:NSMakeRange(start, coreAttrs.decomposition.length - start)]];
-            }
-            
-            
-            [items addRowWithKey:@"Decomposition" stringValue:[subs componentsJoinedByString:@""]];
+            string = RegexReplace(string, UNI_CODEPOINT_REGEX, ^NSString *(NSRange range, BOOL *stop) {
+                NSString * sub = [string substringWithRange:range];
+                return [NSString stringWithFormat:@"<a href=%@>U+%@</a>",
+                        [CharEncoding infoLinkOfUnicodeHex:sub],
+                        sub];
+            });
+            [items addRowWithKey:@"Decomposition" stringValue:string];
         }
         
         [items addRowWithKey:@"Block" stringValue:[[UnicodeDatabase standardDatabase] blockOfChar:self.glyph.charcode].name];

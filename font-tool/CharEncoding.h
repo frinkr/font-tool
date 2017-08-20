@@ -16,6 +16,16 @@ extern NSString * UNI_CODEPOINT_LOOKUP_REGEX;
 extern NSString * GLYPH_INDEX_LOOKUP_REGEX;
 extern NSString * UNDEFINED_UNICODE_CODEPOINT;
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+NSString * RegexReplace(NSString * string,
+                        NSString * regexStr,
+                        NSString * (^handler)(NSRange range, BOOL * stop));
+#ifdef __cplusplus
+}
+#endif
+
 @interface CharEncoding : NSObject
 // return nil if charcode outof unicode range
 +(NSString*)hexForCharcode:(NSUInteger)charcode unicodeFlavor:(BOOL)unicode;
