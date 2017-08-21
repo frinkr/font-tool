@@ -25,6 +25,7 @@ typedef NS_ENUM(NSInteger, ShapingViewOption) {
 @property NSMutableArray<TypefaceGlyph *> * glyphs;
 
 @property (nonatomic, getter=getFontSize, setter=setFontSize:) CGFloat fontSize;
+@property (nonatomic) BOOL isVertical;
 @property (nonatomic, getter=setOptions, setter=setOptions:) ShapingViewOption options;
 - (void)reload;
 - (void)windowDidResize;
@@ -35,15 +36,25 @@ typedef NS_ENUM(NSInteger, ShapingViewOption) {
 
 #define FONT_SIZE 120
 
-#define MARGIN_LEFT  20
-#define MARGIN_RIGHT 20
-#define MARGIN_TOP   50
-#define MARGIN_BOTTOM 20
-#define BASELINE_OFFSET_X 80
-#define BASELINE_OFFSET_Y 100
-#define GLYPH_TABLE_HEIGHT BASELINE_OFFSET_Y
-#define GLYPH_TABLE_ROWS 5
-#define GLYPH_TABLE_ROW_HEIGHT (GLYPH_TABLE_HEIGHT/GLYPH_TABLE_ROWS)
+#define HORI_MARGIN_LEFT  20
+#define HORI_MARGIN_RIGHT 20
+#define HORI_MARGIN_TOP   50
+#define HORI_MARGIN_BOTTOM 20
+
+#define HORI_BASELINE_OFFSET_X 80
+#define HORI_BASELINE_OFFSET_Y 100
+#define HORI_GLYPH_TABLE_HEIGHT HORI_BASELINE_OFFSET_Y
+#define HORI_GLYPH_TABLE_ROWS 5.0
+#define HORI_GLYPH_TABLE_ROW_HEIGHT (HORI_GLYPH_TABLE_HEIGHT/HORI_GLYPH_TABLE_ROWS)
+
+#define VERT_GLYPH_TABLE_WIDTH  200
+
+#define VERT_MARGIN_LEFT 10
+#define VERT_MARGIN_TOP 20
+#define VERT_MARGIN_RIGHT 10
+#define VERT_MARGIN_BOTTOM 20
+#define VERT_GLYPH_TABLE_HEIGHT 80
+#define VERT_GLYPH_TABLE_ROW_HEIGHT (VERT_GLYPH_TABLE_HEIGHT/HORI_GLYPH_TABLE_ROWS)
 
 typedef struct {
     CGPoint  origin;
@@ -85,8 +96,15 @@ typedef struct {
 }
 
 - (CGPoint)baselineOrigin {
-    CGFloat descender = [self fontUnitToPixel:self.face.descender];
-    return CGPointMake(MARGIN_LEFT + BASELINE_OFFSET_X, MARGIN_BOTTOM  + BASELINE_OFFSET_Y - descender);
+    if (_isVertical) {
+        return CGPointMake(VERT_MARGIN_LEFT + [self ptToPixel:self.fontSize],
+                           self.bounds.origin.y + self.bounds.size.height - VERT_MARGIN_TOP);
+    }
+    else {
+        CGFloat descender = [self fontUnitToPixel:self.face.descender];
+        return CGPointMake(HORI_MARGIN_LEFT + HORI_BASELINE_OFFSET_X,
+                           HORI_MARGIN_BOTTOM + HORI_GLYPH_TABLE_HEIGHT - descender);
+    }
 }
 
 - (void)enumerateGlyphs:(BOOL (^)(GlyphDrawingMetrics metrics, NSUInteger index)) handler {
@@ -94,7 +112,10 @@ typedef struct {
     CGPoint p = origin;
     
     CGFloat colMaxY = self.bounds.size.height;
-    CGFloat colMinY = MARGIN_BOTTOM + GLYPH_TABLE_ROW_HEIGHT;
+    CGFloat colMinY = HORI_MARGIN_BOTTOM + HORI_GLYPH_TABLE_ROW_HEIGHT;
+    
+    CGFloat rowMinX = VERT_MARGIN_LEFT;
+    CGFloat rowMaxX = self.bounds.size.width - VERT_MARGIN_RIGHT;
     
     for (NSUInteger index = 0; index < self.glyphs.count; ++ index) {
         CGVector advance = [self fontUnitToPixelVector:[self.shapper glyphAdvanceAtIndex:index]];
@@ -103,7 +124,10 @@ typedef struct {
         metrics.origin = p;
         metrics.advance = advance;
         metrics.offset = [self fontUnitToPixelVector:[self.shapper glyphOffsetAtIndex:index]];
-        metrics.fullBounds = CGRectMake(p.x, colMinY, advance.dx, colMaxY - colMinY);
+        if (_isVertical)
+            metrics.fullBounds = CGRectMake(rowMinX, p.y, rowMaxX - rowMinX, -advance.dy);
+        else
+            metrics.fullBounds = CGRectMake(p.x, colMinY, advance.dx, colMaxY - colMinY);
         
         BOOL continueLoop = handler(metrics, index);
         if (!continueLoop)
@@ -124,7 +148,7 @@ typedef struct {
         CGFloat newX = x + cellAdvance;
         
         CGRect (^getCellRect)(NSUInteger) = ^(NSUInteger cell){
-            return NSMakeRect(x, MARGIN_BOTTOM + GLYPH_TABLE_HEIGHT - (cell + 1) * GLYPH_TABLE_ROW_HEIGHT + (GLYPH_TABLE_ROW_HEIGHT - textHeight) / 2, metrics.advance.dx, textHeight);
+            return NSMakeRect(x, HORI_MARGIN_BOTTOM + HORI_GLYPH_TABLE_HEIGHT - (cell + 1) * HORI_GLYPH_TABLE_ROW_HEIGHT + (HORI_GLYPH_TABLE_ROW_HEIGHT - textHeight) / 2, metrics.advance.dx, textHeight);
         };
         
         CGRect rects[5];
@@ -132,7 +156,7 @@ typedef struct {
         rects[1] = getCellRect(1);
         rects[2] = getCellRect(2);
         rects[3] = getCellRect(3);
-        rects[4] = NSMakeRect((x + newX)/2, MARGIN_BOTTOM + (GLYPH_TABLE_ROW_HEIGHT - textHeight) / 2, cellAdvance, textHeight);
+        rects[4] = NSMakeRect((x + newX)/2, HORI_MARGIN_BOTTOM + (HORI_GLYPH_TABLE_ROW_HEIGHT - textHeight) / 2, cellAdvance, textHeight);
         return handler(metrics, index, rects, 5);
     }];
 }
@@ -205,20 +229,38 @@ typedef struct {
 }
 
 - (void)calculateSize {
-    CGFloat x = 0;
-    for (NSUInteger index = 0; index < self.glyphs.count; ++ index)
-        x += [self fontUnitToPixel:[self.shapper glyphAdvanceAtIndex:index].dx];
-    
-    x += [self fontUnitToPixel:self.face.bbox.size.width];
-    
-    CGFloat y = [self ptToPixel:self.fontSize] + MARGIN_TOP + MARGIN_BOTTOM + BASELINE_OFFSET_Y;
-    y = MAX(y, self.superview.bounds.size.height);
-    
-    [self setFrameSize:NSMakeSize(x + MARGIN_LEFT + BASELINE_OFFSET_X + MARGIN_RIGHT, y)];
+    if (_isVertical) {
+        CGFloat y = 0;
+        for (NSUInteger index = 0; index < self.glyphs.count; ++ index)
+            y += [self fontUnitToPixel:[self.shapper glyphAdvanceAtIndex:index].dy];
+        
+        y = fabs(y);
+        y += [self fontUnitToPixel:self.face.bbox.size.height] + VERT_MARGIN_TOP + VERT_MARGIN_BOTTOM;
+        
+        CGFloat x = [self ptToPixel:self.fontSize];
+        x = x*2;
+        
+        [self setFrameSize:NSMakeSize(x + VERT_MARGIN_LEFT + VERT_GLYPH_TABLE_WIDTH + VERT_MARGIN_RIGHT, y)];
+    }
+    else {
+        CGFloat x = 0;
+        for (NSUInteger index = 0; index < self.glyphs.count; ++ index)
+            x += [self fontUnitToPixel:[self.shapper glyphAdvanceAtIndex:index].dx];
+        
+        x += [self fontUnitToPixel:self.face.bbox.size.width];
+        
+        CGFloat y = [self ptToPixel:self.fontSize] + HORI_MARGIN_TOP + HORI_MARGIN_BOTTOM + HORI_GLYPH_TABLE_HEIGHT;
+        y = MAX(y, self.superview.bounds.size.height);
+        
+        [self setFrameSize:NSMakeSize(x + HORI_MARGIN_LEFT + HORI_BASELINE_OFFSET_X + HORI_MARGIN_RIGHT, y)];
+    }
 }
 
 - (void)setupTooltips {
     [self removeAllToolTips];
+    
+    if (_isVertical) // vertical layout don't need tooltip
+        return;
     
     [self enumerateTableCells:^BOOL(GlyphDrawingMetrics metrics, NSUInteger index, CGRect *cellRects, NSUInteger count) {
         TypefaceGlyph * glyph = [self.glyphs objectAtIndex:index];
@@ -246,7 +288,7 @@ typedef struct {
 
 
 - (NSFont*)tableFont {
-    return [NSFont systemFontOfSize:10];
+    return [NSFont systemFontOfSize:_isVertical? 6: 10];
 }
 
 - (void)setOptions:(ShapingViewOption)options {
@@ -314,11 +356,18 @@ typedef struct {
         
         // draw baseline
         CGPoint baselineOrigin = [self baselineOrigin];
-        if (_options & ShapingViewShowMetricsLines)
-            [self lineFrom:NSMakePoint(MARGIN_LEFT, baselineOrigin.y)
-                        to:NSMakePoint(self.bounds.size.width, baselineOrigin.y)
-                      dash:NO
-                     color:[NSColor greenColor]];
+        if (_options & ShapingViewShowMetricsLines) {
+            if (_isVertical)
+                [self lineFrom:baselineOrigin
+                            to:NSMakePoint(baselineOrigin.x, 0)
+                          dash:NO
+                         color:[NSColor greenColor]];
+            else
+                [self lineFrom:NSMakePoint(HORI_MARGIN_LEFT, baselineOrigin.y)
+                            to:NSMakePoint(self.bounds.size.width, baselineOrigin.y)
+                          dash:NO
+                         color:[NSColor greenColor]];
+        }
         
         [self enumerateGlyphs:^BOOL(GlyphDrawingMetrics metrics, NSUInteger index) {
             CGFloat glyphPosX = metrics.origin.x + metrics.offset.dx;
@@ -329,7 +378,7 @@ typedef struct {
                 [self crossAtPoint:CGPointMake(glyphPosX, glyphPosY) size:6 color:[NSColor blueColor]];
             
             // vertical lines
-            if (_options & ShapingViewShowMetricsLines) {
+            if ((_options & ShapingViewShowMetricsLines) && !_isVertical) {
                 [self lineFrom:NSMakePoint(metrics.origin.x, metrics.origin.y + descender)
                             to:NSMakePoint(metrics.origin.x, maxY)
                           dash:YES
@@ -349,7 +398,6 @@ typedef struct {
     
     // draw glyph table
     
-    
     NSFont * font = [self tableFont];
     [font set];
     
@@ -367,68 +415,138 @@ typedef struct {
                               headStyle, NSParagraphStyleAttributeName,
                               [NSColor controlTextColor], NSForegroundColorAttributeName, nil];
     
-    for (NSUInteger row = 0; row <= GLYPH_TABLE_ROWS; ++ row) {
-        [self lineFrom:NSMakePoint(MARGIN_LEFT, MARGIN_BOTTOM + row * GLYPH_TABLE_ROW_HEIGHT)
-                    to:NSMakePoint(maxX, MARGIN_BOTTOM + row * GLYPH_TABLE_ROW_HEIGHT)
-                  dash:NO
-                 color:[NSColor grayColor]];
-        
-        // draw header
-        NSRect (^getCellRect)(NSUInteger) = ^(NSUInteger cell){
-            return NSMakeRect(MARGIN_LEFT-5, MARGIN_BOTTOM + GLYPH_TABLE_HEIGHT - (cell + 1) * GLYPH_TABLE_ROW_HEIGHT + (GLYPH_TABLE_ROW_HEIGHT - textHeight) / 2, BASELINE_OFFSET_X, textHeight);
-        };
-        
-        [@"Name" drawWithRect:getCellRect(0) options:0 attributes:headAttr context:nil];
-        [@"GID" drawWithRect:getCellRect(1) options:0 attributes:headAttr context:nil];
-        [@"Linear Adv." drawWithRect:getCellRect(2) options:0 attributes:headAttr context:nil];
-        [@"Shaping Adv." drawWithRect:getCellRect(3) options:0 attributes:headAttr context:nil];
-        [@"Kern" drawWithRect:getCellRect(4) options:0 attributes:headAttr context:nil];
-    }
-    
-    [self enumerateTableCells:^BOOL(GlyphDrawingMetrics metrics, NSUInteger index, CGRect *cellRects, NSUInteger count) {
-        TypefaceGlyph * glyph = [self.glyphs objectAtIndex:index];
-        
-        CGFloat cellAdvance = metrics.advance.dx;
-        
-        CGFloat x = metrics.origin.x;
-        CGFloat newX = x + cellAdvance;
-        
-        // vert line of glyph
-        [self lineFrom:NSMakePoint(x, MARGIN_BOTTOM + GLYPH_TABLE_HEIGHT)
-                    to:NSMakePoint(x, MARGIN_BOTTOM + GLYPH_TABLE_ROW_HEIGHT)
-                  dash:NO
-                 color:[NSColor grayColor]];
-        
-        if (index == (self.glyphs.count -1)) {
-            [self lineFrom:NSMakePoint(newX, MARGIN_BOTTOM + GLYPH_TABLE_HEIGHT)
-                        to:NSMakePoint(newX, MARGIN_BOTTOM + GLYPH_TABLE_ROW_HEIGHT)
+    if (_isVertical) {
+        [self enumerateGlyphs:^BOOL(GlyphDrawingMetrics metrics, NSUInteger index) {
+            CGFloat glyphPosX = metrics.origin.x + metrics.offset.dx;
+            CGFloat glyphPosY = metrics.origin.y + metrics.offset.dy;
+            
+           
+            CGFloat tableX = maxX - VERT_GLYPH_TABLE_WIDTH - VERT_MARGIN_RIGHT;
+            CGFloat tableY = glyphPosY;//metrics.fullBounds.origin.y - (VERT_GLYPH_TABLE_HEIGHT - metrics.fullBounds.size.height) / 2;
+            
+            if (_options & ShapingViewShowMetricsLines)
+                [self lineFrom:NSMakePoint(glyphPosX, glyphPosY)
+                            to:NSMakePoint(tableX, glyphPosY)
+                          dash:YES
+                         color:[NSColor grayColor]];
+            
+            
+            [self lineFrom:NSMakePoint(tableX + HORI_BASELINE_OFFSET_X, tableY)
+                        to:NSMakePoint(tableX + HORI_BASELINE_OFFSET_X, tableY + VERT_GLYPH_TABLE_HEIGHT)
                       dash:NO
                      color:[NSColor grayColor]];
+            
+            for (NSUInteger row = 0; row <= HORI_GLYPH_TABLE_ROWS; ++ row) {
+                [self lineFrom:NSMakePoint(tableX, tableY + row * VERT_GLYPH_TABLE_ROW_HEIGHT)
+                            to:NSMakePoint(maxX, tableY + row * VERT_GLYPH_TABLE_ROW_HEIGHT)
+                          dash:NO
+                         color:[NSColor grayColor]];
+                
+                // draw header
+                NSRect (^getHeaderRect)(NSUInteger) = ^(NSUInteger cell){
+                    return NSMakeRect(tableX-5,
+                                      tableY + (HORI_GLYPH_TABLE_ROWS - cell - 1) * VERT_GLYPH_TABLE_ROW_HEIGHT + (VERT_GLYPH_TABLE_ROW_HEIGHT - textHeight) / 2,
+                                      HORI_BASELINE_OFFSET_X,
+                                      textHeight);
+                };
+                
+                NSRect (^getCellRect)(NSUInteger) = ^(NSUInteger cell){
+                    return NSMakeRect(tableX-5 + HORI_BASELINE_OFFSET_X,
+                                      tableY + (HORI_GLYPH_TABLE_ROWS - cell - 1) * VERT_GLYPH_TABLE_ROW_HEIGHT + (VERT_GLYPH_TABLE_ROW_HEIGHT - textHeight) / 2,
+                                      VERT_GLYPH_TABLE_WIDTH - HORI_BASELINE_OFFSET_X,
+                                      textHeight);
+                };
+                
+                [@"Name" drawWithRect:getHeaderRect(0) options:0 attributes:headAttr context:nil];
+                [@"GID" drawWithRect:getHeaderRect(1) options:0 attributes:headAttr context:nil];
+                [@"Linear Adv." drawWithRect:getHeaderRect(2) options:0 attributes:headAttr context:nil];
+                [@"Shaping Adv." drawWithRect:getHeaderRect(3) options:0 attributes:headAttr context:nil];
+                [@"Kern" drawWithRect:getHeaderRect(4) options:0 attributes:headAttr context:nil];
+                
+                TypefaceGlyph * glyph = [self.glyphs objectAtIndex:index];
+                
+                [glyph.name drawWithRect:getCellRect(0) options:0 attributes:cellAttr context:nil];
+                [[NSString stringWithFormat:@"%ld", glyph.GID] drawWithRect:getCellRect(1)  options:0 attributes:cellAttr context:nil];
+                [[NSString stringWithFormat:@"%ld", glyph.horiAdvance] drawWithRect:getCellRect(2)  options:0 attributes:cellAttr context:nil];
+                [[NSString stringWithFormat:@"%ld", (NSInteger)[self.shapper glyphAdvanceAtIndex:index].dx] drawWithRect:getCellRect(3)  options:0 attributes:cellAttr context:nil];
+                
+                if (index != self.glyphs.count - 1) {
+                    NSInteger kern = [self.shapper glyphAdvanceAtIndex:index].dx - glyph.linearAdvance;
+                    [[NSString stringWithFormat:@"%ld", kern] drawWithRect:getCellRect(4)  options:0 attributes:cellAttr context:nil];
+                }
+                else {
+                    [@"N/A" drawWithRect:getCellRect(4)  options:0 attributes:cellAttr context:nil];
+                }
+            }
+            return YES;
+        }];
+    }
+    else {
+    
+        for (NSUInteger row = 0; row <= HORI_GLYPH_TABLE_ROWS; ++ row) {
+            [self lineFrom:NSMakePoint(HORI_MARGIN_LEFT, HORI_MARGIN_BOTTOM + row * HORI_GLYPH_TABLE_ROW_HEIGHT)
+                        to:NSMakePoint(maxX, HORI_MARGIN_BOTTOM + row * HORI_GLYPH_TABLE_ROW_HEIGHT)
+                      dash:NO
+                     color:[NSColor grayColor]];
+            
+            // draw header
+            NSRect (^getCellRect)(NSUInteger) = ^(NSUInteger cell){
+                return NSMakeRect(HORI_MARGIN_LEFT-5, HORI_MARGIN_BOTTOM + HORI_GLYPH_TABLE_HEIGHT - (cell + 1) * HORI_GLYPH_TABLE_ROW_HEIGHT + (HORI_GLYPH_TABLE_ROW_HEIGHT - textHeight) / 2, HORI_BASELINE_OFFSET_X, textHeight);
+            };
+            
+            [@"Name" drawWithRect:getCellRect(0) options:0 attributes:headAttr context:nil];
+            [@"GID" drawWithRect:getCellRect(1) options:0 attributes:headAttr context:nil];
+            [@"Linear Adv." drawWithRect:getCellRect(2) options:0 attributes:headAttr context:nil];
+            [@"Shaping Adv." drawWithRect:getCellRect(3) options:0 attributes:headAttr context:nil];
+            [@"Kern" drawWithRect:getCellRect(4) options:0 attributes:headAttr context:nil];
+            
         }
         
-        
-        // kern line of glyph
-        [self lineFrom:NSMakePoint((x + newX)/2, MARGIN_BOTTOM + GLYPH_TABLE_ROW_HEIGHT)
-                    to:NSMakePoint((x + newX)/2, MARGIN_BOTTOM)
-                  dash:NO
-                 color:[NSColor grayColor]];
-        
-        // first cell - glyph name
-        [glyph.name drawWithRect:cellRects[0] options:0 attributes:cellAttr context:nil];
-        // second sell - glyph id
-        [[NSString stringWithFormat:@"%ld", glyph.GID] drawWithRect:cellRects[1]  options:0 attributes:cellAttr context:nil];
-        // third cell - glyph linear advance
-        [[NSString stringWithFormat:@"%ld", glyph.horiAdvance] drawWithRect:cellRects[2]  options:0 attributes:cellAttr context:nil];
-        // fourth cell - shaping advance
-        [[NSString stringWithFormat:@"%ld", (NSInteger)[self.shapper glyphAdvanceAtIndex:index].dx] drawWithRect:cellRects[3]  options:0 attributes:cellAttr context:nil];
-        
-        // kerning
-        if (index != self.glyphs.count - 1) {
-            NSInteger kern = [self.shapper glyphAdvanceAtIndex:index].dx - glyph.linearAdvance;
-            [[NSString stringWithFormat:@"%ld", kern] drawWithRect:cellRects[4]  options:0 attributes:cellAttr context:nil];
-        }
-        return YES;
-    }];
+        [self enumerateTableCells:^BOOL(GlyphDrawingMetrics metrics, NSUInteger index, CGRect *cellRects, NSUInteger count) {
+            TypefaceGlyph * glyph = [self.glyphs objectAtIndex:index];
+            
+            CGFloat cellAdvance = metrics.advance.dx;
+            
+            CGFloat x = metrics.origin.x;
+            CGFloat newX = x + cellAdvance;
+            
+            // vert line of glyph
+            [self lineFrom:NSMakePoint(x, HORI_MARGIN_BOTTOM + HORI_GLYPH_TABLE_HEIGHT)
+                        to:NSMakePoint(x, HORI_MARGIN_BOTTOM + HORI_GLYPH_TABLE_ROW_HEIGHT)
+                      dash:NO
+                     color:[NSColor grayColor]];
+            
+            if (index == (self.glyphs.count -1)) {
+                [self lineFrom:NSMakePoint(newX, HORI_MARGIN_BOTTOM + HORI_GLYPH_TABLE_HEIGHT)
+                            to:NSMakePoint(newX, HORI_MARGIN_BOTTOM + HORI_GLYPH_TABLE_ROW_HEIGHT)
+                          dash:NO
+                         color:[NSColor grayColor]];
+            }
+            
+            
+            // kern line of glyph
+            [self lineFrom:NSMakePoint((x + newX)/2, HORI_MARGIN_BOTTOM + HORI_GLYPH_TABLE_ROW_HEIGHT)
+                        to:NSMakePoint((x + newX)/2, HORI_MARGIN_BOTTOM)
+                      dash:NO
+                     color:[NSColor grayColor]];
+            
+            // first cell - glyph name
+            [glyph.name drawWithRect:cellRects[0] options:0 attributes:cellAttr context:nil];
+            // second sell - glyph id
+            [[NSString stringWithFormat:@"%ld", glyph.GID] drawWithRect:cellRects[1]  options:0 attributes:cellAttr context:nil];
+            // third cell - glyph linear advance
+            [[NSString stringWithFormat:@"%ld", glyph.horiAdvance] drawWithRect:cellRects[2]  options:0 attributes:cellAttr context:nil];
+            // fourth cell - shaping advance
+            [[NSString stringWithFormat:@"%ld", (NSInteger)[self.shapper glyphAdvanceAtIndex:index].dx] drawWithRect:cellRects[3]  options:0 attributes:cellAttr context:nil];
+            
+            // kerning
+            if (index != self.glyphs.count - 1) {
+                NSInteger kern = [self.shapper glyphAdvanceAtIndex:index].dx - glyph.linearAdvance;
+                [[NSString stringWithFormat:@"%ld", kern] drawWithRect:cellRects[4]  options:0 attributes:cellAttr context:nil];
+            }
+            return YES;
+        }];
+    }
 }
 
 - (void)crossAtPoint:(NSPoint)point size:(CGFloat)size color:(NSColor*)color {
@@ -705,6 +823,7 @@ typedef struct {
     }
     if (object == self) {
         if ([keyPath isEqualToString:@"direction"]) {
+            self.shapingView.isVertical = (self.direction > ShappingDirectionRTL);
             [self shape];
         }
     }
