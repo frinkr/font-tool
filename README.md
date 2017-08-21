@@ -11,8 +11,8 @@ manage the packages.
 ### Usage
 Intuited & Simple
 
-![Alt text](/screenshots/SelectTypeface.jpg?raw=true "Select Typeface")
-![Alt text](/screenshots/MainWindow.jpg?raw=true "Main Window")
+![Alt text](http://i.imgur.com/vLdAfgh.png "Select Typeface")
+![Alt text](http://i.imgur.com/fLJft9h.png "Main Window")
 
 ### License
 MIT
