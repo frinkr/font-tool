@@ -115,7 +115,6 @@ extern NSString * const TypefaceErrorDomain;
 @property NSInteger           imageOffsetY;
 @property CGFloat             imageFontSize;       // the font size used when rendering the image
 
-@property NSInteger           linearAdvance;
 // metrics in font unit
 @property NSInteger           width;
 @property NSInteger           height;

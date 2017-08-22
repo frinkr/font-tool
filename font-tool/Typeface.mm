@@ -1263,8 +1263,6 @@ typedef struct {
     g.vertBearingY = defaultGlyph.vertBearingY;
     g.vertAdvance = defaultGlyph.vertAdvance;
     
-    g.linearAdvance = g.horiAdvance;
-    
     g.typeface = self;
     
     return g;

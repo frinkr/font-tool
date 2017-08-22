@@ -115,7 +115,7 @@ typedef struct {
     CGFloat colMinY = HORI_MARGIN_BOTTOM + HORI_GLYPH_TABLE_ROW_HEIGHT;
     
     CGFloat rowMinX = VERT_MARGIN_LEFT;
-    CGFloat rowMaxX = self.bounds.size.width - VERT_MARGIN_RIGHT;
+    CGFloat rowMaxX = self.bounds.size.width;
     
     for (NSUInteger index = 0; index < self.glyphs.count; ++ index) {
         CGVector advance = [self fontUnitToPixelVector:[self.shapper glyphAdvanceAtIndex:index]];
@@ -125,7 +125,7 @@ typedef struct {
         metrics.advance = advance;
         metrics.offset = [self fontUnitToPixelVector:[self.shapper glyphOffsetAtIndex:index]];
         if (_isVertical)
-            metrics.fullBounds = CGRectMake(rowMinX, p.y, rowMaxX - rowMinX, -advance.dy);
+            metrics.fullBounds = CGRectMake(rowMinX, metrics.origin.y + metrics.offset.dy, rowMaxX - rowMinX, -advance.dy);
         else
             metrics.fullBounds = CGRectMake(p.x, colMinY, advance.dx, colMaxY - colMinY);
         
@@ -270,7 +270,7 @@ typedef struct {
         [self addToolTipRect:cellRects[3] owner:[NSString stringWithFormat:@"%ld", (NSInteger)[self.shapper glyphAdvanceAtIndex:index].dx] userData:nil];
         
         if (index != self.glyphs.count - 1) {
-            NSInteger kern = [self.shapper glyphAdvanceAtIndex:index].dx - glyph.linearAdvance;
+            NSInteger kern = [self.shapper glyphAdvanceAtIndex:index].dx - glyph.horiAdvance;
             [self addToolTipRect:cellRects[4] owner:[NSString stringWithFormat:@"%ld", kern] userData:nil];
         }
         return YES;
@@ -425,7 +425,7 @@ typedef struct {
             CGFloat tableY = glyphPosY;//metrics.fullBounds.origin.y - (VERT_GLYPH_TABLE_HEIGHT - metrics.fullBounds.size.height) / 2;
             
             if (_options & ShapingViewShowMetricsLines)
-                [self lineFrom:NSMakePoint(glyphPosX, glyphPosY)
+                [self lineFrom:NSMakePoint(VERT_MARGIN_LEFT, glyphPosY)
                             to:NSMakePoint(tableX, glyphPosY)
                           dash:YES
                          color:[NSColor grayColor]];
@@ -471,7 +471,7 @@ typedef struct {
                 [[NSString stringWithFormat:@"%ld", (NSInteger)[self.shapper glyphAdvanceAtIndex:index].dx] drawWithRect:getCellRect(3)  options:0 attributes:cellAttr context:nil];
                 
                 if (index != self.glyphs.count - 1) {
-                    NSInteger kern = [self.shapper glyphAdvanceAtIndex:index].dx - glyph.linearAdvance;
+                    NSInteger kern = [self.shapper glyphAdvanceAtIndex:index].dy + glyph.vertAdvance;
                     [[NSString stringWithFormat:@"%ld", kern] drawWithRect:getCellRect(4)  options:0 attributes:cellAttr context:nil];
                 }
                 else {
@@ -541,7 +541,7 @@ typedef struct {
             
             // kerning
             if (index != self.glyphs.count - 1) {
-                NSInteger kern = [self.shapper glyphAdvanceAtIndex:index].dx - glyph.linearAdvance;
+                NSInteger kern = [self.shapper glyphAdvanceAtIndex:index].dx - glyph.horiAdvance;
                 [[NSString stringWithFormat:@"%ld", kern] drawWithRect:cellRects[4]  options:0 attributes:cellAttr context:nil];
             }
             return YES;
