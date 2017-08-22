@@ -219,7 +219,15 @@ typedef struct {
     [self calculateSize];
     [self setupTooltips];
     [self setNeedsDisplay:YES];
+    if (_isVertical)
+        [self scroolToTop];
     
+}
+
+- (void)scroolToTop {
+    NSScrollView * sv = self.enclosingScrollView;
+    NSPoint pt = NSMakePoint(0.0, [[sv documentView] bounds].size.height);
+    [[sv documentView] scrollPoint:pt];
 }
 
 - (void)windowDidResize {
@@ -354,7 +362,7 @@ typedef struct {
         CGPoint baselineOrigin = [self baselineOrigin];
         if (_options & ShapingViewShowMetricsLines) {
             if (_isVertical)
-                [self lineFrom:baselineOrigin
+                [self lineFrom:NSMakePoint(baselineOrigin.x, maxY)
                             to:NSMakePoint(baselineOrigin.x, 0)
                           dash:NO
                          color:[NSColor greenColor]];
