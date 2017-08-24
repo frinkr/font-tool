@@ -692,7 +692,7 @@ static uint32_t   toolBarTags[] = {
     NSAlert *alert = [[NSAlert alloc] init];
     [alert addButtonWithTitle:@"OK"];
     [alert setMessageText:message];
-    [alert setAlertStyle:NSAlertStyleCritical];
+    [alert setAlertStyle:NSCriticalAlertStyle];
     [alert runModal];
 }
 

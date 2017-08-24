@@ -31,7 +31,7 @@
     [self addObserver:self forKeyPath:@"glyph" options:NSKeyValueObservingOptionNew context:nil];
 }
 
-- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSKeyValueChangeKey,id> *)change context:(void *)context {
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSString*,id> *)change context:(void *)context {
     if (object == self) {
         if ([keyPath isEqualToString:@"foreground"] ||
             [keyPath isEqualToString:@"background"] ||
@@ -132,8 +132,6 @@
         CGFloat faceDescenderPx = [typeface fontUnitToPixel:typeface.descender withFontSize:imageFontSize];
         CGFloat faceAscenderPx = [typeface fontUnitToPixel:typeface.ascender withFontSize:imageFontSize];
         
-        CGFloat faceTolorancePx = [typeface ptToPixel:imageFontSize * 0.05];
-        
         NSInteger glyphTop = glyph.image.size.height + glyph.imageOffsetY;
         NSInteger glyphBottom = glyph.imageOffsetY;
         
@@ -186,7 +184,7 @@
             [glyphImage lockFocus];
             [foreground set];
             NSRect imageRect = {NSZeroPoint, [glyphImage size]};
-            NSRectFillUsingOperation(imageRect, NSCompositingOperationSourceAtop);
+            NSRectFillUsingOperation(imageRect, NSCompositeSourceAtop);
             [glyphImage unlockFocus];
         }
         
@@ -198,11 +196,8 @@
         
         [glyphImage drawInRect:imageRect
                       fromRect:NSZeroRect
-                     operation:NSCompositingOperationSourceOver
+                     operation:NSCompositeSourceOver
                       fraction:1];
-        
-        
-        CGFloat strokeWidth = 1;
         
         if (glyphScale != 1) {
             // show marks the glyph is scaled, not the natual size

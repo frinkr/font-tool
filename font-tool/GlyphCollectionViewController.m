@@ -37,7 +37,7 @@
     TypefaceDocument * document = self.view.window.windowController.document;
     [self setRepresentedObject:document];
     
-    NSCollectionViewFlowLayout * layout = self.collectionView.collectionViewLayout;
+    NSCollectionViewFlowLayout * layout = (NSCollectionViewFlowLayout*)self.collectionView.collectionViewLayout;
     [document.typeface setPixelSize:(layout.itemSize.width - 5)*1];
 }
 

@@ -343,13 +343,13 @@ typedef struct {
             [glyphImage lockFocus];
             [[NSColor textColor] set];
             NSRect imageRect = {NSZeroPoint, [glyphImage size]};
-            NSRectFillUsingOperation(imageRect, NSCompositingOperationSourceAtop);
+            NSRectFillUsingOperation(imageRect, NSCompositeSourceAtop);
             [glyphImage unlockFocus];
         }
         
         [glyphImage drawAtPoint:NSMakePoint(glyphPosX + glyph.imageOffsetX, glyphPosY + glyph.imageOffsetY)
                        fromRect:NSZeroRect
-                      operation:NSCompositingOperationSourceOver
+                      operation:NSCompositeSourceOver
                        fraction:2];
         return YES;
     }];
@@ -634,7 +634,7 @@ typedef struct {
     
     NSEvent * newEvent = [NSEvent mouseEventWithType:event.type
                                             location:event.locationInWindow
-                                       modifierFlags:event.modifierFlags | NSEventModifierFlagCommand
+                                       modifierFlags:event.modifierFlags | NSCommandKeyMask
                                            timestamp:event.timestamp
                                         windowNumber:event.windowNumber
                                              context:event.context
@@ -647,7 +647,7 @@ typedef struct {
 - (void)mouseUp:(NSEvent *)event {
     NSEvent * newEvent = [NSEvent mouseEventWithType:event.type
                                             location:event.locationInWindow
-                                       modifierFlags:event.modifierFlags  | NSEventModifierFlagCommand
+                                       modifierFlags:event.modifierFlags  | NSCommandKeyMask
                                            timestamp:event.timestamp
                                         windowNumber:event.windowNumber
                                              context:event.context
@@ -826,7 +826,7 @@ typedef struct {
     [self.shapingView windowDidResize];
 }
 
-- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSKeyValueChangeKey,id> *)change context:(void *)context {
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSString*,id> *)change context:(void *)context {
     if (object == self.languagesArrayController) {
         if ([keyPath isEqualToString:@"selectedObjects"]) {
             if (!self.languagesArrayController.selectedObjects.count)

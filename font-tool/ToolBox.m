@@ -179,7 +179,7 @@ color = [NSColor name2]; \
     GET_COLOR_NAMED(_name, headerTextColor);
     GET_COLOR_NAMED(_name, alternateSelectedControlColor);
     GET_COLOR_NAMED(_name, alternateSelectedControlTextColor);
-    GET_COLOR_NAMED(_name, scrubberTexturedBackgroundColor);
+    //GET_COLOR_NAMED(_name, scrubberTexturedBackgroundColor);
     
     NSBezierPath * path = [NSBezierPath bezierPathWithRect:self.bounds];
     [color setFill];
@@ -241,7 +241,9 @@ color = [NSColor name2]; \
     ADD_COLOR_NAMED(headerTextColor);
     ADD_COLOR_NAMED(alternateSelectedControlColor);      
     ADD_COLOR_NAMED(alternateSelectedControlTextColor);
+#if __MAC_OS_X_VERSION_MAX_ALLOWED >= 101200
     ADD_COLOR_NAMED(scrubberTexturedBackgroundColor);
+#endif
 }
 
 - (NSInteger)collectionView:(NSCollectionView *)collectionView numberOfItemsInSection:(NSInteger)section {
@@ -302,8 +304,10 @@ do { \
     ADD_NSIMAGE_STANDARD_NAME(NSImageNameInvalidDataFreestandingTemplate);
     ADD_NSIMAGE_STANDARD_NAME(NSImageNameLockLockedTemplate);
     ADD_NSIMAGE_STANDARD_NAME(NSImageNameLockUnlockedTemplate);
+#if __MAC_OS_X_VERSION_MAX_ALLOWED >= 101200
     ADD_NSIMAGE_STANDARD_NAME(NSImageNameGoForwardTemplate);
     ADD_NSIMAGE_STANDARD_NAME(NSImageNameGoBackTemplate);
+#endif
     ADD_NSIMAGE_STANDARD_NAME(NSImageNameGoRightTemplate);
     ADD_NSIMAGE_STANDARD_NAME(NSImageNameGoLeftTemplate);
     ADD_NSIMAGE_STANDARD_NAME(NSImageNameRightFacingTriangleTemplate);
@@ -350,6 +354,7 @@ do { \
     ADD_NSIMAGE_STANDARD_NAME(NSImageNameStatusUnavailable );
     ADD_NSIMAGE_STANDARD_NAME(NSImageNameStatusNone );
     ADD_NSIMAGE_STANDARD_NAME(NSImageNameShareTemplate);
+#if __MAC_OS_X_VERSION_MAX_ALLOWED >= 101200
     ADD_NSIMAGE_STANDARD_NAME(NSImageNameTouchBarAddDetailTemplate);
     ADD_NSIMAGE_STANDARD_NAME(NSImageNameTouchBarAddTemplate);
     ADD_NSIMAGE_STANDARD_NAME(NSImageNameTouchBarAlarmTemplate);
@@ -426,6 +431,7 @@ do { \
     ADD_NSIMAGE_STANDARD_NAME(NSImageNameTouchBarUserTemplate);
     ADD_NSIMAGE_STANDARD_NAME(NSImageNameTouchBarVolumeDownTemplate);
     ADD_NSIMAGE_STANDARD_NAME(NSImageNameTouchBarVolumeUpTemplate);
+#endif
 
 }
 
