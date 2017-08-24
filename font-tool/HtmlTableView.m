@@ -96,6 +96,19 @@ static HtmlTableViewAppearance * defaultHtmlTableViewApperance;
 
 @implementation HtmlTableView
 
+
+- (instancetype)initWithFrame:(NSRect)frameRect {
+    WKWebViewConfiguration * config = [[WKWebViewConfiguration alloc] init];
+    config.suppressesIncrementalRendering = YES;
+    config.allowsAirPlayForMediaPlayback = NO;
+    //config.allowsInlineMediaPlayback = NO;
+    if (self = [super initWithFrame:frameRect configuration:config]) {
+        [self setValue:[NSNumber numberWithBool:YES] forKey:@"drawsTransparentBackground"];
+        self.navigationDelegate = self;
+    }
+    return self;
+}
+
 - (void)awakeFromNib {
     [super awakeFromNib];
     [self setValue:[NSNumber numberWithBool:YES] forKey:@"drawsTransparentBackground"];

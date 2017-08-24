@@ -60,6 +60,8 @@ typedef NSMutableArray<HtmlTableRow*> HtmlTableRows;
 @property (nullable, weak) id<HtmlTableViewDataSource> dataSource;
 @property (nullable, weak) id<HtmlTableViewDelegate> delegate;
 
+- (instancetype)initWithFrame:(NSRect)frameRect;
+
 - (void)reloadData;
 
 + (NSString*)htmlTableRowWithKey:(NSString*)key keyStyle:(NSString*)keyStyle value:(NSString*)value valueStyle:(NSString*)valueStyle;

@@ -3,7 +3,6 @@
     <dependencies>
         <deployment identifier="macosx"/>
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="12121"/>
-        <plugIn identifier="com.apple.WebKit2IBPlugin" version="12121"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -506,13 +505,6 @@ DQ
                         <rect key="frame" x="0.0" y="0.0" width="352" height="409"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
-                            <wkWebView wantsLayer="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ryb-0O-Bbe" userLabel="Table View" customClass="HtmlTableView">
-                                <rect key="frame" x="0.0" y="0.0" width="352" height="197"/>
-                                <wkWebViewConfiguration key="configuration">
-                                    <audiovisualMediaTypes key="mediaTypesRequiringUserActionForPlayback" none="YES"/>
-                                    <wkPreferences key="preferences" javaScriptCanOpenWindowsAutomatically="NO" javaScriptEnabled="NO"/>
-                                </wkWebViewConfiguration>
-                            </wkWebView>
                             <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="dUm-LV-5SN" customClass="GlyphImageView">
                                 <rect key="frame" x="0.0" y="197" width="352" height="200"/>
                                 <constraints>
@@ -523,18 +515,13 @@ DQ
                         </subviews>
                         <constraints>
                             <constraint firstAttribute="trailing" secondItem="dUm-LV-5SN" secondAttribute="trailing" id="2jh-kq-4gN"/>
-                            <constraint firstAttribute="bottom" secondItem="ryb-0O-Bbe" secondAttribute="bottom" id="3tB-Av-dJe"/>
                             <constraint firstItem="dUm-LV-5SN" firstAttribute="centerX" secondItem="Ayr-9M-W1G" secondAttribute="centerX" id="9RC-1o-8ih"/>
                             <constraint firstItem="dUm-LV-5SN" firstAttribute="leading" secondItem="Ayr-9M-W1G" secondAttribute="leading" id="DoE-RJ-3h3"/>
-                            <constraint firstItem="ryb-0O-Bbe" firstAttribute="top" secondItem="dUm-LV-5SN" secondAttribute="bottom" id="IxX-ji-02G"/>
-                            <constraint firstItem="ryb-0O-Bbe" firstAttribute="leading" secondItem="Ayr-9M-W1G" secondAttribute="leading" id="Kcu-Uh-LEW"/>
-                            <constraint firstAttribute="trailing" secondItem="ryb-0O-Bbe" secondAttribute="trailing" id="UK5-sr-Bvz"/>
                             <constraint firstItem="dUm-LV-5SN" firstAttribute="top" secondItem="Ayr-9M-W1G" secondAttribute="top" constant="12" id="gmi-db-jaq"/>
                         </constraints>
                     </view>
                     <connections>
                         <outlet property="glyphImage" destination="dUm-LV-5SN" id="93H-7X-JfM"/>
-                        <outlet property="tableView" destination="ryb-0O-Bbe" id="bZ7-mg-4IS"/>
                     </connections>
                 </viewController>
                 <customObject id="yrV-LM-G4K" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>

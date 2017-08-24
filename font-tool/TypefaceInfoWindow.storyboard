@@ -3,7 +3,6 @@
     <dependencies>
         <deployment identifier="macosx"/>
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="12121"/>
-        <plugIn identifier="com.apple.WebKit2IBPlugin" version="12121"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -37,26 +36,14 @@
                                     <action selector="doChangeCurrentSegment:" target="ftV-hd-Iut" id="DF0-Tn-vAe"/>
                                 </connections>
                             </segmentedControl>
-                            <wkWebView wantsLayer="YES" allowsLinkPreview="NO" translatesAutoresizingMaskIntoConstraints="NO" id="G8F-TB-0I6" userLabel="Table View" customClass="HtmlTableView">
-                                <rect key="frame" x="0.0" y="0.0" width="550" height="471"/>
-                                <wkWebViewConfiguration key="configuration" suppressesIncrementalRendering="YES">
-                                    <audiovisualMediaTypes key="mediaTypesRequiringUserActionForPlayback" none="YES"/>
-                                    <wkPreferences key="preferences" javaScriptCanOpenWindowsAutomatically="NO" javaScriptEnabled="NO"/>
-                                </wkWebViewConfiguration>
-                            </wkWebView>
                         </subviews>
                         <constraints>
-                            <constraint firstItem="G8F-TB-0I6" firstAttribute="leading" secondItem="lAU-qM-5O1" secondAttribute="leading" id="8un-fS-Zxf"/>
-                            <constraint firstItem="G8F-TB-0I6" firstAttribute="top" secondItem="etD-ee-ShX" secondAttribute="bottom" constant="8" id="Agy-ER-cUg"/>
                             <constraint firstItem="etD-ee-ShX" firstAttribute="top" secondItem="lAU-qM-5O1" secondAttribute="top" constant="12" id="RBH-jB-v51"/>
-                            <constraint firstAttribute="bottom" secondItem="G8F-TB-0I6" secondAttribute="bottom" id="cny-5k-Lfv"/>
                             <constraint firstItem="etD-ee-ShX" firstAttribute="centerX" secondItem="lAU-qM-5O1" secondAttribute="centerX" id="dAx-lm-qEx"/>
-                            <constraint firstAttribute="trailing" secondItem="G8F-TB-0I6" secondAttribute="trailing" id="ibK-Ew-d2r"/>
                         </constraints>
                     </view>
                     <connections>
                         <outlet property="infoSegments" destination="etD-ee-ShX" id="rpc-K6-1Z5"/>
-                        <outlet property="tableView" destination="G8F-TB-0I6" id="nry-ZP-6CN"/>
                     </connections>
                 </viewController>
                 <customObject id="ezm-gH-SCM" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>

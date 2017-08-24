@@ -17,7 +17,7 @@
 #import "Shapper.h"
 
 @interface GlyphInfoViewController ()
-@property (assign) IBOutlet HtmlTableView *tableView;
+@property (strong) HtmlTableView *tableView;
 
 @property (strong) TypefaceGlyph * glyph;
 @property (strong) HtmlTableRows * tableRows;
@@ -38,6 +38,16 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    self.tableView = [[HtmlTableView alloc] initWithFrame:CGRectMake(0, 0, 400, 600)];
+    self.tableView.translatesAutoresizingMaskIntoConstraints = NO;
+    [self.view addSubview:self.tableView];
+    
+    NSDictionary<NSString*, id> * views = @{@"tableView": self.tableView,
+                                            @"imageView": self.glyphImage};
+    [self.view addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"|-0-[tableView]-0-|" options:0 metrics:nil views:views]];
+    [self.view addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:[imageView]-0-[tableView]-0-|" options:0 metrics:nil views:views]];
+
+    
     // Do view setup here.
     self.glyphImage.edgeInsets = NSEdgeInsetsMake(20, 20, 20, 20);
     self.glyphImage.options = GlyphImageViewShowAllMetrics;

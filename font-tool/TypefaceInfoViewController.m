@@ -61,7 +61,7 @@ NSSet<NSNumber*> * HBSet2NSSet(hb_set_t *set) {
 
 @interface TypefaceInfoViewController ()
 @property (assign) IBOutlet NSSegmentedControl *infoSegments;
-@property (assign) IBOutlet HtmlTableView *tableView;
+@property (strong) HtmlTableView *tableView;
 
 @property (assign) NSUInteger currrentTable;
 
@@ -112,6 +112,14 @@ NSSet<NSNumber*> * HBSet2NSSet(hb_set_t *set) {
     
     [self loadCurrentTypefaceDictionary];
     
+    self.tableView = [[HtmlTableView alloc] initWithFrame:CGRectMake(0, 0, 400, 600)];
+    self.tableView.translatesAutoresizingMaskIntoConstraints = NO;
+    [self.view addSubview:self.tableView positioned:NSWindowBelow relativeTo:self.infoSegments];
+    
+    NSDictionary<NSString*, id> * views = @{@"tableView": self.tableView};
+    [self.view addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"|-0-[tableView]-0-|" options:0 metrics:nil views:views]];
+    [self.view addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|-50-[tableView]-0-|" options:0 metrics:nil views:views]];
+
     self.tableView.dataSource = self;
     self.tableView.delegate = self;
     

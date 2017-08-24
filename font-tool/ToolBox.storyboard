@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="12118" systemVersion="16C67" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="12121" systemVersion="16F73" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="12118"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="12121"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
         <capability name="stacking Non-gravity area distributions on NSStackView" minToolsVersion="7.0" minSystemVersion="10.11"/>
     </dependencies>
@@ -154,11 +154,11 @@
                                 <rect key="frame" x="20" y="58" width="440" height="548"/>
                                 <subviews>
                                     <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="bLA-8J-ll4">
-                                        <rect key="frame" x="26" y="286" width="388" height="262"/>
+                                        <rect key="frame" x="0.0" y="278" width="440" height="270"/>
                                         <imageCell key="cell" selectable="YES" editable="YES" alignment="left" animates="YES" imageScaling="proportionallyUpOrDown" image="glyphMetricsHori" id="zqe-8C-xL2"/>
                                     </imageView>
                                     <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="Dtn-J1-PFH">
-                                        <rect key="frame" x="73" y="0.0" width="294" height="278"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="440" height="270"/>
                                         <imageCell key="cell" selectable="YES" editable="YES" alignment="left" animates="YES" imageScaling="proportionallyUpOrDown" image="glyphMetricsVert" id="ufB-47-ebF"/>
                                     </imageView>
                                 </subviews>
@@ -242,6 +242,6 @@
         <image name="glyphMetricsVert" width="294" height="278"/>
     </resources>
     <inferredMetricsTieBreakers>
-        <segue reference="cKa-tJ-OBR"/>
+        <segue reference="mkY-11-4qZ"/>
     </inferredMetricsTieBreakers>
 </document>
