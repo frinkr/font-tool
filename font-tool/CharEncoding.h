@@ -7,24 +7,18 @@
 //
 
 #import <Foundation/Foundation.h>
-
-
-#define INVALID_CODE_POINT (0x110000)
+#import "Common.h"
 
 extern NSString * UNI_CODEPOINT_REGEX;
 extern NSString * UNI_CODEPOINT_LOOKUP_REGEX;
 extern NSString * GLYPH_INDEX_LOOKUP_REGEX;
 extern NSString * UNDEFINED_UNICODE_CODEPOINT;
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+FT_BEGIN_DECLS
 NSString * RegexReplace(NSString * string,
                         NSString * regexStr,
                         NSString * (^handler)(NSRange range, BOOL * stop));
-#ifdef __cplusplus
-}
-#endif
+FT_END_DECLS
 
 @interface CharEncoding : NSObject
 // return nil if charcode outof unicode range
