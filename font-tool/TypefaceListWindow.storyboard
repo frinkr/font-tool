@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="12118" systemVersion="16C67" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="RNt-oL-yWh">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="12121" systemVersion="16F73" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="RNt-oL-yWh">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="12118"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="12121"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
         <capability name="system font weights other than Regular or Bold" minToolsVersion="7.0"/>
     </dependencies>
@@ -368,13 +368,13 @@ DQ
                                         <action selector="doShowMoreOpenTypeFeatures:" target="RNt-oL-yWh" id="wrN-iQ-xnr"/>
                                     </connections>
                                 </toolbarItem>
-                                <toolbarItem implicitItemIdentifier="739A8512-DA5D-42EB-8CAA-8B44FC095ADE" label="Recents" paletteLabel="Recents" toolTip="Recents" image="NSTouchBarHistoryTemplate" id="Xma-4L-Xq1">
-                                    <size key="minSize" width="30" height="30"/>
+                                <toolbarItem implicitItemIdentifier="739A8512-DA5D-42EB-8CAA-8B44FC095ADE" label="Recents" paletteLabel="Recents" toolTip="Recents" image="History" id="Xma-4L-Xq1">
+                                    <size key="minSize" width="22" height="22"/>
                                     <size key="maxSize" width="36" height="36"/>
                                     <button key="view" id="y6b-mU-8VK">
-                                        <rect key="frame" x="7" y="14" width="36" height="36"/>
+                                        <rect key="frame" x="9" y="14" width="32" height="32"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                        <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="NSTouchBarHistoryTemplate" imagePosition="only" alignment="center" imageScaling="proportionallyUpOrDown" inset="2" id="f8k-la-OEn">
+                                        <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="History" imagePosition="only" alignment="center" imageScaling="proportionallyUpOrDown" inset="2" id="f8k-la-OEn">
                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                             <font key="font" metaFont="system"/>
                                         </buttonCell>
@@ -716,10 +716,10 @@ Gw
         </scene>
     </scenes>
     <resources>
+        <image name="History" width="128" height="128"/>
         <image name="NSAddTemplate" width="11" height="11"/>
         <image name="NSInfo" width="32" height="32"/>
         <image name="NSRemoveTemplate" width="11" height="11"/>
-        <image name="NSTouchBarHistoryTemplate" width="18" height="30"/>
         <image name="toolbarItem:0Ze-fk-XhZ:image" width="256" height="256">
             <mutableData key="keyedArchiveRepresentation">
 YnBsaXN0MDDUAQIDBAUGPD1YJHZlcnNpb25YJG9iamVjdHNZJGFyY2hpdmVyVCR0b3ASAAGGoK0HCBMY

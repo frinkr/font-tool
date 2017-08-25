@@ -116,7 +116,7 @@
 
         [items addRowWithKey:@"Unicode Name" stringValue:coreAttrs.name];
         
-        if (true) {        
+        if (true) {
             NSString * string = [[coreAttrs.decomposition
                                   stringByReplacingOccurrencesOfString:@"<" withString:@"&lt;"]
                                   stringByReplacingOccurrencesOfString:@">" withString:@"&gt;"];

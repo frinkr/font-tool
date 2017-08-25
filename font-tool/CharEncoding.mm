@@ -28,6 +28,8 @@ NSString * UNDEFINED_UNICODE_CODEPOINT = @"<undefined>";
 NSString * RegexReplace(NSString * string,
                         NSString * regexStr,
                         NSString * (^handler)(NSRange range, BOOL * stop)) {
+    if (!string) return string;
+    
     NSError * error = nil;
     
     NSRegularExpression * regex = [NSRegularExpression regularExpressionWithPattern:regexStr
