@@ -12,10 +12,7 @@
 #import "GlyphCollectionViewItem.h"
 #import "GlyphInfoViewController.h"
 #import "Typeface.h"
-
-#ifndef NSAppKitVersionNumber10_11_3
-    #define NSAppKitVersionNumber10_11_3 1404.34
-#endif
+#import "Common.h"
 
 @interface GlyphCollectionViewController ()
 @property (nonatomic, readonly, getter=document) TypefaceDocument * document;
@@ -39,7 +36,7 @@
 - (void)viewWillAppear {
     [super viewWillAppear];
     
-    if (floor(NSAppKitVersionNumber) <= NSAppKitVersionNumber10_11_3) {
+    if (OS_IS_BELOW_SIERRA) {
         self.collectionView.wantsLayer = YES;
         self.collectionView.layer.backgroundColor = [[NSColor whiteColor] CGColor];
     }
@@ -73,7 +70,7 @@
 - (void)setCurrentBlockIndex:(NSInteger)currentBlockIndex {
     _currentBlockIndex = currentBlockIndex;
     
-    if (floor(NSAppKitVersionNumber) <= NSAppKitVersionNumber10_11_3) {
+    if (OS_IS_BELOW_SIERRA) {
         // For some reason, 'itemForRepresentedObjectAtIndexPath' is not called upon 'reloadData' in Yosemit
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
             [self.collectionView reloadData];

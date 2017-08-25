@@ -116,9 +116,10 @@ NSSet<NSNumber*> * HBSet2NSSet(hb_set_t *set) {
     self.tableView.translatesAutoresizingMaskIntoConstraints = NO;
     [self.view addSubview:self.tableView positioned:NSWindowBelow relativeTo:self.infoSegments];
     
-    NSDictionary<NSString*, id> * views = @{@"tableView": self.tableView};
+    NSDictionary<NSString*, id> * views = @{@"tableView": self.tableView,
+                                            @"segments": self.infoSegments};
     [self.view addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"|-0-[tableView]-0-|" options:0 metrics:nil views:views]];
-    [self.view addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|-50-[tableView]-0-|" options:0 metrics:nil views:views]];
+    [self.view addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:[segments]-8-[tableView]-0-|" options:0 metrics:nil views:views]];
 
     self.tableView.dataSource = self;
     self.tableView.delegate = self;
@@ -803,6 +804,7 @@ NSSet<NSNumber*> * HBSet2NSSet(hb_set_t *set) {
                            ]];
         
         
+#if DEBUG
         if (1)
         {
             hb_set_t * glyphs = hb_set_create();
@@ -830,6 +832,7 @@ NSSet<NSNumber*> * HBSet2NSSet(hb_set_t *set) {
             hb_set_destroy(glyphs_after);
             hb_set_destroy(glyphs_output);
         }
+#endif
     }
 #endif
     return items;

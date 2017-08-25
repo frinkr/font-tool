@@ -8,6 +8,7 @@
 
 #import "HtmlTableView.h"
 #import "AppDelegate.h"
+#import "Common.h"
 
 @implementation HtmlTableRow
 - (id _Nonnull )initWithKey:(NSString*_Nonnull)key value:(NSString*_Nonnull)value {
@@ -101,9 +102,10 @@ static HtmlTableViewAppearance * defaultHtmlTableViewApperance;
     WKWebViewConfiguration * config = [[WKWebViewConfiguration alloc] init];
     config.suppressesIncrementalRendering = YES;
     config.allowsAirPlayForMediaPlayback = NO;
-    //config.allowsInlineMediaPlayback = NO;
+
     if (self = [super initWithFrame:frameRect configuration:config]) {
-        [self setValue:[NSNumber numberWithBool:YES] forKey:@"drawsTransparentBackground"];
+        if (!OS_IS_BELOW_SIERRA)
+            [self setValue:[NSNumber numberWithBool:YES] forKey:@"drawsBackground"];
         self.navigationDelegate = self;
     }
     return self;
@@ -111,7 +113,9 @@ static HtmlTableViewAppearance * defaultHtmlTableViewApperance;
 
 - (void)awakeFromNib {
     [super awakeFromNib];
-    [self setValue:[NSNumber numberWithBool:YES] forKey:@"drawsTransparentBackground"];
+    NSAssert(!OS_IS_BELOW_SIERRA, @"WKWebview can't live in Nib in OS older than Sierra");
+        
+    [self setValue:[NSNumber numberWithBool:YES] forKey:@"drawsBackground"];
     self.navigationDelegate = self;
 }
 
