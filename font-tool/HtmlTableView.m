@@ -105,7 +105,7 @@ static HtmlTableViewAppearance * defaultHtmlTableViewApperance;
 
     if (self = [super initWithFrame:frameRect configuration:config]) {
         if (!OS_IS_BELOW_SIERRA)
-            [self setValue:[NSNumber numberWithBool:YES] forKey:@"drawsBackground"];
+            [self setValue:@(NO) forKey:@"drawsBackground"];
         self.navigationDelegate = self;
     }
     return self;
@@ -115,7 +115,7 @@ static HtmlTableViewAppearance * defaultHtmlTableViewApperance;
     [super awakeFromNib];
     NSAssert(!OS_IS_BELOW_SIERRA, @"WKWebview can't live in Nib in OS older than Sierra");
         
-    [self setValue:[NSNumber numberWithBool:YES] forKey:@"drawsBackground"];
+    [self setValue:@(NO) forKey:@"drawsBackground"];
     self.navigationDelegate = self;
 }
 
