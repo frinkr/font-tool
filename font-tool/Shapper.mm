@@ -31,7 +31,7 @@ static hb_bool_t hb_buffer_message(hb_buffer_t *buffer,
                                    hb_font_t   *font,
                                    const char  *message,
                                    void        *user_data) {
-    NSLog(@"HBBUF MSG: %@", [NSString stringWithUTF8String:message]);
+    //NSLog(@"HBBUF MSG: %@", [NSString stringWithUTF8String:message]);
     return YES;
 }
 

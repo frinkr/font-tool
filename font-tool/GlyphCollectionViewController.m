@@ -72,7 +72,16 @@
 
 - (void)setCurrentBlockIndex:(NSInteger)currentBlockIndex {
     _currentBlockIndex = currentBlockIndex;
-    [self.collectionView reloadData];
+    
+    if (floor(NSAppKitVersionNumber) <= NSAppKitVersionNumber10_11_3) {
+        // For some reason, 'itemForRepresentedObjectAtIndexPath' is not called upon 'reloadData' in Yosemit
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            [self.collectionView reloadData];
+        });
+    }
+    else {
+        [self.collectionView reloadData];
+    }
 }
 
 - (GlyphLabelCategory)glyphLabelCategory {
