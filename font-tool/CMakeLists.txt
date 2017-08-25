@@ -1,6 +1,5 @@
 cmake_minimum_required(VERSION 3.2)
 set(APP_NAME font-tool)
-set(APP_VERSION "1.2.1")
 
 project(font-tool)
 
@@ -10,6 +9,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 add_compile_options("-Wno-nullability-completeness")
 
 option(BUILD_FREETYPE_HARFBUZZ "Enable building of Freetype and harfbuzz" ON)
+set(APP_VERSION "1.0.0" CACHE STRING "The version of the application")
 
 if(BUILD_FREETYPE_HARFBUZZ)
   
