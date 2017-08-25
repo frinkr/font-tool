@@ -13,6 +13,10 @@
 #import "GlyphInfoViewController.h"
 #import "Typeface.h"
 
+#ifndef NSAppKitVersionNumber10_11_3
+    #define NSAppKitVersionNumber10_11_3 1404.34
+#endif
+
 @interface GlyphCollectionViewController ()
 @property (nonatomic, readonly, getter=document) TypefaceDocument * document;
 @property (nonatomic, readonly, getter=currentBlock) TypefaceGlyphBlock * block;
@@ -34,6 +38,12 @@
 
 - (void)viewWillAppear {
     [super viewWillAppear];
+    
+    if (floor(NSAppKitVersionNumber) <= NSAppKitVersionNumber10_11_3) {
+        self.collectionView.wantsLayer = YES;
+        self.collectionView.layer.backgroundColor = [[NSColor whiteColor] CGColor];
+    }
+    
     TypefaceDocument * document = self.view.window.windowController.document;
     [self setRepresentedObject:document];
     
