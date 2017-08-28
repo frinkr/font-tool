@@ -25,6 +25,7 @@ static TypefaceListWindowController * sharedTypefaceListWC;
 
 @property TypefaceSerifStyle serifStyle;
 @property TypefaceFormat format;
+@property NSString * familyName;
 
 - (BOOL)isEmpty;
 @end
@@ -39,6 +40,7 @@ static TypefaceListWindowController * sharedTypefaceListWC;
         self.designLanguages = [[NSMutableArray<NSString*> alloc] init];
         self.serifStyle = TypefaceSerifStyleAny;
         self.format = TypefaceFormatAny;
+        self.familyName = @"";
     }
     return self;
 }
@@ -50,7 +52,8 @@ static TypefaceListWindowController * sharedTypefaceListWC;
     _openTypeFeatures.count == 0 &&
     _designLanguages.count == 0 &&
     _serifStyle == TypefaceSerifStyleAny &&
-    _format == TypefaceFormatAny;
+    _format == TypefaceFormatAny &&
+    _familyName.length == 0;
 }
 
 - (instancetype)mutableCopyWithZone:(NSZone *)zone {
@@ -63,6 +66,7 @@ static TypefaceListWindowController * sharedTypefaceListWC;
     copy.designLanguages = [self.designLanguages mutableCopyWithZone:zone];
     copy.serifStyle = self.serifStyle;
     copy.format = self.format;
+    copy.familyName = [self.familyName mutableCopyWithZone:zone];
     return copy;
 }
 @end
@@ -87,6 +91,18 @@ static TypefaceListWindowController * sharedTypefaceListWC;
         return NO;
     if (![filter.openTypeFeatures isSubsetOfSet: self.attributes.openTypeFeatures])
         return NO;
+    
+    if (filter.familyName.length) {
+        BOOL contains = NO;
+        for (NSString * name in self.attributes.localizedFamilyNames.allValues) {
+            if ([name rangeOfString:filter.familyName options:NSCaseInsensitiveSearch].location != NSNotFound) {
+                contains = YES;
+                break;
+            }
+        }
+        if (!contains)
+            return NO;
+    }
     
     if (filter.designLanguages.count == 0)
         return YES;
@@ -168,6 +184,7 @@ static TypefaceListWindowController * sharedTypefaceListWC;
 @property (weak) IBOutlet NSTextField *otLanguagesTextField;
 @property (weak) IBOutlet NSTextField *otFeaturesTextField;
 
+@property (weak) IBOutlet NSTextField *familyNameTextField;
 @property (weak) IBOutlet NSSegmentedControl *serifStyleSegments;
 @property (weak) IBOutlet NSTextField *designLanguagesTextField;
 @property (weak) IBOutlet NSSegmentedControl *formatSegments;
@@ -281,7 +298,8 @@ static uint32_t   toolBarTags[] = {
     (self.filter.format != TypefaceFormatAny) ||
     (self.filter.designLanguages.count != 0) ||
     (self.filter.openTypeScripts.count != 0) ||
-    (self.filter.openTypeLanguages.count != 0);
+    (self.filter.openTypeLanguages.count != 0) ||
+    (self.filter.familyName.length);
     
     if (!showBadge) {
         NSMutableSet<OpenTypeFeatureTag*>* moreTags = [self.filter.openTypeFeatures mutableCopy];
@@ -605,6 +623,9 @@ static uint32_t   toolBarTags[] = {
     [sortedTags addObjectsFromArray:[secondRowTags allObjects]];
     [self.otFeaturesTextField setStringValue:[sortedTags componentsJoinedByString:@", "]];
     
+    // family name
+    self.familyNameTextField.stringValue = self.filter.familyName;
+    
     // design langauges
     self.designLanguagesTextField.stringValue = [self.filter.designLanguages componentsJoinedByString:@", "];
     
@@ -629,6 +650,7 @@ static uint32_t   toolBarTags[] = {
     
     self.filter.serifStyle = (TypefaceSerifStyle)self.serifStyleSegments.selectedSegment;
     self.filter.format = (TypefaceFormat)(self.formatSegments.selectedSegment - 1);
+    self.filter.familyName = self.familyNameTextField.stringValue;
     
     // OpenType scripts
     for (NSString * tagStr0 in [self.otScriptsTextField.stringValue componentsSeparatedByString:@","]) {
