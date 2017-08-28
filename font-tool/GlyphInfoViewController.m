@@ -67,6 +67,10 @@
     return appearance;
 }
 
+- (void)htmlTableView:(HtmlTableView*)view didOpenURL:(NSURL*)url {
+    [self.popover performClose:self];
+}
+
 - (void)loadGlyphcode:(TypefaceGlyphcode*)code ofDocument:(TypefaceDocument*)document {
     self.glyph = [document.typeface loadGlyph:code size:200];
     

@@ -9,22 +9,22 @@
 #import <WebKit/WebKit.h>
 
 @interface HtmlTableRow : NSObject
-@property (strong) NSString * _Nonnull key;
-@property (strong) NSString * _Nonnull value;
-- (id _Nonnull )initWithKey:(NSString*_Nonnull)key value:(NSString*_Nonnull)value;
+@property (strong) NSString *  key;
+@property (strong) NSString *  value;
+- (id  )initWithKey:(NSString*)key value:(NSString*)value;
 @end
 
 extern HtmlTableRow * MakeHtmlTableRow(NSString *key, NSString * value);
 
 @interface NSMutableArray  (HtmlTableRow)
-- (void)addRowWithKey:(NSString*_Nonnull)key stringValue:(NSString*_Nonnull)value;
-- (void)addRowWithKey:(NSString*_Nonnull)key boolValue:(BOOL)value;
-- (void)addRowWithKey:(NSString*_Nonnull)key integerValue:(NSInteger)value;
-- (void)addRowWithKey:(NSString*_Nonnull)key unsignedIntegerValue:(NSUInteger)value;
-- (void)addRowWithKey:(NSString*_Nonnull)key doubleValue:(double)value;
-- (void)addRowWithKey:(NSString*_Nonnull)key uint32HexValue:(NSUInteger)value withPrefix:(NSString*_Nonnull)prefix;
-- (void)addRowWithKey:(NSString*_Nonnull)key uint16HexValue:(NSUInteger)value withPrefix:(NSString*_Nonnull)prefix;
-- (void)addRowWithKey:(NSString*_Nonnull)key bitsValue:(NSUInteger)value count:(NSUInteger)count;
+- (void)addRowWithKey:(NSString*)key stringValue:(NSString*)value;
+- (void)addRowWithKey:(NSString*)key boolValue:(BOOL)value;
+- (void)addRowWithKey:(NSString*)key integerValue:(NSInteger)value;
+- (void)addRowWithKey:(NSString*)key unsignedIntegerValue:(NSUInteger)value;
+- (void)addRowWithKey:(NSString*)key doubleValue:(double)value;
+- (void)addRowWithKey:(NSString*)key uint32HexValue:(NSUInteger)value withPrefix:(NSString*)prefix;
+- (void)addRowWithKey:(NSString*)key uint16HexValue:(NSUInteger)value withPrefix:(NSString*)prefix;
+- (void)addRowWithKey:(NSString*)key bitsValue:(NSUInteger)value count:(NSUInteger)count;
 
 @end
 
@@ -34,8 +34,8 @@ typedef NSMutableArray<HtmlTableRow*> HtmlTableRows;
 
 @protocol HtmlTableViewDataSource <NSObject>
 @required
--(NSUInteger)numberOfRowsInHtmlTableView:(HtmlTableView*_Nonnull)view;
--(HtmlTableRow*_Nonnull)htmlTableView:(HtmlTableView*_Nonnull)view rowAtIndex:(NSUInteger)index;
+-(NSUInteger)numberOfRowsInHtmlTableView:(HtmlTableView*)view;
+-(HtmlTableRow*)htmlTableView:(HtmlTableView*)view rowAtIndex:(NSUInteger)index;
 @end
 
 
@@ -51,7 +51,9 @@ typedef NSMutableArray<HtmlTableRow*> HtmlTableRows;
 @end
 
 @protocol HtmlTableViewDelegate <NSObject>
-- (HtmlTableViewAppearance*_Nonnull) appearanceOfHtmlTableView:(HtmlTableView*_Nonnull)view;
+- (HtmlTableViewAppearance*) appearanceOfHtmlTableView:(HtmlTableView*)view;
+@optional
+- (void)htmlTableView:(HtmlTableView*)view didOpenURL:(NSURL*)url;
 @end
 
 

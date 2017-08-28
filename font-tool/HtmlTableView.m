@@ -149,6 +149,9 @@ static HtmlTableViewAppearance * defaultHtmlTableViewApperance;
         NSURL * url = navigationAction.request.URL;
         [(AppDelegate*)NSApp.delegate openURL:url];
         decisionHandler(WKNavigationActionPolicyCancel);
+        
+        if ([self.delegate respondsToSelector:@selector(htmlTableView:didOpenURL:)])
+            [self.delegate htmlTableView:self didOpenURL:url];
     }
     decisionHandler(WKNavigationActionPolicyAllow);
 
