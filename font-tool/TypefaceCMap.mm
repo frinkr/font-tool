@@ -29,7 +29,6 @@
 
 @end
 
-
 @interface TypefaceGlyphBlock ()
 @property NSMutableArray<TypefaceGlyphcode*> * internalGlyphCodes;
 @end
@@ -97,8 +96,6 @@
 
 
 @end
-
-
 
 #pragma mark  ###### TypefaceCMap ######
 
@@ -215,7 +212,6 @@ static NSMutableArray<TypefaceCMapPlatform*> * _allCMapPlatforms;
         return encoding == TT_MS_ID_UNICODE_CS || encoding == TT_MS_ID_UCS_4;
     
     return NO;
-    
 };
 
 - (NSArray<TypefaceGlyphBlock*>*)loadUnicodeBlocksOfVersion:(NSString*)version {
@@ -224,6 +220,10 @@ static NSMutableArray<TypefaceCMapPlatform*> * _allCMapPlatforms;
     
     _unicodeBlocks= [[NSMutableArray<TypefaceGlyphBlock*> alloc] init];
     
+    // Full Repertorire block
+    [_unicodeBlocks addObject:[self unicodeFullRepertoireBlock]];
+    
+    // Add each Unicode block
     NSArray<UnicodeBlock*> * uniBlocks = [UnicodeDatabase standardDatabase].unicodeBlocks;
     for (UnicodeBlock * block in uniBlocks) {
         TypefaceGlyphRangeBlock * b = [[TypefaceGlyphRangeBlock alloc] initWithFrom:block.from
@@ -235,6 +235,14 @@ static NSMutableArray<TypefaceCMapPlatform*> * _allCMapPlatforms;
     
     return _unicodeBlocks;
 }
+
+- (TypefaceGlyphRangeBlock*) unicodeFullRepertoireBlock {
+    return [[TypefaceGlyphRangeBlock alloc] initWithFrom:0
+                                                      to:0x10FFFF
+                                                   isGID:NO
+                                                    name:@"Unicode Full Repertoire" ];
+}
+
 
 + (TypefaceCMapPlatform*)platformById:(NSUInteger)platformId {
     if (!_allCMapPlatforms) {
@@ -280,10 +288,9 @@ static NSMutableArray<TypefaceCMapPlatform*> * _allCMapPlatforms;
 }
 
 - (NSMutableArray<TypefaceGlyphBlock*> *)loadGlyphBlocks {
-    
+    NSMutableArray<TypefaceGlyphBlock*> * blocks = [[NSMutableArray<TypefaceGlyphBlock*> alloc] init];
     TypefaceCMapPlatform * cmapPlatform = [TypefaceCMapPlatform platformById:_platformId];
     
-    NSMutableArray<TypefaceGlyphBlock*> * blocks = [[NSMutableArray<TypefaceGlyphBlock*> alloc] init];
     [blocks addObjectsFromArray:[cmapPlatform glyphBlocksOfEncoding:_encodingId]];
     [blocks insertObject:[self allGlyphsBlock] atIndex:ALL_GLYPHS_BLOCK_INDEX];
     
@@ -292,11 +299,10 @@ static NSMutableArray<TypefaceCMapPlatform*> * _allCMapPlatforms;
 
 
 - (TypefaceGlyphRangeBlock*) allGlyphsBlock {
-    TypefaceGlyphRangeBlock * b = [[TypefaceGlyphRangeBlock alloc] initWithFrom:0
-                                                                             to:self.numOfGlyphs
-                                                                          isGID:YES
-                                                                           name:@"All Glyphs"];
-    return b;
+    return [[TypefaceGlyphRangeBlock alloc] initWithFrom:0
+                                                      to:self.numOfGlyphs
+                                                   isGID:YES
+                                                    name:@"All Glyphs"];
 }
 
 - (BOOL)isUnicode {

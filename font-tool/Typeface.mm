@@ -777,7 +777,7 @@ typedef struct {
     return face;
 }
 
-#pragma mark *** Getters ***
+#pragma mark *** CMaps ***
 - (NSArray<TypefaceCMap*>*)cmaps {
     return cmaps;
 }
@@ -800,6 +800,24 @@ typedef struct {
     return [self currentCMap].isUnicode;
 }
 
+- (TypefaceCMap*)getCMapAtIndex:(NSUInteger)index {
+    return [cmaps objectAtIndex:index];
+}
+
+- (TypefaceCMap*)selectCMap:(TypefaceCMap*)cmap {
+    for (FT_Int i = 0; i < face->num_charmaps; ++ i) {
+        FT_CharMap cm = face->charmaps[i];
+        if (cm->platform_id == cmap.platformId && cm->encoding_id == cmap.encodingId) {
+            FT_Set_Charmap(face, cm);
+        }
+    }
+    [glyphNameCache rebuildFromFace:face isUnicodeCMap:self.currentCMap.isUnicode];
+    return self.currentCMap;
+}
+
+- (TypefaceCMap*)selectCMapAtIndex:(NSUInteger)index {
+    return [self selectCMap:[self getCMapAtIndex:index]];
+}
 
 #pragma mark *** Attributes & Names ***
 
@@ -989,27 +1007,6 @@ typedef struct {
         attributes.preferedLocalizedFullName = [NSString stringWithFormat:@"%@ %@", attributes.preferedLocalizedFamilyName, attributes.preferedLocalizedStyleName];
 }
 
-
-#pragma mark *** CMaps ***
-
-- (TypefaceCMap*)getCMapAtIndex:(NSUInteger)index {
-    return [cmaps objectAtIndex:index];
-}
-
-- (TypefaceCMap*)selectCMap:(TypefaceCMap*)cmap {
-    for (FT_Int i = 0; i < face->num_charmaps; ++ i) {
-        FT_CharMap cm = face->charmaps[i];
-        if (cm->platform_id == cmap.platformId && cm->encoding_id == cmap.encodingId) {
-            FT_Set_Charmap(face, cm);
-        }
-    }
-    [glyphNameCache rebuildFromFace:face isUnicodeCMap:self.currentCMap.isUnicode];
-    return self.currentCMap;
-}
-
-- (TypefaceCMap*)selectCMapAtIndex:(NSUInteger)index {
-    return [self selectCMap:[self getCMapAtIndex:index]];
-}
 
 #pragma mark *** Glyph Loading ***
 

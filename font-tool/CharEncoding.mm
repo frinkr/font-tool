@@ -384,7 +384,7 @@ static UnicodeDatabase *standardUnicodDatabase = nil;
 - (NSArray<UnicodeBlock*>*)unicodeBlocks {
     if (!_unicodeBlocks) {
         NSMutableArray<UnicodeBlock*> * blocks = [[NSMutableArray<UnicodeBlock*> alloc] init];
-        [blocks addObject:[UnicodeBlock unicodeBlockWithName:@"Unicode Full Repertoire" from:0 to:0x10FFFF]];
+        //[blocks addObject:[UnicodeBlock unicodeBlockWithName:@"Unicode Full Repertoire" from:0 to:0x10FFFF]];
         [blocks addObjectsFromArray:[self loadUnicodeBlocksFromFile:@"Blocks.txt"]];
 
         _unicodeBlocks = blocks;
