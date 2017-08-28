@@ -5,8 +5,7 @@
 #error "Stone age ape no ARC?"
 #endif
 
-#pragma clang diagnostic ignored "-Wno-nullability-completeness"
-
+#import "TypefaceCMap.h"
 
 typedef uint32_t ot_tag_t;
 #define MAKE_TAG4(a, b, c, d) ((ot_tag_t)((((uint8_t)(a))<<24)|(((uint8_t)(b))<<16)|(((uint8_t)(c))<<8)|((uint8_t)(d))))
@@ -24,7 +23,7 @@ typedef uint32_t ot_tag_t;
 
 
 #define INVALID_FACE_INDEX -1
-#define ALL_GLYPHS_BLOCK_INDEX 0
+
 
 typedef NS_ENUM(NSInteger, GlyphLookupType) {
     GlyphLookupByCharcode,
@@ -77,33 +76,6 @@ extern NSString * const TypefaceErrorDomain;
 
 
 
-@interface TypefaceGlyphcode : NSObject
-@property NSUInteger charcode;
-@property NSUInteger GID;
-@property BOOL       isGID;  // image loaded by charcode or glyphIndex
-
-+(instancetype)glyphCodeWithGID:(NSUInteger)gid;
-+(instancetype)glyphCodeWithCharcode:(NSUInteger)charcode;
-@end
-
-@interface TypefaceGlyphBlock : NSObject
-- (NSString *) name;
-- (NSUInteger) numOfGlyphs;
-- (TypefaceGlyphcode*)glyphCodeAtIndex:(NSUInteger)index;
-@end
-
-
-@interface TypefaceGlyphRangeBlock : TypefaceGlyphBlock
-@property NSUInteger from;
-@property NSUInteger to;
-@property (strong) NSString * blockName;
-@property BOOL isGID;
-
-- (id)initWithFrom: (NSUInteger) from to:(NSUInteger)to isGID:(BOOL)isGID name:(NSString*)name;
-@end
-
-
-
 @interface TypefaceGlyph : NSObject
 @property NSUInteger          charcode;     // the requested charcode, usually the first element in charcodes
 @property NSArray<NSNumber*> *charcodes;    // multiple charcodes may map to same glyph
@@ -132,22 +104,6 @@ extern NSString * const TypefaceErrorDomain;
 - (NSString*)charcodeHex;
 
 @end
-
-
-@interface TypefaceCMap : NSObject
-@property NSUInteger platformId;
-@property NSUInteger encodingId;
-@property (readonly, strong) NSString * name;
-
-@property (readonly, getter=glyphBlocks) NSArray<TypefaceGlyphBlock*> * glyphBlocks;
-
-@property (assign) Typeface * face;
-
-- (id)initWithPlatformId:(NSUInteger)platform encodingId:(NSUInteger)encoding ofFace:(Typeface*)face;
-
-- (BOOL)isUnicode;
-@end
-
 
 @interface TypefaceDescriptor : NSObject<NSCopying>
 @property (strong) NSURL    * fileURL;

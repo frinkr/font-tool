@@ -70,6 +70,7 @@ set(SOURCE_FILES
   ShapingWindowController.m
   Shapper.mm
   Typeface.mm
+  TypefaceCMap.mm
   TypefaceManager.m
   TypefaceNames.m
   TypefaceDocument.m
