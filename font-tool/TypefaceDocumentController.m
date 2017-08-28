@@ -67,7 +67,7 @@
 }
 
 - (IBAction)openFontFromFile:(id)sender {
-    [self beginOpenPanelWithCompletionHandler:^(NSArray<NSURL *> * _Nullable files) {
+    [self beginOpenPanelWithCompletionHandler:^(NSArray<NSURL *> * files) {
         for (NSURL * url in files) {
             
             NSInteger face = [TypefaceStylesWindowController selectTypefaceOfFile:url];
@@ -95,7 +95,7 @@
 }
 
 - (void)openDocumentForURL:(NSURL*)url {
-    [self openDocumentWithContentsOfURL:url display:YES completionHandler:^(NSDocument * _Nullable document, BOOL documentWasAlreadyOpen, NSError * _Nullable error) {
+    [self openDocumentWithContentsOfURL:url display:YES completionHandler:^(NSDocument * document, BOOL documentWasAlreadyOpen, NSError * error) {
         if (!error) {
             TypefaceDocument * tfDoc = (TypefaceDocument*)document;
             if (tfDoc.typeface) {
@@ -119,7 +119,7 @@
     return [super openDocumentWithContentsOfURL:url display:display];
 }
 
-- (NSString*)typeForContentsOfURL:(NSURL *)url error:(NSError * _Nullable __autoreleasing *)outError {
+- (NSString*)typeForContentsOfURL:(NSURL *)url error:(NSError * __autoreleasing *)outError {
     TypefaceDescriptor * descriptor = [TypefaceDocument typefaceDescriptorWithDocumentURL:url];
     if (descriptor)
         return @"public.font";

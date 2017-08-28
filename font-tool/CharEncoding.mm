@@ -40,7 +40,7 @@ NSString * RegexReplace(NSString * string,
     [regex enumerateMatchesInString:string
                             options:0
                               range:NSMakeRange(0, string.length)
-                         usingBlock:^(NSTextCheckingResult * _Nullable result, NSMatchingFlags flags, BOOL * _Nonnull stop) {
+                         usingBlock:^(NSTextCheckingResult * result, NSMatchingFlags flags, BOOL * stop) {
         [matchRanges addObject:[NSValue valueWithRange:result.range]];
     }];
     

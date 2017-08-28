@@ -362,7 +362,7 @@ int TypefaceGlyphCacheScoreCompare(const TypefaceGlyphCacheScore * a, const Type
     TypefaceGlyphCacheScore * scoreItems = (TypefaceGlyphCacheScore*)malloc(sizeof(TypefaceGlyphCacheScore) * cache.count);
     
     __block NSUInteger index = 0;
-    [cache enumerateKeysAndObjectsUsingBlock:^(NSNumber * _Nonnull key, TypefaceGlyphImageCacheItem * _Nonnull obj, BOOL * _Nonnull stop) {
+    [cache enumerateKeysAndObjectsUsingBlock:^(NSNumber *  key, TypefaceGlyphImageCacheItem *  obj, BOOL *  stop) {
         int score = 0;
         if (key.unsignedIntegerValue == 0) // .nodef never removed
             score = INT_MAX;

@@ -57,7 +57,7 @@
     return self.tableRows.count;
 }
 
--(HtmlTableRow*_Nonnull)htmlTableView:(HtmlTableView*_Nonnull)view rowAtIndex:(NSUInteger)index {
+-(HtmlTableRow*)htmlTableView:(HtmlTableView*)view rowAtIndex:(NSUInteger)index {
     return [self.tableRows objectAtIndex:index];
 }
 

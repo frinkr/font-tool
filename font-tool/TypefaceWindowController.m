@@ -17,7 +17,7 @@
 #import "AppDelegate.h"
 
 @interface TypefaceWindowController () <GlyphTableDelegate>
-@property (assign) IBOutlet NSComboBox * _Nonnull glyphListCombobox;
+@property (assign) IBOutlet NSComboBox * glyphListCombobox;
 @property (assign) IBOutlet NSComboBox *cmapCombobox;
 
 @property (nonatomic, getter=glyphCollectionViewController) GlyphCollectionViewController * glyphCollectionViewController;

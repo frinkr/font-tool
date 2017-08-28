@@ -412,7 +412,7 @@ static uint32_t   toolBarTags[] = {
         [self.familiesArrayController setFilterPredicate:nil];
     }
     else {
-        NSPredicate * predicate = [NSPredicate predicateWithBlock:^BOOL(id  _Nullable evaluatedObject, NSDictionary<NSString *,id> * _Nullable bindings) {
+        NSPredicate * predicate = [NSPredicate predicateWithBlock:^BOOL(id  evaluatedObject, NSDictionary<NSString *,id> *  bindings) {
             TMTypefaceFamily * family = (TMTypefaceFamily*)evaluatedObject;
             return [family filter:filter];
         }];
@@ -432,7 +432,7 @@ static uint32_t   toolBarTags[] = {
     
     NSArray<TMTypefaceFamily*> * families = self.familiesArrayController.arrangedObjects;
     
-    NSUInteger familyIndex = [families indexOfObjectPassingTest:^BOOL(TMTypefaceFamily * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+    NSUInteger familyIndex = [families indexOfObjectPassingTest:^BOOL(TMTypefaceFamily * obj, NSUInteger idx, BOOL * stop) {
         if ([obj.localizedFamilyName isEqualToString:familyName]) {
             *stop = YES;
             return YES;
@@ -445,7 +445,7 @@ static uint32_t   toolBarTags[] = {
     
     TMTypefaceFamily * family = [families objectAtIndex:familyIndex];
     
-    NSUInteger styleIndex = [family.faces indexOfObjectPassingTest:^BOOL(TMTypeface * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+    NSUInteger styleIndex = [family.faces indexOfObjectPassingTest:^BOOL(TMTypeface *  obj, NSUInteger idx, BOOL *  stop) {
         if ([obj.localizedStyleName isEqualToString:styleName]) {
             *stop = YES;
             return YES;
@@ -598,7 +598,7 @@ static uint32_t   toolBarTags[] = {
     [secondRowTags minusSet:[NSSet setWithArray:sortedTags]];
     
     NSMutableArray<OpenTypeFeatureTag*>* secondPart = [secondRowTags.allObjects mutableCopy];
-    [secondPart sortUsingComparator:^NSComparisonResult(OpenTypeFeatureTag *  _Nonnull obj1, OpenTypeFeatureTag *  _Nonnull obj2) {
+    [secondPart sortUsingComparator:^NSComparisonResult(OpenTypeFeatureTag *   obj1, OpenTypeFeatureTag *   obj2) {
         return [obj1.text compare:obj2.text];
     }];
     

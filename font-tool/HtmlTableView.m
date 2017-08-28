@@ -11,7 +11,7 @@
 #import "Common.h"
 
 @implementation HtmlTableRow
-- (id _Nonnull )initWithKey:(NSString*_Nonnull)key value:(NSString*_Nonnull)value {
+- (id  )initWithKey:(NSString*)key value:(NSString*)value {
     if (self = [super init]) {
         self.key = key;
         self.value = value;
@@ -27,37 +27,37 @@ HtmlTableRow * MakeHtmlTableRow(NSString *key, NSString * value) {
 
 @implementation NSMutableArray  (HtmlTableRow)
 
-- (void)addRowWithKey:(NSString*_Nonnull)key stringValue:(NSString*_Nonnull)value {
+- (void)addRowWithKey:(NSString*)key stringValue:(NSString*)value {
     if (!value)
         value = @"<i>nil</i>";
     [self addObject:MakeHtmlTableRow(key, value)];
 }
 
-- (void)addRowWithKey:(NSString*_Nonnull)key boolValue:(BOOL)value {
+- (void)addRowWithKey:(NSString*)key boolValue:(BOOL)value {
     return [self addRowWithKey:key stringValue:value?@"YES":@"NO"];
 }
 
-- (void)addRowWithKey:(NSString*_Nonnull)key integerValue:(NSInteger)value {
+- (void)addRowWithKey:(NSString*)key integerValue:(NSInteger)value {
     return [self addRowWithKey:key stringValue:[NSString stringWithFormat:@"%ld", value]];
 }
 
-- (void)addRowWithKey:(NSString*_Nonnull)key unsignedIntegerValue:(NSUInteger)value {
+- (void)addRowWithKey:(NSString*)key unsignedIntegerValue:(NSUInteger)value {
     return [self addRowWithKey:key stringValue:[NSString stringWithFormat:@"%lu", value]];
 }
 
-- (void)addRowWithKey:(NSString*_Nonnull)key doubleValue:(double)value{
+- (void)addRowWithKey:(NSString*)key doubleValue:(double)value{
     return [self addRowWithKey:key stringValue:[NSString stringWithFormat:@"%f", value]];
 }
 
-- (void)addRowWithKey:(NSString*_Nonnull)key uint32HexValue:(NSUInteger)value withPrefix:(NSString*)prefix{
+- (void)addRowWithKey:(NSString*)key uint32HexValue:(NSUInteger)value withPrefix:(NSString*)prefix{
     return [self addRowWithKey:key stringValue:[NSString stringWithFormat:@"%@%08lX", prefix, value]];
 }
 
-- (void)addRowWithKey:(NSString*_Nonnull)key uint16HexValue:(NSUInteger)value  withPrefix:(NSString*)prefix{
+- (void)addRowWithKey:(NSString*)key uint16HexValue:(NSUInteger)value  withPrefix:(NSString*)prefix{
     return [self addRowWithKey:key stringValue:[NSString stringWithFormat:@"%@%04lX", prefix, value]];
 }
 
-- (void)addRowWithKey:(NSString*_Nonnull)key bitsValue:(NSUInteger)value count:(NSUInteger)count {
+- (void)addRowWithKey:(NSString*)key bitsValue:(NSUInteger)value count:(NSUInteger)count {
     char * buf = (char *)calloc(count+1, 1);
     for (NSUInteger i = 0; i < count; ++ i) {
         if ((1 << i) & value)

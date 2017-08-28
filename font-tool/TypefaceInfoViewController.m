@@ -279,7 +279,7 @@ NSSet<NSNumber*> * HBSet2NSSet(hb_set_t *set) {
     
     // OT features
     NSMutableArray<NSString*> * sorted = [attributes.openTypeFeatures.allObjects mutableCopy];
-    [sorted sortUsingComparator:^NSComparisonResult(id  _Nonnull obj1, id  _Nonnull obj2) {
+    [sorted sortUsingComparator:^NSComparisonResult(id   obj1, id   obj2) {
         return [[obj1 text] compare:[obj2 text]];
     }];
     
@@ -868,7 +868,7 @@ NSSet<NSNumber*> * HBSet2NSSet(hb_set_t *set) {
     return tables[index];
 }
 
--(NSUInteger)numberOfRowsInHtmlTableView:(HtmlTableView*_Nonnull)view {
+-(NSUInteger)numberOfRowsInHtmlTableView:(HtmlTableView*)view {
     return self.currentRows.count;
 }
 

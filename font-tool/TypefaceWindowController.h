@@ -17,7 +17,7 @@
 - (IBAction)changeCMap:(id )sender;
 - (IBAction)lookupCharacter:(id )sender;
 
-- (NSInteger)numberOfItemsInComboBox:(NSComboBox *_Nonnull)comboBox;
+- (NSInteger)numberOfItemsInComboBox:(NSComboBox *)comboBox;
 - (id)comboBox:(NSComboBox *)comboBox objectValueForItemAtIndex:(NSInteger)index;
 
 - (void)lookupGlyphWithExpression:(NSString*)expression;
