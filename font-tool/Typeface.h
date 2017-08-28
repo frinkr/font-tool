@@ -24,7 +24,7 @@ typedef uint32_t ot_tag_t;
 
 
 #define INVALID_FACE_INDEX -1
-
+#define ALL_GLYPHS_BLOCK_INDEX 0
 
 typedef NS_ENUM(NSInteger, GlyphLookupType) {
     GlyphLookupByCharcode,

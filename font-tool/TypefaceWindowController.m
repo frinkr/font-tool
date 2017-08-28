@@ -86,7 +86,7 @@
     [self.typefaceDocument selectCMapAtIndex:index];
     
     [self.glyphListCombobox reloadData];
-    [self selectGlyphListAtIndex:0]; // 0 is 'All Glyphs'
+    [self selectGlyphListAtIndex:ALL_GLYPHS_BLOCK_INDEX];
 }
 
 - (void)selectGlyphListAtIndex:(NSUInteger)index {

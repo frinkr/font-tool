@@ -58,7 +58,7 @@ NSString * const TypefaceErrorDomain = @"TypefaceErrorDomain";
     
     code = [CharEncoding gidOfString:expression];
     if (code != INVALID_CODE_POINT)
-        return [GlyphLookupRequest createRequestWithId:code preferedBlock:preferedBlock];
+        return [GlyphLookupRequest createRequestWithId:code preferedBlock:ALL_GLYPHS_BLOCK_INDEX/*always prefer the glyph block*/];
     
     return [GlyphLookupRequest createRequestWithName:expression preferedBlock:preferedBlock];
 }
@@ -1323,7 +1323,7 @@ typedef struct {
             handler(0, 0, error);
         }
         else {
-            if (preferedBlockIndex == 0) { // 'All Glyph' block
+            if (preferedBlockIndex == ALL_GLYPHS_BLOCK_INDEX) { // 'All Glyphs' block
                 TypefaceGlyphName * tgn = [glyphNameCache lookupByCharcode:code];
                 if (tgn) {
                     return [self lookupGlyph:[GlyphLookupRequest createRequestWithId:tgn->GID preferedBlock:preferedBlockIndex]
@@ -1334,7 +1334,8 @@ typedef struct {
             NSUInteger blockIndex = INVALID_CODE_POINT;
             NSUInteger itemIndex = INVALID_CODE_POINT;
             std::vector<NSUInteger> searchBlocks;
-            searchBlocks.push_back(preferedBlockIndex);
+            if (preferedBlockIndex != ALL_GLYPHS_BLOCK_INDEX)
+                searchBlocks.push_back(preferedBlockIndex);
             for (NSUInteger i = 2; i < currCMap.glyphBlocks.count; ++ i)
                 searchBlocks.push_back(i);
             searchBlocks.push_back(1); // unicode full
@@ -1351,7 +1352,7 @@ typedef struct {
             }
             
             if (blockIndex == INVALID_CODE_POINT || itemIndex == INVALID_CODE_POINT) {
-                // let's fallback to 'All Glyph' block
+                // let's fallback to 'All Glyphs' block
                 TypefaceGlyphName * tgn = [glyphNameCache lookupByCharcode:code];
                 if (tgn) {
                     return [self lookupGlyph:[GlyphLookupRequest createRequestWithId:tgn->GID preferedBlock:preferedBlockIndex]
@@ -1366,7 +1367,7 @@ typedef struct {
     }
     else if (type == GlyphLookupByGlyphIndex) {
         NSUInteger gid = [request.lookupValue unsignedIntegerValue];
-        if (preferedBlockIndex != 0) {
+        if (preferedBlockIndex != ALL_GLYPHS_BLOCK_INDEX) {
             TypefaceGlyphName * tgn = [glyphNameCache lookupByGID:gid];
             if (tgn && tgn->charcode != INVALID_CODE_POINT) {
                 return [self lookupGlyph:[GlyphLookupRequest createRequestWithCharcode:tgn->charcode preferedBlock:preferedBlockIndex]
@@ -1374,11 +1375,11 @@ typedef struct {
             }
         }
         
-        // always goto the 'All Glyph' block
+        // always goto the 'All Glyphs' block
         if (gid == INVALID_CODE_POINT)
             error = [NSError errorWithDomain:TypefaceErrorDomain code:INVALID_CODE_POINT userInfo:nil];
         
-        handler(0, gid, error);
+        handler(ALL_GLYPHS_BLOCK_INDEX, gid, error);
     }
     else if (type == GlyphLookupByName) {
         TypefaceGlyphName * tgn = [glyphNameCache lookupByName:[(NSString*)(request.lookupValue) UTF8String]];
@@ -1388,7 +1389,7 @@ typedef struct {
                          completeHandler:handler];
             }
             else  {
-                if (preferedBlockIndex == 0) {
+                if (preferedBlockIndex == ALL_GLYPHS_BLOCK_INDEX) {
                     return [self lookupGlyph:[GlyphLookupRequest createRequestWithId:tgn->GID preferedBlock:preferedBlockIndex]
                              completeHandler:handler];
                 }
@@ -1652,8 +1653,8 @@ static NSMutableArray<TypefaceCMapPlatform*> * _allCMapPlatforms;
     TypefaceCMapPlatform * cmapPlatform = [TypefaceCMapPlatform platformById:_platformId];
     
     NSMutableArray<TypefaceGlyphBlock*> * blocks = [[NSMutableArray<TypefaceGlyphBlock*> alloc] init];
-    [blocks addObject:[self allGlyphsBlock]];
     [blocks addObjectsFromArray:[cmapPlatform glyphBlocksOfEncoding:_encodingId]];
+    [blocks insertObject:[self allGlyphsBlock] atIndex:ALL_GLYPHS_BLOCK_INDEX];
     
     return blocks;
 }
