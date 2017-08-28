@@ -423,7 +423,7 @@ static NSMutableArray<TypefaceCMapPlatform*> * _allCMapPlatforms;
             
             // find next Unicode block
             NSUInteger uniBlockIndex = currUniBlockIndex + 1;
-            if (uniBlockIndex < uniBlocks.count &&
+            while (uniBlockIndex < uniBlocks.count &&
                 ![[uniBlocks objectAtIndex:uniBlockIndex] containsUnicode:charcode]) {
                 ++ uniBlockIndex;
             }
