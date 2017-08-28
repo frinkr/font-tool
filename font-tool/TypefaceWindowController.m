@@ -86,7 +86,10 @@
     [self.typefaceDocument selectCMapAtIndex:index];
     
     [self.glyphListCombobox reloadData];
-    [self selectGlyphListAtIndex:ALL_GLYPHS_BLOCK_INDEX];
+    if (self.typefaceDocument.currentCMap.isUnicode)
+        [self selectGlyphListAtIndex:UNICODE_COMPACT_REPERTOIRE];
+    else
+        [self selectGlyphListAtIndex:FULL_GLYPH_LIST_BLOCK_INDEX];
 }
 
 - (void)selectGlyphListAtIndex:(NSUInteger)index {

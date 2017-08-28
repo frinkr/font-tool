@@ -367,17 +367,18 @@ static NSMutableArray<TypefaceCMapPlatform*> * _allCMapPlatforms;
 - (NSMutableArray<TypefaceGlyphBlock*> *)loadSuperBlocks {
     NSMutableArray<TypefaceGlyphBlock*> * superBlocks = [[NSMutableArray<TypefaceGlyphBlock*> alloc] init];
     
+    if (self.isUnicode) {
+        [self loadUnicodeFullRepertoireCompactBlock];
+        [superBlocks addObject:_unicodeFullRepertoireCompactBlock];
+    }
+    
     TypefaceCMapPlatform * cmapPlatform = [TypefaceCMapPlatform platformById:_platformId];
     for (TypefaceGlyphSection * subBlock in [cmapPlatform glyphBlocksOfEncoding:_encodingId])
         [superBlocks addObject:[self subBlockToSuperBlock:subBlock]];
     
-    if (self.isUnicode) {
-        [self loadUnicodeFullRepertoireCompactBlock];
-        [superBlocks insertObject:_unicodeFullRepertoireCompactBlock
-                          atIndex:1];
-    }
+
     [superBlocks insertObject:[self subBlockToSuperBlock: [self allGlyphsBlock]]
-                      atIndex:ALL_GLYPHS_BLOCK_INDEX];
+                      atIndex:FULL_GLYPH_LIST_BLOCK_INDEX];
     
     return superBlocks;
 }
@@ -465,7 +466,7 @@ static NSMutableArray<TypefaceCMapPlatform*> * _allCMapPlatforms;
         [blocks addObject:block];
     }
     
-    _unicodeFullRepertoireCompactBlock = [[TypefaceGlyphBlock alloc] initWithName:@"Unicode Compact" sections:blocks];
+    _unicodeFullRepertoireCompactBlock = [[TypefaceGlyphBlock alloc] initWithName:@"Unicode Compact Repertoire" sections:blocks];
     
     [self selectCharMapByIndex: oldIndex];
 
@@ -475,7 +476,7 @@ static NSMutableArray<TypefaceCMapPlatform*> * _allCMapPlatforms;
     return [[TypefaceGlyphRangeSection alloc] initWithFrom:0
                                                       to:self.numOfGlyphs
                                                    isGID:YES
-                                                    name:@"All Glyphs"];
+                                                    name:@"Full Glyph List"];
 }
 
 - (BOOL)isUnicode {

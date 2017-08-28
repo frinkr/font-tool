@@ -1,7 +1,9 @@
 #import <Cocoa/Cocoa.h>
 #import "Common.h"
 
-#define ALL_GLYPHS_BLOCK_INDEX 0
+#define FULL_GLYPH_LIST_BLOCK_INDEX 0
+#define UNICODE_COMPACT_REPERTOIRE 1
+#define UNICODE_FULL_REPERTOIRE 2
 
 @interface TypefaceGlyphcode : NSObject
 @property NSUInteger charcode;
