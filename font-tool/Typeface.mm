@@ -687,6 +687,10 @@ typedef struct {
     return self;
 }
 
+- (void)dealloc {
+    FT_Done_Face(face);
+}
+
 - (FT_Library)ftLib {
     return (FT_Library) [[TypefaceManager defaultManager] ftLib];
 }
@@ -709,10 +713,7 @@ typedef struct {
     
     // read all cmaps
     for (FT_Int i = 0; i < face->num_charmaps; ++ i) {
-        FT_CharMap cm = face->charmaps[i];
-        [cmaps addObject:[[TypefaceCMap alloc] initWithPlatformId:cm->platform_id
-                                                       encodingId:cm->encoding_id
-                                                      numOfGlyphs:face->num_glyphs]];
+        [cmaps addObject:[[TypefaceCMap alloc] initWithFace:face cmapIndex:i]];
     }
     
     self.fontSize = FT_DEFAULT_FONTSIZE;
@@ -1217,7 +1218,7 @@ typedef struct {
 
 
 #pragma mark *** Glyph Lookup ***
-- (void)lookupGlyph:(GlyphLookupRequest *)request completeHandler:(void (^)(NSUInteger blockIndex, NSUInteger itemIndex, NSError *error))handler {
+- (void)lookupGlyph:(GlyphLookupRequest *)request completeHandler:(void (^)(NSUInteger blockIndex, NSUInteger sectionIndex, NSUInteger itemIndex, NSError *error))handler {
     GlyphLookupType type = request.lookupType;
     NSUInteger preferedBlockIndex = request.preferedBlock;
     
@@ -1228,7 +1229,7 @@ typedef struct {
         
         if (code == INVALID_CODE_POINT) {
             error = [NSError errorWithDomain:TypefaceErrorDomain code:INVALID_CODE_POINT userInfo:nil];
-            handler(0, 0, error);
+            handler(0, 0, 0, error);
         }
         else {
             if (preferedBlockIndex == ALL_GLYPHS_BLOCK_INDEX) { // 'All Glyphs' block
@@ -1240,26 +1241,32 @@ typedef struct {
             }
             
             NSUInteger blockIndex = INVALID_CODE_POINT;
+            NSUInteger sectionIndex = INVALID_CODE_POINT;
             NSUInteger itemIndex = INVALID_CODE_POINT;
             std::vector<NSUInteger> searchBlocks;
             if (preferedBlockIndex != ALL_GLYPHS_BLOCK_INDEX)
                 searchBlocks.push_back(preferedBlockIndex);
-            for (NSUInteger i = 2; i < currCMap.glyphBlocks.count; ++ i)
+            for (NSUInteger i = 2; i < currCMap.blocks.count; ++ i)
                 searchBlocks.push_back(i);
             searchBlocks.push_back(1); // unicode full
             
             for (NSUInteger i : searchBlocks) {
-                if (i >= currCMap.glyphBlocks.count)
+                if (i >= currCMap.blocks.count)
                     continue;
-                TypefaceGlyphRangeBlock * block = (TypefaceGlyphRangeBlock*)[currCMap.glyphBlocks objectAtIndex:i];
-                if (block.from <= code && code <= block.to) {
-                    blockIndex = i;
-                    itemIndex = code - block.from;
-                    break;
+                TypefaceGlyphBlock * block = (TypefaceGlyphBlock*)[currCMap.blocks objectAtIndex:i];
+                for (NSUInteger j = 0; j < block.sections.count; ++ j) {
+                    TypefaceGlyphSection * section = [block.sections objectAtIndex:j];
+                    if ([section containsCode:code outIndex:&itemIndex]) {
+                        blockIndex = i;
+                        sectionIndex = j;
+                        break;
+                    }
                 }
+                if (blockIndex != INVALID_CODE_POINT)
+                    break;
             }
             
-            if (blockIndex == INVALID_CODE_POINT || itemIndex == INVALID_CODE_POINT) {
+            if (blockIndex == INVALID_CODE_POINT || sectionIndex == INVALID_CODE_POINT || itemIndex == INVALID_CODE_POINT) {
                 // let's fallback to 'All Glyphs' block
                 TypefaceGlyphName * tgn = [glyphNameCache lookupByCharcode:code];
                 if (tgn) {
@@ -1270,7 +1277,7 @@ typedef struct {
                 error = [NSError errorWithDomain:TypefaceErrorDomain code:INVALID_CODE_POINT userInfo:nil];
             }
             
-            handler(blockIndex, itemIndex, error);
+            handler(blockIndex, sectionIndex, itemIndex, error);
         }
     }
     else if (type == GlyphLookupByGlyphIndex) {
@@ -1287,7 +1294,7 @@ typedef struct {
         if (gid == INVALID_CODE_POINT)
             error = [NSError errorWithDomain:TypefaceErrorDomain code:INVALID_CODE_POINT userInfo:nil];
         
-        handler(ALL_GLYPHS_BLOCK_INDEX, gid, error);
+        handler(ALL_GLYPHS_BLOCK_INDEX, 0, gid, error);
     }
     else if (type == GlyphLookupByName) {
         TypefaceGlyphName * tgn = [glyphNameCache lookupByName:[(NSString*)(request.lookupValue) UTF8String]];
@@ -1309,7 +1316,7 @@ typedef struct {
         }
         else {
             error = [NSError errorWithDomain:TypefaceErrorDomain code:INVALID_CODE_POINT userInfo:nil];
-            handler(INVALID_CODE_POINT, INVALID_CODE_POINT, error);
+            handler(INVALID_CODE_POINT, INVALID_CODE_POINT, INVALID_CODE_POINT, error);
         }
     }
 }
@@ -1368,9 +1375,7 @@ typedef struct {
     }
 }
 
-- (void)dealloc {
-    FT_Done_Face(face);
-}
+
 
 
 @end

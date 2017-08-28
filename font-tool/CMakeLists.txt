@@ -102,6 +102,7 @@ set(NIB_FILES
   GlyphTableWindow.storyboard
   ToolBox.storyboard
   GlyphCollectionViewItem.xib
+  GlyphCollectionViewHeader.xib
   TBColorConstantsViewItem.xib
   StandardCollectionViewItem.xib
 )

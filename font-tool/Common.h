@@ -16,3 +16,6 @@
 #endif
 
 #define OS_IS_BELOW_SIERRA  (floor(NSAppKitVersionNumber) <= NSAppKitVersionNumber10_11_3)
+
+
+typedef struct FT_FaceRec_ * OpaqueFTFace;

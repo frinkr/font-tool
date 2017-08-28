@@ -1,4 +1,5 @@
 #import <Cocoa/Cocoa.h>
+#import "Common.h"
 
 #define ALL_GLYPHS_BLOCK_INDEX 0
 
@@ -11,31 +12,48 @@
 +(instancetype)glyphCodeWithCharcode:(NSUInteger)charcode;
 @end
 
-@interface TypefaceGlyphBlock : NSObject
+@interface TypefaceGlyphSection : NSObject
 - (NSString *) name;
 - (NSUInteger) numOfGlyphs;
 - (TypefaceGlyphcode*)glyphCodeAtIndex:(NSUInteger)index;
+- (BOOL)containsCode:(NSUInteger)code outIndex:(NSUInteger*)outIndex;
 @end
 
 
-@interface TypefaceGlyphRangeBlock : TypefaceGlyphBlock
+@interface TypefaceGlyphRangeSection : TypefaceGlyphSection
 @property NSUInteger from;
 @property NSUInteger to;
 @property (strong) NSString * blockName;
 @property BOOL isGID;
 
 - (id)initWithFrom: (NSUInteger) from to:(NSUInteger)to isGID:(BOOL)isGID name:(NSString*)name;
+- (BOOL)containsCode:(NSUInteger)code outIndex:(NSUInteger*)outIndex;
 @end
 
+@interface TypefaceGlyphArraySection : TypefaceGlyphSection
+@property (strong) NSArray<NSNumber*> * glyphs;
+@property (strong) NSString * blockName;
+@property BOOL isGID;
+- (instancetype)initWithGlyphs:(NSArray<NSNumber*>*)glyphs isGID:(BOOL)isGID name:(NSString*)name;
+- (BOOL)containsCode:(NSUInteger)code outIndex:(NSUInteger*)outIndex;
+@end
+
+@interface TypefaceGlyphBlock: NSObject
+@property NSString * name;
+@property NSArray<TypefaceGlyphSection*> * sections;
+- (instancetype)initWithName:(NSString*)name sections:(NSArray<TypefaceGlyphSection*> *)sections;
+@end
 
 @interface TypefaceCMap : NSObject
-@property NSUInteger platformId;
-@property NSUInteger encodingId;
-@property NSUInteger numOfGlyphs;
+@property (readonly) NSUInteger index;
+@property (readonly) NSUInteger platformId;
+@property (readonly) NSUInteger encodingId;
+@property (readonly) NSUInteger numOfGlyphs;
 @property (readonly, strong) NSString * name;
-@property (readonly, getter=glyphBlocks) NSArray<TypefaceGlyphBlock*> * glyphBlocks;
+@property (readonly, getter=blocks) NSArray<TypefaceGlyphBlock*> * blocks;
 
-- (id)initWithPlatformId:(NSUInteger)platform encodingId:(NSUInteger)encoding numOfGlyphs:(NSUInteger)nrGlyphs;
+- (instancetype)initWithFace:(OpaqueFTFace)ftFace cmapIndex:(NSUInteger)index;
 
 - (BOOL)isUnicode;
+
 @end

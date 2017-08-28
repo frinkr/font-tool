@@ -60,7 +60,7 @@
 }
 
 - (TypefaceGlyphBlock*)currentBlock {
-    return [self.document.currentCMap.glyphBlocks objectAtIndex:self.currentBlockIndex];
+    return [self.document.currentCMap.blocks objectAtIndex:self.currentBlockIndex];
 }
 
 - (NSInteger)currentBlockIndex {
@@ -90,30 +90,46 @@
     [self.collectionView reloadData];
 }
 
-- (void)selectGlyphAtIndex:(NSUInteger)index {
-    // deselect all
+- (void)selectItem:(NSUInteger)itemIndex inSection:(NSUInteger) sectionIndex {
     [self.collectionView deselectItemsAtIndexPaths:[self.collectionView selectionIndexPaths]];
     
-    NSIndexPath * path = [NSIndexPath indexPathForItem:index inSection:0];
+    NSIndexPath * path = [NSIndexPath indexPathForItem:itemIndex inSection:sectionIndex];
     NSSet<NSIndexPath*> * set = [NSSet setWithObjects:path, nil];
     [self.collectionView selectItemsAtIndexPaths:set scrollPosition:NSCollectionViewScrollPositionCenteredVertically];
 }
 
 #pragma mark *** NSCollectionView datasource and delegate ***
 - (NSInteger)numberOfSectionsInCollectionView:(NSCollectionView *)collectionView {
-    return 1;
+    return self.currentBlock.sections.count;
 }
 
 - (NSInteger)collectionView:(NSCollectionView *)collectionView numberOfItemsInSection:(NSInteger)section {
-    return self.currentBlock.numOfGlyphs;
+    return [self.currentBlock.sections objectAtIndex:section].numOfGlyphs;
+}
+
+- (NSView*)collectionView:(NSCollectionView *)collectionView viewForSupplementaryElementOfKind:(NSString *)kind atIndexPath:(NSIndexPath *)indexPath {
+    if ([kind isEqualToString:NSCollectionElementKindSectionHeader]) {
+        NSView * view = [collectionView makeSupplementaryViewOfKind:kind withIdentifier:@"GlyphCollectionViewHeader" forIndexPath:indexPath];
+        for (NSView * subView in view.subviews) {
+            if ([subView isKindOfClass:[NSTextField class]]) {
+                NSTextField * textField = (NSTextField*)subView;
+                NSUInteger section = indexPath.section;
+                textField.stringValue = [self.currentBlock.sections objectAtIndex:section].name;
+                break;
+            }
+        }
+        return view;
+    }
+    return nil;
 }
 
 - (NSCollectionViewItem *)collectionView:(NSCollectionView *)collectionView itemForRepresentedObjectAtIndexPath:(NSIndexPath *)indexPath {
     GlyphCollectionViewItem * item = [collectionView makeItemWithIdentifier:@"GlyphCollectionViewItem" forIndexPath:indexPath];
     item.delegate = self;
     
+    NSUInteger section = indexPath.section;
     NSUInteger index = indexPath.item;
-    TypefaceGlyphcode * gc = [self.currentBlock glyphCodeAtIndex:index];
+    TypefaceGlyphcode * gc = [[self.currentBlock.sections objectAtIndex:section] glyphCodeAtIndex:index];
     [item setGlyphCode:gc
             ofDocument:self.document
     GlyphLabelCategory:self.glyphLabelCategory];
@@ -121,10 +137,11 @@
     return item;
 }
 
+
 - (void)collectionView:(NSCollectionView *)collectionView didSelectItemsAtIndexPaths:(NSSet<NSIndexPath *> *)indexPaths {
-    if ([self.delegate respondsToSelector:@selector(glyphViewController:selectGlyphAtIndex:)]) {
-        NSIndexPath * path = [indexPaths anyObject];
-        [self.delegate glyphViewController:self selectGlyphAtIndex:path.item];
+    if ([self.delegate respondsToSelector:@selector(glyphViewController:didSelectGlyphAtIndexPath:)]) {
+        [self.delegate glyphViewController:self
+                 didSelectGlyphAtIndexPath:[indexPaths anyObject]];
     }
 }
 

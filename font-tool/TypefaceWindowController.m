@@ -142,10 +142,10 @@
     if (!request)
         return;
     [self.typefaceDocument.typeface lookupGlyph: request
-                                completeHandler:^(NSUInteger blockIndex, NSUInteger itemIndex, NSError * error) {
+                                completeHandler:^(NSUInteger blockIndex, NSUInteger sectionIndex, NSUInteger itemIndex, NSError * error) {
                                     if (error)
                                         return;
-                                    [self selectBlockAtIndex:blockIndex itemAtIndex:itemIndex];
+                                    [self selectGlyphAtBlockIndex:blockIndex sectionIndex:sectionIndex itemIndex:itemIndex];
                                     
                                 }];
 }
@@ -154,12 +154,12 @@
     return self.glyphListCombobox.indexOfSelectedItem;
 }
 
-- (void)selectBlockAtIndex:(NSUInteger)blockIndex itemAtIndex:(NSUInteger)itemIndex {
+- (void)selectGlyphAtBlockIndex:(NSUInteger)blockIndex sectionIndex:(NSUInteger) sectionIndex itemIndex:(NSUInteger)itemIndex {
     if (blockIndex != self.glyphListCombobox.indexOfSelectedItem)
         [self selectGlyphListAtIndex:blockIndex];
     
     dispatch_async(dispatch_get_main_queue(), ^{
-        [self.glyphCollectionViewController selectGlyphAtIndex:itemIndex];
+        [self.glyphCollectionViewController selectItem:itemIndex inSection:sectionIndex];
     });
 }
 
@@ -183,7 +183,7 @@
     if (comboBox == self.cmapCombobox)
         return [self.typefaceDocument cmaps].count;
     else if (comboBox == self.glyphListCombobox)
-        return self.typefaceDocument.currentCMap.glyphBlocks.count;
+        return self.typefaceDocument.currentCMap.blocks.count;
     else
         return 0;
 }
@@ -192,7 +192,7 @@
     if (comboBox == self.cmapCombobox)
         return [[self.typefaceDocument cmaps] objectAtIndex:index].name;
     if (comboBox == self.glyphListCombobox)
-        return [self.typefaceDocument.currentCMap.glyphBlocks objectAtIndex:index].name;
+        return [self.typefaceDocument.currentCMap.blocks objectAtIndex:index].name;
     else
         return nil;
 }
@@ -202,7 +202,7 @@
         NSString * maxPrefixMatch = @"";
         NSUInteger maxPrefixMatchLength = 0;
         
-        for (TypefaceGlyphBlock * block in self.typefaceDocument.currentCMap.glyphBlocks) {
+        for (TypefaceGlyphBlock * block in self.typefaceDocument.currentCMap.blocks) {
             NSString * prefix = [block.name commonPrefixWithString:string options:NSCaseInsensitiveSearch];
             if (prefix.length > maxPrefixMatchLength) {
                 maxPrefixMatch = block.name;
@@ -216,7 +216,7 @@
 
 - (NSUInteger)comboBox:(NSComboBox *)comboBox indexOfItemWithStringValue:(NSString *)string {
     if (comboBox == self.glyphListCombobox) {
-        NSArray<TypefaceGlyphBlock*> * blocks = self.typefaceDocument.currentCMap.glyphBlocks;
+        NSArray<TypefaceGlyphBlock*> * blocks = self.typefaceDocument.currentCMap.blocks;
         for (NSUInteger i = 0; i < blocks.count; ++ i) {
             if ([[blocks objectAtIndex:i].name isEqualToString:string])
                 return i;

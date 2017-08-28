@@ -13,7 +13,7 @@
 
 @protocol GlyphCollectionViewControllerDelegate <NSObject>
 @optional
-- (void)glyphViewController:(GlyphCollectionViewController*)vc selectGlyphAtIndex:(NSUInteger)index;
+- (void)glyphViewController:(GlyphCollectionViewController*)vc didSelectGlyphAtIndexPath:(NSIndexPath*)indexPath;
 @end
 
 @interface GlyphCollectionViewController : NSViewController<NSCollectionViewDataSource, GlyphCollectionViewItemDelegate>
@@ -28,6 +28,6 @@
 - (NSInteger)collectionView:(NSCollectionView *)collectionView numberOfItemsInSection:(NSInteger)section;
 - (NSCollectionViewItem *)collectionView:(NSCollectionView *)collectionView itemForRepresentedObjectAtIndexPath:(NSIndexPath *)indexPath;
 
-- (void)selectGlyphAtIndex:(NSUInteger)index;
+- (void)selectItem:(NSUInteger)itemIndex inSection:(NSUInteger) sectionIndex;
 
 @end

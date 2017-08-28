@@ -44,7 +44,6 @@ typedef NS_ENUM(NSInteger, GlyphLookupType) {
 +(instancetype)createRequestWithExpression:(NSString*)expression preferedBlock:(NSUInteger)preferedBlock;
 @end
 
-typedef void * OpaqueFTFace;
 typedef void * OpaqueFTLibrary;
 
 extern NSString * const TypefaceErrorDomain;
@@ -216,7 +215,7 @@ typedef NS_ENUM(NSInteger, TypefaceFormat) {
 - (TypefaceGlyph*)loadGlyph:(TypefaceGlyphcode*)code; // load with default font size, with cache
 - (TypefaceGlyph*)loadGlyph:(TypefaceGlyphcode*)gc size:(CGFloat)fontSize; // no cache
 
-- (void)lookupGlyph:(GlyphLookupRequest*) request completeHandler:(void (^)(NSUInteger blockIndex, NSUInteger itemIndex, NSError *error))handler;
+- (void)lookupGlyph:(GlyphLookupRequest*) request completeHandler:(void (^)(NSUInteger blockIndex, NSUInteger sectionIndex, NSUInteger itemIndex, NSError *error))handler;
 
 - (BOOL)hasCanonicalGlyphNames;
 - (NSString*)canonicalNameOfGlyph:(NSUInteger)gid;
