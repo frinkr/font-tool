@@ -8,6 +8,7 @@
 
 #import "HtmlTableView.h"
 #import "AppDelegate.h"
+#import "CharEncoding.h"
 #import "Common.h"
 
 @implementation HtmlTableRow
@@ -58,17 +59,7 @@ HtmlTableRow * MakeHtmlTableRow(NSString *key, NSString * value) {
 }
 
 - (void)addRowWithKey:(NSString*)key bitsValue:(NSUInteger)value count:(NSUInteger)count {
-    char * buf = (char *)calloc(count+1, 1);
-    for (NSUInteger i = 0; i < count; ++ i) {
-        if ((1 << i) & value)
-            buf[count - 1 - i] = '1';
-        else
-            buf[count - 1 - i] = '0';
-    }
-    NSString * str = [NSString stringWithCString:buf encoding:NSASCIIStringEncoding];
-    free(buf);
-    
-    return [self addRowWithKey:key stringValue:str];
+    return [self addRowWithKey:key stringValue:[CharEncoding bitsStringOfNumber:value count:count]];
 }
 
 @end

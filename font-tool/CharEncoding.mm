@@ -247,6 +247,20 @@ NSString * RegexReplace(NSString * string,
     });
 }
 
++(NSString*)bitsStringOfNumber:(NSUInteger)value count:(NSUInteger)count {
+    char * buf = (char *)calloc(count+1, 1);
+    for (NSUInteger i = 0; i < count; ++ i) {
+        if ((1 << i) & value)
+            buf[count - 1 - i] = '1';
+        else
+            buf[count - 1 - i] = '0';
+    }
+    NSString * str = [NSString stringWithCString:buf encoding:NSASCIIStringEncoding];
+    free(buf);
+    return str;
+}
+
+
 @end
 
 static NSMutableArray<UnicodeBlock*> * blocks;

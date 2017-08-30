@@ -18,6 +18,7 @@
 #include <hb-ft.h>
 #include <hb-ot.h>
 
+#import "CharEncoding.h"
 #import "TypefaceDocument.h"
 #import "TypefaceNames.h"
 #import "TypefaceInfoViewController.h"
@@ -313,9 +314,54 @@ NSSet<NSNumber*> * HBSet2NSSet(hb_set_t *set) {
     HtmlTableRows * items = [[HtmlTableRows alloc] init];
     [items addRowWithKey:@"Family" stringValue:face.familyName];
     [items addRowWithKey:@"Style"  stringValue:face.styleName];
+    
+    [items addRowWithKey:@"Face Index" unsignedIntegerValue: face.faceIndex];
+    
+    // Flags
+    NSMutableArray<NSString*> * faceFlagsStr = [[NSMutableArray<NSString*> alloc] init]; {
+        [faceFlagsStr addObject:[CharEncoding bitsStringOfNumber: ftFace->face_flags
+                                                       count:15]];
+        
+        NSDictionary<NSNumber*, NSString*> * flagNumbers = @{
+                                                             @(FT_FACE_FLAG_SCALABLE): @"SCALABLE",
+                                                             @(FT_FACE_FLAG_FIXED_SIZES): @"FIXED_SIZES",
+                                                             @(FT_FACE_FLAG_FIXED_WIDTH): @"FIXED_WIDTH",
+                                                             @(FT_FACE_FLAG_SFNT): @"SFNT",
+                                                             @(FT_FACE_FLAG_HORIZONTAL): @"HORIZONTAL",
+                                                             @(FT_FACE_FLAG_VERTICAL): @"VERTICAL",
+                                                             @(FT_FACE_FLAG_KERNING): @"KERNING",
+                                                             @(FT_FACE_FLAG_FAST_GLYPHS): @"FAST_GLYPHS",
+                                                             @(FT_FACE_FLAG_MULTIPLE_MASTERS): @"MULTIPLE_MASTERS",
+                                                             @(FT_FACE_FLAG_GLYPH_NAMES): @"GLYPH_NAMES",
+                                                             @(FT_FACE_FLAG_EXTERNAL_STREAM): @"EXTERNAL_STREAM",
+                                                             @(FT_FACE_FLAG_HINTER): @"HINTER",
+                                                             @(FT_FACE_FLAG_CID_KEYED): @"CID_KEYED",
+                                                             @(FT_FACE_FLAG_TRICKY): @"TRICKY",
+                                                             @(FT_FACE_FLAG_COLOR): @"COLOR",
+                                                             };
+        for (NSNumber * n in flagNumbers) {
+            if (ftFace->face_flags & n.unsignedIntegerValue)
+                [faceFlagsStr addObject:[NSString stringWithFormat:@"- %@", [flagNumbers objectForKey:n]]];
+        }
+        [items addRowWithKey:@"Face Flags" stringValue:[faceFlagsStr componentsJoinedByString:@"<br>"]];
+    }
+    NSMutableArray<NSString*> * styleFlagsStr = [[NSMutableArray<NSString*> alloc] init]; {
+        [styleFlagsStr addObject:[CharEncoding bitsStringOfNumber: ftFace->style_flags
+                                                           count:2]];
+        
+        NSDictionary<NSNumber*, NSString*> * flagNumbers = @{
+                                                             @(FT_STYLE_FLAG_ITALIC): @"ITALIC",
+                                                             @(FT_STYLE_FLAG_BOLD): @"BOLD",
+                                                             };
+        for (NSNumber * n in flagNumbers) {
+            if (ftFace->style_flags & n.unsignedIntegerValue)
+                [styleFlagsStr addObject:[NSString stringWithFormat:@"- %@", [flagNumbers objectForKey:n]]];
+        }
+        [items addRowWithKey:@"Style Flags" stringValue:[styleFlagsStr componentsJoinedByString:@"<br>"]];
+    }
+    
     [items addRowWithKey:@"File"   stringValue:face.fileURL.path];
     [items addRowWithKey:@"Format" stringValue:[NSString stringWithUTF8String:FT_Get_Font_Format(ftFace)]];
-    
     { // CID
         FT_Bool isCID = false;
         error = FT_Get_CID_Is_Internally_CID_Keyed(ftFace, &isCID);
@@ -335,8 +381,6 @@ NSSet<NSNumber*> * HBSet2NSSet(hb_set_t *set) {
                                                    supplement]];
         }
     }
-    
-    [items addRowWithKey:@"Face Index" unsignedIntegerValue: face.faceIndex];
     
     
     TypefaceCMap * cmap = face.currentCMap;

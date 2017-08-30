@@ -50,6 +50,9 @@ FT_END_DECLS
 
 // input mix of U+ notation and chars, ABCU+AFFEF.
 +(NSString*)decodeUnicodeMixed:(NSString*)string;
+
++(NSString*)bitsStringOfNumber:(NSUInteger)value count:(NSUInteger)count;
+
 @end
 
 
