@@ -13,6 +13,7 @@
 #include FT_TYPE1_TABLES_H
 #include FT_TRUETYPE_TABLES_H
 #include FT_CID_H
+#include FT_MULTIPLE_MASTERS_H
 
 #include <hb.h>
 #include <hb-ft.h>
@@ -225,10 +226,10 @@ NSSet<NSNumber*> * HBSet2NSSet(hb_set_t *set) {
         FT_SfntName sfntName;
         error = FT_Get_Sfnt_Name(ftFace, i, &sfntName);
         if (sfntName.name_id == TT_NAME_ID_COPYRIGHT && !copyright) {
-            copyright = SFNTNameGetString(&sfntName);
+            copyright = SFNTNameGetValue(&sfntName);
         }
         if (sfntName.name_id == TT_NAME_ID_VERSION_STRING && !version) {
-            version = SFNTNameGetString(&sfntName);
+            version = SFNTNameGetValue(&sfntName);
         }
     }
     if (!version) version = @"Unknown";
@@ -379,6 +380,56 @@ NSSet<NSNumber*> * HBSet2NSSet(hb_set_t *set) {
                                                    [NSString stringWithUTF8String:registry],
                                                    [NSString stringWithUTF8String:ordering],
                                                    supplement]];
+        }
+    }
+    
+    // Multiple master/ font variation
+    {
+        FT_MM_Var * mmvar = NULL;
+        FT_Multi_Master  mmt1;
+        BOOL isMMT1 = false;
+        
+        if (FT_HAS_MULTIPLE_MASTERS(ftFace)) {
+            if (FT_Get_MM_Var(ftFace, &mmvar) != 0)
+                mmvar = NULL;
+            if (FT_Get_Multi_Master(ftFace, &mmt1) == 0)
+                isMMT1 = YES;;
+        }
+        
+        // opentype font variation
+        if (mmvar && !isMMT1) {
+            for (FT_UInt i = 0; i < mmvar->num_axis; ++ i) {
+                const FT_Var_Axis * axis = mmvar->axis + i;
+                NSString * str = [NSString stringWithFormat:@"TAG: '%@'<br> Name: %s(%@)<br> Min:%f<br> Max:%f<br> Default:%f",
+                                  [TypefaceTag tagFromCode:axis->tag],
+                                  axis->name,
+                                  SFNTNameGetValueFromId(ftFace, axis->strid),
+                                  axis->minimum/65536.0,
+                                  axis->maximum/65536.0,
+                                  axis->def/65536.0];
+                
+                [items addRowWithKey:[NSString stringWithFormat:@"MM Axis %d", i]
+                         stringValue:str];
+            }
+            for (FT_UInt i = 0; i < mmvar->num_namedstyles; ++ i) {
+                const FT_Var_Named_Style * namedStyle = mmvar->namedstyle + i;
+                NSMutableString * coordStr = [[NSMutableString alloc] init];
+                for (FT_UInt j = 0; j < mmvar->num_axis; ++ j) {
+                    if (j) [coordStr appendString:@", "];
+                    [coordStr appendFormat:@"%f", namedStyle->coords[j]/65536.0];
+                }
+                
+                NSString * str = [NSString stringWithFormat:@"Name (%d): %@<br> PS Name (%d): %@<br> Coords: %@",
+                                  namedStyle->strid,
+                                  SFNTNameGetValueFromId(ftFace, namedStyle->strid),
+                                  namedStyle->psid,
+                                  SFNTNameGetValueFromId(ftFace, namedStyle->psid),
+                                  coordStr];
+                
+                [items addRowWithKey:[NSString stringWithFormat:@"MM Named Style %d", i]
+                         stringValue:str];
+                
+            }
         }
     }
     
@@ -677,9 +728,10 @@ NSSet<NSNumber*> * HBSet2NSSet(hb_set_t *set) {
         FT_SfntName sfntName;
         error = FT_Get_Sfnt_Name(ftFace, i, &sfntName);
         
-        [items addRowWithKey:[NSString stringWithFormat:@"(%d-%d %@) %@", sfntName.platform_id, sfntName.encoding_id, SFNTNameGetLanguage(&sfntName, ftFace),
+        [items addRowWithKey:[NSString stringWithFormat:@"(%d-%d %@) %d %@", sfntName.platform_id, sfntName.encoding_id, SFNTNameGetLanguage(&sfntName, ftFace),
+                              sfntName.name_id,
                            SFNTNameGetName(&sfntName) ]
-              stringValue:SFNTNameGetString(&sfntName)];
+              stringValue:SFNTNameGetValue(&sfntName)];
     }
     return items;
 }

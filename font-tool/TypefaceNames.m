@@ -644,7 +644,7 @@ NSString * SFNTNameGetName(FT_SfntName * sfntName) {
     return [NSString stringWithUTF8String:names[sfntName->name_id]];
 }
 
-NSString * SFNTNameGetString(FT_SfntName * sfntName) {
+NSString * SFNTNameGetValue(FT_SfntName * sfntName) {
     return FTGetUnicodeString(sfntName->platform_id, sfntName->encoding_id, sfntName->string, sfntName->string_len);
 }
 
@@ -658,6 +658,26 @@ NSString * SFNTNameGetLanguage(FT_SfntName *sfntName, FT_Face face) {
     return FTGetPlatformLanguageName(sfntName->platform_id, sfntName->language_id);
 }
 
+
+BOOL SFNTNameGetFromId(FT_Face face, NSUInteger nameId, FT_SfntName * sfnt) {
+    FT_UInt count = FT_Get_Sfnt_Name_Count(face);
+
+    for (FT_UInt i = 0; i < count; ++ i) {
+        FT_SfntName sfntName;
+        if (!FT_Get_Sfnt_Name(face, i, &sfntName) && (sfntName.name_id == nameId)) {
+            *sfnt = sfntName;
+            return YES;
+        }
+    }
+    return NO;
+}
+
+NSString * SFNTNameGetValueFromId(FT_Face face, NSUInteger nameId) {
+    FT_SfntName name;
+    if (SFNTNameGetFromId(face, nameId, &name))
+        return SFNTNameGetValue(&name);
+    return nil;
+}
 
 NSString * SFNTTagName(FT_ULong tagValue) {
     char buf [] = {tagValue >> 24, tagValue >> 16, tagValue >> 8, tagValue};

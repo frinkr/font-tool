@@ -406,7 +406,7 @@ static TypefaceManager * defaultTypefaceManager;
                 FT_Get_Sfnt_Name(opaqueFace, nameIndex, &sfntName);
                 if (sfntName.name_id == TT_NAME_ID_FONT_SUBFAMILY || sfntName.name_id == 17 /*TT_NAME_ID_TYPOGRAPHIC_SUBFAMILY*/ ||
                     sfntName.name_id == TT_NAME_ID_WWS_SUBFAMILY) {
-                    if ([style isEqualToString:SFNTNameGetString(&sfntName)]) {
+                    if ([style isEqualToString:SFNTNameGetValue(&sfntName)]) {
                         faceIndex = index;
                         return NO;
                     }

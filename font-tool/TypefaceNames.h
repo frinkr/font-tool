@@ -26,8 +26,11 @@ extern NSString * FTGetPlatformEncodingName(FT_UShort platformId, FT_UShort enco
 extern NSString * FTGetPlatformLanguageName(FT_UShort platformId, FT_UShort encodingId);
 
 extern NSString * SFNTNameGetName(FT_SfntName * sfntName); //
-extern NSString * SFNTNameGetString(FT_SfntName * sfntName); //
+extern NSString * SFNTNameGetValue(FT_SfntName * sfntName); //
 extern NSString * SFNTNameGetLanguage(FT_SfntName *sfntName, FT_Face face); // language id
+
+extern BOOL       SFNTNameGetFromId(FT_Face face, NSUInteger nameId, FT_SfntName * sfnt);
+extern NSString * SFNTNameGetValueFromId(FT_Face face, NSUInteger nameId);
 
 extern NSString * SFNTTagName(FT_ULong tagValue);
 extern FT_ULong * SFNTTagValue(NSString * tagName);

@@ -917,20 +917,20 @@ typedef struct {
                 case TT_NAME_ID_PREFERRED_FAMILY:
                 case TT_NAME_ID_FONT_FAMILY:
                     if (![localizedFamilyNames objectForKey:lang])
-                        [localizedFamilyNames setObject:SFNTNameGetString(&sfntName) forKey:lang];
+                        [localizedFamilyNames setObject:SFNTNameGetValue(&sfntName) forKey:lang];
                     break;
                     
                 case TT_NAME_ID_WWS_SUBFAMILY:
                 case TT_NAME_ID_PREFERRED_SUBFAMILY:
                 case TT_NAME_ID_FONT_SUBFAMILY:
                     if (![localizedStyleNames objectForKey:lang])
-                        [localizedStyleNames setObject:SFNTNameGetString(&sfntName) forKey:lang];
+                        [localizedStyleNames setObject:SFNTNameGetValue(&sfntName) forKey:lang];
                     break;
                     
                 case TT_NAME_ID_MAC_FULL_NAME:
                 case TT_NAME_ID_FULL_NAME:
                     if (![localizedFullNames objectForKey:lang])
-                        [localizedFullNames setObject:SFNTNameGetString(&sfntName) forKey:lang];
+                        [localizedFullNames setObject:SFNTNameGetValue(&sfntName) forKey:lang];
                     break;
             }
             
