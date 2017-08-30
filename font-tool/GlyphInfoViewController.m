@@ -27,8 +27,7 @@
 @implementation GlyphInfoViewController
 
 - (void)awakeFromNib {
-    self.tableView.dataSource = self;
-    self.tableView.delegate = self;
+    [super awakeFromNib];
 }
 
 - (void)forceLoadView {
@@ -40,6 +39,9 @@
     [super viewDidLoad];
     self.tableView = [[HtmlTableView alloc] initWithFrame:CGRectMake(0, 0, 400, 600)];
     self.tableView.translatesAutoresizingMaskIntoConstraints = NO;
+    self.tableView.dataSource = self;
+    self.tableView.delegate = self;
+    
     [self.view addSubview:self.tableView];
     
     NSDictionary<NSString*, id> * views = @{@"tableView": self.tableView,
