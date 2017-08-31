@@ -421,9 +421,9 @@ NSSet<NSNumber*> * HBSet2NSSet(hb_set_t *set) {
                 
                 NSString * str = [NSString stringWithFormat:@"Name (%d): %@<br> PS Name (%d): %@<br> Coords: %@",
                                   namedStyle->strid,
-                                  SFNTNameGetValueFromId(ftFace, namedStyle->strid),
+                                  (namedStyle->strid? SFNTNameGetValueFromId(ftFace, namedStyle->strid) : @"<i>undefined</i>"),
                                   namedStyle->psid,
-                                  SFNTNameGetValueFromId(ftFace, namedStyle->psid),
+                                  ((namedStyle->psid && (namedStyle->psid != 0xFFFF))? SFNTNameGetValueFromId(ftFace, namedStyle->psid): @"<i>undefined</i>"),
                                   coordStr];
                 
                 [items addRowWithKey:[NSString stringWithFormat:@"MM Named Style %d", i]
