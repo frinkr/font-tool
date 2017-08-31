@@ -170,7 +170,36 @@ typedef NS_ENUM(NSInteger, TypefaceFormat) {
 @end
 
 
+
+@interface TypefaceAxis : NSObject
+@property NSUInteger index;
+@property NSString * name;
+@property TypefaceTag * tag;
+@property Fixed minValue;
+@property Fixed maxValue;
+@property Fixed defaultValue;
+@end
+
+@interface TypefaceVariation : NSObject
+@property NSArray<NSNumber*> * coordinates;
+-(BOOL)isEqualToVariation:(TypefaceVariation*)other;
+@end
+
+@interface TypefaceNamedVariation : TypefaceVariation
+@property NSString * name;
+@property NSString * psName;
+@property NSUInteger index;
+@property BOOL isDefault;
+-(BOOL)isEqualToNamedVariation:(TypefaceNamedVariation*)other;
+@end
+
 @interface Typeface : NSObject
+
+// variations
+@property (readonly) BOOL isAdobeMM;
+@property (readonly) BOOL isFontVariation;
+@property (readonly) NSArray<TypefaceAxis*> * axises;
+@property (readonly) NSArray<TypefaceNamedVariation*> * namedVariations;
 
 // cmaps
 @property (readonly) NSArray<TypefaceCMap*> * cmaps;
@@ -207,6 +236,9 @@ typedef NS_ENUM(NSInteger, TypefaceFormat) {
 - (void)setPixelSize:(NSUInteger) px;
 
 - (OpaqueFTFace)nativeFace; // return the native FT_Face
+
+- (TypefaceVariation*)currentVariation;
+- (void)selectVariation:(TypefaceVariation*)variation;
 
 - (TypefaceCMap*)getCMapAtIndex:(NSUInteger)index;
 - (TypefaceCMap*)selectCMap:(TypefaceCMap*)cmap;

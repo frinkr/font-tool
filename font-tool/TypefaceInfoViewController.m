@@ -56,6 +56,14 @@ NSSet<NSNumber*> * HBSet2NSSet(hb_set_t *set) {
     return newSet;
 }
 
+NSString* FixedArrayToString(NSArray<NSNumber*> * array) {
+    NSMutableArray<NSNumber*> * converted = [[NSMutableArray<NSNumber*> alloc] init];
+    for (NSNumber* n in array) {
+        [converted addObject:@(FixedToFloat([n intValue]))];
+    }
+    return [converted componentsJoinedByString:@", "];
+}
+
 
 @interface TypefaceInfoWindowController()
 
@@ -384,52 +392,46 @@ NSSet<NSNumber*> * HBSet2NSSet(hb_set_t *set) {
     }
     
     // Multiple master/ font variation
+    if (face.isFontVariation)
     {
-        FT_MM_Var * mmvar = NULL;
-        FT_Multi_Master  mmt1;
-        BOOL isMMT1 = false;
-        
-        if (FT_HAS_MULTIPLE_MASTERS(ftFace)) {
-            if (FT_Get_MM_Var(ftFace, &mmvar) != 0)
-                mmvar = NULL;
-            if (FT_Get_Multi_Master(ftFace, &mmt1) == 0)
-                isMMT1 = YES;;
+        for (TypefaceAxis * axis in face.axises) {
+            NSString * str = [NSString stringWithFormat:@"TAG: '%@'<br> Name: %@<br> Min:%f<br> Max:%f<br> Default:%f",
+                              axis.tag,
+                              axis.name,
+                              FixedToFloat(axis.minValue),
+                              FixedToFloat(axis.maxValue),
+                              FixedToFloat(axis.defaultValue)];
+            
+            [items addRowWithKey:[NSString stringWithFormat:@"MM Axis %lu", (unsigned long)axis.index]
+                     stringValue:str];
         }
         
-        // opentype font variation
-        if (mmvar && !isMMT1) {
-            for (FT_UInt i = 0; i < mmvar->num_axis; ++ i) {
-                const FT_Var_Axis * axis = mmvar->axis + i;
-                NSString * str = [NSString stringWithFormat:@"TAG: '%@'<br> Name: %s(%@)<br> Min:%f<br> Max:%f<br> Default:%f",
-                                  [TypefaceTag tagFromCode:axis->tag],
-                                  axis->name,
-                                  SFNTNameGetValueFromId(ftFace, axis->strid),
-                                  axis->minimum/65536.0,
-                                  axis->maximum/65536.0,
-                                  axis->def/65536.0];
-                
-                [items addRowWithKey:[NSString stringWithFormat:@"MM Axis %d", i]
-                         stringValue:str];
-            }
-            for (FT_UInt i = 0; i < mmvar->num_namedstyles; ++ i) {
-                const FT_Var_Named_Style * namedStyle = mmvar->namedstyle + i;
-                NSMutableString * coordStr = [[NSMutableString alloc] init];
-                for (FT_UInt j = 0; j < mmvar->num_axis; ++ j) {
-                    if (j) [coordStr appendString:@", "];
-                    [coordStr appendFormat:@"%f", namedStyle->coords[j]/65536.0];
-                }
-                
-                NSString * str = [NSString stringWithFormat:@"Name (%d): %@<br> PS Name (%d): %@<br> Coords: %@",
-                                  namedStyle->strid,
-                                  (namedStyle->strid? SFNTNameGetValueFromId(ftFace, namedStyle->strid) : @"<i>undefined</i>"),
-                                  namedStyle->psid,
-                                  ((namedStyle->psid && (namedStyle->psid != 0xFFFF))? SFNTNameGetValueFromId(ftFace, namedStyle->psid): @"<i>undefined</i>"),
-                                  coordStr];
-                
-                [items addRowWithKey:[NSString stringWithFormat:@"MM Named Style %d", i]
-                         stringValue:str];
-                
-            }
+        TypefaceVariation * currentVariation = face.currentVariation;
+        if ([currentVariation isKindOfClass:[TypefaceNamedVariation class]]) {
+            TypefaceNamedVariation * variation = (TypefaceNamedVariation*)currentVariation;
+            NSString * str = [NSString stringWithFormat:@"Index: %lu<br> Name : %@<br> PS Name: %@<br> Coords: %@",
+                              (unsigned long)variation.index,
+                              variation.name,
+                              variation.psName,
+                              FixedArrayToString(variation.coordinates)];
+            
+            [items addRowWithKey:@"MM Current Variatoin" stringValue:str];
+        }
+        else {
+            NSString * str = [NSString stringWithFormat:@"Coords: %@",
+                              [currentVariation.coordinates componentsJoinedByString:@", "]];
+            
+            [items addRowWithKey:@"MM Current Variatoin" stringValue:str];
+        }
+        
+        for (TypefaceNamedVariation * variation in face.namedVariations) {
+            NSString * str = [NSString stringWithFormat:@"Name : %@<br> PS Name: %@<br> Coords: %@",
+                              variation.name,
+                              variation.psName,
+                              FixedArrayToString(variation.coordinates)];
+            
+            [items addRowWithKey:[NSString stringWithFormat:@"MM Named Variatoin %lu", (unsigned long)variation.index]
+                     stringValue:str];
         }
     }
     

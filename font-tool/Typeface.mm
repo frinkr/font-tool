@@ -11,6 +11,7 @@
 #include FT_TRUETYPE_IDS_H
 #include FT_TRUETYPE_TABLES_H
 #include FT_SIZES_H
+#include FT_MULTIPLE_MASTERS_H
 
 static int FT_DEFAULT_FONTSIZE = 24 * 4;
 static int FT_DEFAULT_DPI      = 72;
@@ -447,7 +448,7 @@ typedef struct {
 @end
 
 
-#pragma mark ##### Typeface #####
+#pragma mark ##### TypefaceAttributes #####
 
 @implementation TypefaceAttributes
 - (void)encodeWithCoder:(NSCoder *)coder {
@@ -490,6 +491,8 @@ typedef struct {
 }
 
 @end
+
+#pragma mark ##### TypefaceDescriptor #####
 
 @interface TypefaceDescriptor ()
 - (id)initWithFamily:(NSString*)family style:(NSString*)style;
@@ -628,8 +631,45 @@ typedef struct {
 
 @end
 
+#pragma mark ##### TypefaceAxis #####
+@implementation TypefaceAxis
+@end
+
+
+#pragma mark ##### TypefaceVariation #####
+@implementation TypefaceVariation
+- (BOOL)isEqual:(id)other {
+    if (self == other)
+        return YES;
+    if (![other isKindOfClass:[TypefaceVariation class]])
+        return NO;
+    TypefaceVariation * d = (TypefaceVariation*)other;
+    return [self isEqualToVariation:d];
+}
+-(BOOL)isEqualToVariation:(TypefaceVariation*)other {
+    return [self.coordinates isEqualToArray:other.coordinates];
+}
+
+@end
+
+@implementation TypefaceNamedVariation
+- (BOOL)isEqual:(id)other {
+    return [self isEqualToVariation:other];
+}
+
+-(BOOL)isEqualToNamedVariation:(TypefaceNamedVariation*)other {
+    return [self isEqualToVariation:other];
+}
+
+@end
+
+#pragma mark ##### Typeface #####
+
 @interface Typeface() {
     FT_Face  face;
+    NSMutableArray<TypefaceAxis*> * _axises;
+    NSMutableArray<TypefaceNamedVariation *> * _namedVariations;
+    
     NSMutableArray<TypefaceCMap*> * cmaps;
     TypefaceGlyphImageCache * imageCache;
     
@@ -699,6 +739,9 @@ typedef struct {
     cmaps = [[NSMutableArray<TypefaceCMap*> alloc] init];
     imageCache = [[TypefaceGlyphImageCache alloc] initWithCacheSize:500];
     
+    // load variations
+    [self loadVariations];
+    
     // setup cmap
     // Freetype will try to select the unicode cmap on creating face, but some fonts
     // doesn't contains unicode cmap
@@ -730,6 +773,8 @@ typedef struct {
                                                     isUnicodeCMap:self.currentCMap.isUnicode];
     return YES;
 }
+
+#pragma mark *** Metrics ***
 
 - (void)setFontSize:(CGFloat)fontSize {
     _fontSize = fontSize;
@@ -777,6 +822,135 @@ typedef struct {
 - (OpaqueFTFace)nativeFace {
     return face;
 }
+
+#pragma mark *** Variations ***
+
+- (void)loadVariations {
+    FT_MM_Var * mmvar = NULL;
+    FT_Multi_Master  mmt1;
+    
+    if (!FT_HAS_MULTIPLE_MASTERS(face))
+        return;
+    
+    if (FT_Get_MM_Var(face, &mmvar) != 0)
+        mmvar = NULL;
+    if (FT_Get_Multi_Master(face, &mmt1) == 0)
+        _isAdobeMM = YES;;
+    
+    if (!mmvar && !_isAdobeMM)
+        return;
+    
+    _isFontVariation = YES;
+    
+    _axises = [[NSMutableArray<TypefaceAxis*> alloc] init];
+    
+    if (mmvar && !_isAdobeMM) {
+        for (FT_UInt i = 0; i < mmvar->num_axis; ++ i) {
+            const FT_Var_Axis * axis = mmvar->axis + i;
+            TypefaceAxis * a = [[TypefaceAxis alloc] init];
+            a.name = SFNTNameGetValueFromId(face, axis->strid);
+            a.index = i;
+            a.tag = [TypefaceTag tagFromCode:axis->tag];
+            a.minValue = axis->minimum;
+            a.maxValue = axis->maximum;
+            a.defaultValue = axis->def;
+            
+            [_axises addObject:a];
+        }
+        
+        std::vector<FT_Fixed> defaultCoords(mmvar->num_axis);
+        if (FT_Get_Var_Design_Coordinates(face, mmvar->num_axis, &defaultCoords[0])
+            || (defaultCoords.size() != mmvar->num_axis))
+            defaultCoords.clear();
+        
+        _namedVariations = [[NSMutableArray<TypefaceNamedVariation*> alloc] init];
+        
+        TypefaceVariation * currentVariation = nil;
+        
+        for (FT_UInt i = 0; i < mmvar->num_namedstyles; ++ i) {
+            const FT_Var_Named_Style * namedStyle = mmvar->namedstyle + i;
+            
+            NSMutableArray<NSNumber*> * coords = [[NSMutableArray<NSNumber*> alloc] init];
+            BOOL isDefault = YES;
+            for (FT_UInt j = 0; j < mmvar->num_axis; ++ j) {
+                [coords addObject:@(namedStyle->coords[j])];
+                if (isDefault && defaultCoords.size() && (namedStyle->coords[j] != defaultCoords[j]))
+                    isDefault = NO;
+            }
+            
+            TypefaceNamedVariation * variation = [[TypefaceNamedVariation alloc] init];
+            variation.name = (namedStyle->strid? SFNTNameGetValueFromId(face, namedStyle->strid) : nil);
+            variation.psName = ((namedStyle->psid && (namedStyle->psid != 0xFFFF))? SFNTNameGetValueFromId(face, namedStyle->psid): nil);
+            variation.isDefault = isDefault;
+            variation.coordinates = coords;
+            variation.index = i;
+            
+            [_namedVariations addObject:variation];
+            
+            if (isDefault && !currentVariation)
+                currentVariation = variation;
+        }
+        
+        if (!currentVariation && defaultCoords.size()) {
+            TypefaceNamedVariation * variation = [[TypefaceNamedVariation alloc] init];
+            variation.name = @"<default>";
+            variation.isDefault = YES;
+            
+            NSMutableArray<NSNumber*> * coords = [[NSMutableArray<NSNumber*> alloc] init];
+            for (FT_Fixed v : defaultCoords)
+                [coords addObject:@(v)];
+            variation.coordinates = coords;
+            
+            // Add the default instance at beginning.
+            [_namedVariations insertObject:variation atIndex:0];
+            
+        }
+    }
+}
+
+- (NSArray<TypefaceAxis*> *) axises {
+    return _axises;
+}
+
+- (NSArray<TypefaceNamedVariation*> *) namedVariations {
+    return _namedVariations;
+}
+
+- (TypefaceVariation*)currentVariation {
+    
+    if (!_isFontVariation)
+        return nil;
+    
+    std::vector<FT_Fixed> defaultCoords(_axises.count);
+    if (FT_Get_Var_Design_Coordinates(face, _axises.count, &defaultCoords[0])
+        || (defaultCoords.size() != _axises.count))
+        defaultCoords.clear();
+    
+    if (defaultCoords.empty())
+        return nil;
+    
+    TypefaceVariation * variation = [[TypefaceVariation alloc] init];
+    NSMutableArray<NSNumber*> * coords = [[NSMutableArray<NSNumber*> alloc] init];
+    for (FT_Fixed v : defaultCoords)
+        [coords addObject:@(v)];
+    variation.coordinates = coords;
+    
+    // Return named is possible
+    for (TypefaceNamedVariation * namedVariation in _namedVariations) {
+        if ([namedVariation isEqual:variation])
+            return namedVariation;
+    }
+    
+    return variation;
+}
+
+- (void)selectVariation:(TypefaceVariation*)variation {
+    std::vector<FT_Fixed> coords;
+    for (NSNumber * c in variation.coordinates)
+        coords.push_back([c floatValue]*65536.0);
+    FT_Set_Var_Design_Coordinates(face, coords.size(), &coords[0]);
+}
+
 
 #pragma mark *** CMaps ***
 - (NSArray<TypefaceCMap*>*)cmaps {
