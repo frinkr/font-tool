@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="12121" systemVersion="16F73" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="Kwg-7l-2JQ">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="12121" systemVersion="17A358a" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="Kwg-7l-2JQ">
     <dependencies>
         <deployment identifier="macosx"/>
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="12121"/>
@@ -181,7 +181,7 @@
                                             <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                                             <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
                                             <tableColumns>
-                                                <tableColumn editable="NO" width="115" minWidth="40" maxWidth="1000" id="LKO-A2-CNv">
+                                                <tableColumn identifier="" editable="NO" width="115" minWidth="40" maxWidth="1000" id="LKO-A2-CNv">
                                                     <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border">
                                                         <font key="font" metaFont="smallSystem"/>
                                                         <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
@@ -272,8 +272,8 @@
         </scene>
     </scenes>
     <resources>
-        <image name="ShapingShowLines" width="34.560001373291016" height="34.560001373291016"/>
-        <image name="ShapingShowOrigin" width="34.560001373291016" height="34.560001373291016"/>
-        <image name="ShapingText" width="34.560001373291016" height="34.560001373291016"/>
+        <image name="ShapingShowLines" width="69.120002746582031" height="69.120002746582031"/>
+        <image name="ShapingShowOrigin" width="69.120002746582031" height="69.120002746582031"/>
+        <image name="ShapingText" width="69.120002746582031" height="69.120002746582031"/>
     </resources>
 </document>

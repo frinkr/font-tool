@@ -79,6 +79,7 @@ set(SOURCE_FILES
   TypefaceWindowController.m
   TypefaceStylesWindowController.m
   TypefaceListWindowController.m
+  TypefaceVariationViewController.m
   ToolBox.m
   )
 

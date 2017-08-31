@@ -12,6 +12,7 @@
 #import "TypefaceWindowController.h"
 #import "TypefaceDocumentController.h"
 #import "TypefaceInfoViewController.h"
+#import "TypefaceVariationViewController.h"
 #import "ShapingWindowController.h"
 #import "CharEncoding.h"
 #import "AppDelegate.h"
@@ -51,6 +52,20 @@
 
 - (IBAction)changeGlyphList:(id)sender {
     [self selectGlyphListAtIndex:[self.glyphListCombobox indexOfSelectedItem]];
+}
+
+- (IBAction)selectVariant:(id)sender {
+    TypefaceVariationViewController * vc = [TypefaceVariationViewController createViewController];
+    NSView * view = nil;
+    if ([sender isKindOfClass:[NSView class]])
+        view = (NSView*)sender;
+    else if ([sender isKindOfClass:[NSToolbarItem class]])
+        view = [(NSToolbarItem*)sender view];
+    
+    [vc showPopoverRelativeToRect:view.bounds
+                           ofView:view
+                    preferredEdge:NSRectEdgeMinY
+                     withDocument:self.typefaceDocument];
 }
 
 - (IBAction)changeCMap:(id)sender {

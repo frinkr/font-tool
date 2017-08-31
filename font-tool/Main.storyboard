@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="12121" systemVersion="16F73" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="12121" systemVersion="17A358a" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="12121"/>
@@ -251,8 +251,6 @@
                         <rect key="screenRect" x="0.0" y="0.0" width="1680" height="1027"/>
                         <toolbar key="toolbar" implicitIdentifier="83D34463-3F92-4BBF-94B3-DCF08CA98DF4" autosavesConfiguration="NO" displayMode="iconAndLabel" sizeMode="regular" id="7Vw-Jx-CVk">
                             <allowedToolbarItems>
-                                <toolbarItem implicitItemIdentifier="NSToolbarShowColorsItem" id="YCk-Hp-S6E"/>
-                                <toolbarItem implicitItemIdentifier="NSToolbarShowFontsItem" id="LX3-vq-sEg"/>
                                 <toolbarItem implicitItemIdentifier="NSToolbarSpaceItem" id="2OW-kV-4pT"/>
                                 <toolbarItem implicitItemIdentifier="NSToolbarFlexibleSpaceItem" id="OBJ-gk-vHa"/>
                                 <toolbarItem implicitItemIdentifier="4E03E8D1-B23D-47FC-A8B7-E9ABAFB8877C" label="Attributes" paletteLabel="Attributes" tag="-1" image="NSInfo" id="B3e-Vs-hXg">
@@ -321,6 +319,22 @@
                                         <action selector="changeCMap:" target="jGA-0Y-lOj" id="NY0-nE-M5Z"/>
                                     </connections>
                                 </toolbarItem>
+                                <toolbarItem implicitItemIdentifier="BDDF7CA3-79DE-4834-9294-AF2230E2BCC4" label="Variants" paletteLabel="Variants" image="NSFontPanel" id="Yk9-xR-zhD">
+                                    <nil key="toolTip"/>
+                                    <size key="minSize" width="32" height="32"/>
+                                    <size key="maxSize" width="48" height="48"/>
+                                    <button key="view" id="hxO-Zr-Mpr">
+                                        <rect key="frame" x="1" y="14" width="48" height="48"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                        <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="NSFontPanel" imagePosition="only" alignment="center" imageScaling="proportionallyUpOrDown" inset="2" id="dls-m1-41X">
+                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                            <font key="font" metaFont="system"/>
+                                        </buttonCell>
+                                    </button>
+                                    <connections>
+                                        <action selector="selectVariant:" target="jGA-0Y-lOj" id="UjL-G4-BVr"/>
+                                    </connections>
+                                </toolbarItem>
                                 <toolbarItem implicitItemIdentifier="4CEF58AF-2B9B-43A5-A47D-F58BA8E7C89F" label="Find" paletteLabel="Find" tag="-1" image="Search" id="6Ts-mD-YSf">
                                     <connections>
                                         <action selector="lookupCharacter:" target="jGA-0Y-lOj" id="BiP-ra-wXy"/>
@@ -341,6 +355,7 @@
                                 <toolbarItem reference="gYh-RD-ERN"/>
                                 <toolbarItem reference="UbQ-WV-XE3"/>
                                 <toolbarItem reference="ScC-02-6uu"/>
+                                <toolbarItem reference="Yk9-xR-zhD"/>
                                 <toolbarItem reference="6Ts-mD-YSf"/>
                                 <toolbarItem reference="KYu-qR-J3p"/>
                                 <toolbarItem reference="oL9-fT-OML"/>
@@ -358,6 +373,19 @@
                 <customObject id="6f7-a7-6o1" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="360.5" y="196"/>
+        </scene>
+        <!--Typeface Variation View Controller-->
+        <scene sceneID="1lX-Xi-i2S">
+            <objects>
+                <viewController storyboardIdentifier="variationViewController" id="Coo-lS-sbe" customClass="TypefaceVariationViewController" sceneMemberID="viewController">
+                    <view key="view" id="U3A-Uw-jnK">
+                        <rect key="frame" x="0.0" y="0.0" width="450" height="300"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </view>
+                </viewController>
+                <customObject id="yND-jc-sAA" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1072" y="-16"/>
         </scene>
         <!--Window Controller-->
         <scene sceneID="tbZ-BF-JG0">
@@ -386,7 +414,7 @@
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <segmentedControl verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="gO4-aN-dir">
-                                <rect key="frame" x="24" y="71" width="232" height="24"/>
+                                <rect key="frame" x="15" y="71" width="249" height="24"/>
                                 <segmentedCell key="cell" borderStyle="border" alignment="left" style="rounded" trackingMode="selectOne" id="0f7-rY-Sv9">
                                     <font key="font" metaFont="smallSystem"/>
                                     <segments>
@@ -460,7 +488,7 @@ DQ
                                     <subviews>
                                         <collectionView selectable="YES" allowsEmptySelection="NO" id="Ger-En-HC3">
                                             <rect key="frame" x="0.0" y="0.0" width="923" height="575"/>
-                                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                            <autoresizingMask key="autoresizingMask" widthSizable="YES"/>
                                             <collectionViewFlowLayout key="collectionViewLayout" id="hTq-CO-Dds">
                                                 <size key="itemSize" width="100" height="100"/>
                                                 <size key="headerReferenceSize" width="300" height="40"/>
@@ -532,6 +560,7 @@ DQ
         </scene>
     </scenes>
     <resources>
+        <image name="NSFontPanel" width="32" height="32"/>
         <image name="NSInfo" width="32" height="32"/>
         <image name="Search" width="256" height="256"/>
         <image name="Shape" width="575" height="575"/>

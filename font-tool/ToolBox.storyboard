@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="12121" systemVersion="16F73" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="12121" systemVersion="17A358a" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="12121"/>
@@ -41,7 +41,7 @@
                                     <subviews>
                                         <collectionView selectable="YES" id="YW2-HG-1eb">
                                             <rect key="frame" x="0.0" y="0.0" width="874" height="518"/>
-                                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                            <autoresizingMask key="autoresizingMask" widthSizable="YES"/>
                                             <collectionViewFlowLayout key="collectionViewLayout" minimumInteritemSpacing="10" minimumLineSpacing="10" id="cfP-fN-Zut">
                                                 <size key="itemSize" width="150" height="150"/>
                                             </collectionViewFlowLayout>
@@ -202,7 +202,7 @@
                                     <subviews>
                                         <collectionView id="M5j-Ww-gAr">
                                             <rect key="frame" x="0.0" y="0.0" width="663" height="477"/>
-                                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                            <autoresizingMask key="autoresizingMask" widthSizable="YES"/>
                                             <collectionViewFlowLayout key="collectionViewLayout" minimumInteritemSpacing="10" minimumLineSpacing="10" id="9MB-Va-a2N">
                                                 <size key="itemSize" width="150" height="150"/>
                                             </collectionViewFlowLayout>
