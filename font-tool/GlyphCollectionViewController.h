@@ -24,6 +24,7 @@
 @property (assign) IBOutlet NSObject<GlyphCollectionViewControllerDelegate>* delegate;
 @property (assign) IBOutlet NSCollectionView *collectionView;
 
+- (void)reload;
 - (NSInteger)numberOfSectionsInCollectionView:(NSCollectionView *)collectionView;
 - (NSInteger)collectionView:(NSCollectionView *)collectionView numberOfItemsInSection:(NSInteger)section;
 - (NSCollectionViewItem *)collectionView:(NSCollectionView *)collectionView itemForRepresentedObjectAtIndexPath:(NSIndexPath *)indexPath;

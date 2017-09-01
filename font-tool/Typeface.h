@@ -181,7 +181,7 @@ typedef NS_ENUM(NSInteger, TypefaceFormat) {
 @end
 
 @interface TypefaceVariation : NSObject
-@property NSArray<NSNumber*> * coordinates;
+@property NSArray<NSNumber*> * coordinates; /*Fixed Number*/
 -(BOOL)isEqualToVariation:(TypefaceVariation*)other;
 @end
 
@@ -237,7 +237,7 @@ typedef NS_ENUM(NSInteger, TypefaceFormat) {
 
 - (OpaqueFTFace)nativeFace; // return the native FT_Face
 
-- (TypefaceVariation*)currentVariation;
+- (TypefaceVariation*)currentVariation; /** observerable */
 - (void)selectVariation:(TypefaceVariation*)variation;
 
 - (TypefaceCMap*)getCMapAtIndex:(NSUInteger)index;

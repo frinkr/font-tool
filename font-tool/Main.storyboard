@@ -4,6 +4,7 @@
         <deployment identifier="macosx"/>
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="12121"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+        <capability name="stacking Non-gravity area distributions on NSStackView" minToolsVersion="7.0" minSystemVersion="10.11"/>
     </dependencies>
     <scenes>
         <!--Application-->
@@ -321,7 +322,7 @@
                                 </toolbarItem>
                                 <toolbarItem implicitItemIdentifier="BDDF7CA3-79DE-4834-9294-AF2230E2BCC4" label="Variants" paletteLabel="Variants" image="NSFontPanel" id="Yk9-xR-zhD">
                                     <nil key="toolTip"/>
-                                    <size key="minSize" width="32" height="32"/>
+                                    <size key="minSize" width="36" height="36"/>
                                     <size key="maxSize" width="48" height="48"/>
                                     <button key="view" id="hxO-Zr-Mpr">
                                         <rect key="frame" x="1" y="14" width="48" height="48"/>
@@ -379,13 +380,77 @@
             <objects>
                 <viewController storyboardIdentifier="variationViewController" id="Coo-lS-sbe" customClass="TypefaceVariationViewController" sceneMemberID="viewController">
                     <view key="view" id="U3A-Uw-jnK">
-                        <rect key="frame" x="0.0" y="0.0" width="450" height="300"/>
+                        <rect key="frame" x="0.0" y="0.0" width="360" height="120"/>
                         <autoresizingMask key="autoresizingMask"/>
+                        <subviews>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" translatesAutoresizingMaskIntoConstraints="NO" id="8y8-If-0dD">
+                                <rect key="frame" x="18" y="83" width="115" height="17"/>
+                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Named Variations:" id="vHw-kZ-eJM">
+                                    <font key="font" metaFont="system"/>
+                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <comboBox verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" translatesAutoresizingMaskIntoConstraints="NO" id="wEh-aH-CxS">
+                                <rect key="frame" x="139" y="76" width="204" height="26"/>
+                                <comboBoxCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" drawsBackground="YES" completes="NO" usesDataSource="YES" numberOfVisibleItems="5" id="Dsj-4a-2fz">
+                                    <font key="font" metaFont="system"/>
+                                    <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </comboBoxCell>
+                                <connections>
+                                    <outlet property="dataSource" destination="Coo-lS-sbe" id="oeL-Vv-0Eo"/>
+                                    <outlet property="delegate" destination="Coo-lS-sbe" id="h0F-bm-545"/>
+                                </connections>
+                            </comboBox>
+                            <stackView distribution="fill" orientation="vertical" alignment="leading" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="2co-4d-VlC">
+                                <rect key="frame" x="20" y="20" width="320" height="50"/>
+                                <subviews>
+                                    <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="GfL-LU-0rj">
+                                        <rect key="frame" x="-6" y="22" width="81" height="32"/>
+                                        <buttonCell key="cell" type="push" title="Button" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="8Pl-jr-ORC">
+                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                            <font key="font" metaFont="system"/>
+                                        </buttonCell>
+                                    </button>
+                                    <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="mYW-GJ-l5T">
+                                        <rect key="frame" x="-6" y="-7" width="81" height="32"/>
+                                        <buttonCell key="cell" type="push" title="Button" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="oru-PA-Cuv">
+                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                            <font key="font" metaFont="system"/>
+                                        </buttonCell>
+                                    </button>
+                                </subviews>
+                                <visibilityPriorities>
+                                    <integer value="1000"/>
+                                    <integer value="1000"/>
+                                </visibilityPriorities>
+                                <customSpacing>
+                                    <real value="3.4028234663852886e+38"/>
+                                    <real value="3.4028234663852886e+38"/>
+                                </customSpacing>
+                            </stackView>
+                        </subviews>
+                        <constraints>
+                            <constraint firstItem="wEh-aH-CxS" firstAttribute="top" secondItem="U3A-Uw-jnK" secondAttribute="top" constant="20" id="GHq-9z-89D"/>
+                            <constraint firstAttribute="trailing" secondItem="2co-4d-VlC" secondAttribute="trailing" constant="20" id="Z66-V5-NRN"/>
+                            <constraint firstAttribute="bottom" secondItem="2co-4d-VlC" secondAttribute="bottom" constant="20" id="ePy-vo-yGL"/>
+                            <constraint firstItem="wEh-aH-CxS" firstAttribute="leading" secondItem="8y8-If-0dD" secondAttribute="trailing" constant="8" id="gxF-FP-tM9"/>
+                            <constraint firstItem="8y8-If-0dD" firstAttribute="top" secondItem="U3A-Uw-jnK" secondAttribute="top" constant="20" id="jlX-MW-iTn"/>
+                            <constraint firstAttribute="trailing" secondItem="wEh-aH-CxS" secondAttribute="trailing" constant="20" id="mYA-3l-Czh"/>
+                            <constraint firstItem="wEh-aH-CxS" firstAttribute="leading" secondItem="8y8-If-0dD" secondAttribute="trailing" constant="8" id="ou0-K7-0wi"/>
+                            <constraint firstItem="2co-4d-VlC" firstAttribute="top" secondItem="wEh-aH-CxS" secondAttribute="bottom" constant="10" id="shb-eI-95J"/>
+                            <constraint firstItem="8y8-If-0dD" firstAttribute="leading" secondItem="U3A-Uw-jnK" secondAttribute="leading" constant="20" id="vsq-dr-Dvt"/>
+                            <constraint firstItem="2co-4d-VlC" firstAttribute="leading" secondItem="U3A-Uw-jnK" secondAttribute="leading" constant="20" id="xx7-tN-oG1"/>
+                        </constraints>
                     </view>
+                    <connections>
+                        <outlet property="namedVariantsCombobox" destination="wEh-aH-CxS" id="jQF-f7-5da"/>
+                    </connections>
                 </viewController>
                 <customObject id="yND-jc-sAA" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1072" y="-16"/>
+            <point key="canvasLocation" x="1050" y="-27"/>
         </scene>
         <!--Window Controller-->
         <scene sceneID="tbZ-BF-JG0">

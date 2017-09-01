@@ -10,7 +10,7 @@
 
 @class TypefaceDocument;
 
-@interface TypefaceVariationViewController : NSViewController<NSPopoverDelegate>
+@interface TypefaceVariationViewController : NSViewController<NSPopoverDelegate, NSComboBoxDataSource, NSComboBoxDelegate>
 - (void)forceLoadView;
 
 - (void)showPopoverRelativeToRect:(NSRect)rect

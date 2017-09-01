@@ -945,10 +945,18 @@ typedef struct {
 }
 
 - (void)selectVariation:(TypefaceVariation*)variation {
+    
+    [self willChangeValueForKey:@"currentVariation"];
+    
     std::vector<FT_Fixed> coords;
     for (NSNumber * c in variation.coordinates)
-        coords.push_back([c floatValue]*65536.0);
+        coords.push_back([c integerValue]);
     FT_Set_Var_Design_Coordinates(face, coords.size(), &coords[0]);
+    
+    
+    [imageCache invalidateImageCache];
+    
+    [self didChangeValueForKey:@"currentVariation"];
 }
 
 

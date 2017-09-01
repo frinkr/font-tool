@@ -36,6 +36,11 @@
 - (void)setDocument:(id)document {
     [super setDocument:document];
     
+    [self.typefaceDocument.typeface addObserver:self
+                            forKeyPath:@"currentVariation"
+                               options:NSKeyValueObservingOptionNew
+                               context:nil];
+    
     [self.cmapCombobox reloadData];
     [self selectCMapAtIndex: 0];
 }
@@ -43,6 +48,13 @@
 - (BOOL)shouldCloseDocument {
     // make the other WindowController close when closing the main window.
     return YES;
+}
+
+#pragma mark *** Actions ***
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSString *,id> *)change context:(void *)context {
+    if ((object == self.typefaceDocument.typeface) && [keyPath isEqualToString:@"currentVariation"]) {
+        [self.glyphCollectionViewController reload];
+    }
 }
 
 #pragma mark *** Actions ***
@@ -64,7 +76,7 @@
     
     [vc showPopoverRelativeToRect:view.bounds
                            ofView:view
-                    preferredEdge:NSRectEdgeMinY
+                    preferredEdge:NSRectEdgeMaxY
                      withDocument:self.typefaceDocument];
 }
 
