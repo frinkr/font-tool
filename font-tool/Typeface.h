@@ -143,6 +143,11 @@ typedef NS_ENUM(NSInteger, TypefaceFormat) {
 
 
 @interface TypefaceAttributes : NSObject
+
+@property BOOL isOpenTypeVariable;
+@property BOOL isAdobeMultiMaster;
+
+
 @property TypefaceSerifStyle serifStyle;
 @property (strong) NSSet<TypefaceTag*> * openTypeScripts;
 @property (strong) NSSet<TypefaceTag*> * openTypeLanguages;

@@ -452,6 +452,8 @@ typedef struct {
 
 @implementation TypefaceAttributes
 - (void)encodeWithCoder:(NSCoder *)coder {
+    [coder encodeBool:_isOpenTypeVariable forKey:@"isOpenTypeVariable"];
+    [coder encodeBool:_isAdobeMultiMaster forKey:@"isAdobeMM"];
     [coder encodeObject:_openTypeScripts forKey:@"openTypeScripts"];
     [coder encodeObject:_openTypeLanguages forKey:@"openTypeLanguages"];
     [coder encodeObject:_openTypeFeatures forKey:@"openTypeFeatures"];
@@ -471,6 +473,8 @@ typedef struct {
 
 - (id)initWithCoder:(NSCoder *)decoder {
     if (self = [super init]) {
+        _isOpenTypeVariable = [decoder decodeBoolForKey:@"isOpenTypeVariable"];
+        _isAdobeMultiMaster = [decoder decodeBoolForKey:@"isAdobeMM"];
         _openTypeScripts = [decoder decodeObjectForKey:@"openTypeScripts"];
         _openTypeLanguages = [decoder decodeObjectForKey:@"openTypeLanguages"];
         _openTypeFeatures = [decoder decodeObjectForKey:@"openTypeFeatures"];
@@ -1008,6 +1012,10 @@ typedef struct {
 - (TypefaceAttributes*)getAttributes {
     if (!_attributes) {
         _attributes = [[TypefaceAttributes alloc] init];
+        
+        // MM
+        _attributes.isAdobeMultiMaster = _isAdobeMM;
+        _attributes.isOpenTypeVariable = _isFontVariation;
         
         // OT features
         Shapper * shapper = [[Shapper alloc] initWithTypeface:self];

@@ -15,6 +15,12 @@ static TypefaceListWindowController * sharedTypefaceListWC;
 #define TypefaceSerifStyleAny (TypefaceSerifStyleUndefined)
 #define TypefaceFormatAny ((TypefaceFormat)-1)
 
+typedef NS_ENUM(NSInteger, TypefaceVariationFlavor) {
+    TypefaceVariationFlavorAny,
+    TypefaceVariationFlavorOpenType,
+    TypefaceVariationFlavorAdobeMM,
+};
+
 
 #pragma mark #### TypefaceListFilter ####
 @interface TypefaceListFilter : NSObject<NSMutableCopying>
@@ -25,6 +31,7 @@ static TypefaceListWindowController * sharedTypefaceListWC;
 
 @property TypefaceSerifStyle serifStyle;
 @property TypefaceFormat format;
+@property TypefaceVariationFlavor variationFlavor;
 @property NSString * familyName;
 
 - (BOOL)isEmpty;
@@ -40,6 +47,7 @@ static TypefaceListWindowController * sharedTypefaceListWC;
         self.designLanguages = [[NSMutableArray<NSString*> alloc] init];
         self.serifStyle = TypefaceSerifStyleAny;
         self.format = TypefaceFormatAny;
+        self.variationFlavor = TypefaceVariationFlavorAny;
         self.familyName = @"";
     }
     return self;
@@ -53,6 +61,7 @@ static TypefaceListWindowController * sharedTypefaceListWC;
     _designLanguages.count == 0 &&
     _serifStyle == TypefaceSerifStyleAny &&
     _format == TypefaceFormatAny &&
+    _variationFlavor == TypefaceVariationFlavorAny &&
     _familyName.length == 0;
 }
 
@@ -66,6 +75,7 @@ static TypefaceListWindowController * sharedTypefaceListWC;
     copy.designLanguages = [self.designLanguages mutableCopyWithZone:zone];
     copy.serifStyle = self.serifStyle;
     copy.format = self.format;
+    copy.variationFlavor = self.variationFlavor;
     copy.familyName = [self.familyName mutableCopyWithZone:zone];
     return copy;
 }
@@ -82,6 +92,13 @@ static TypefaceListWindowController * sharedTypefaceListWC;
 - (BOOL)filter:(TypefaceListFilter*)filter {
     if (self.attributes.serifStyle != filter.serifStyle)
         return NO;
+    
+    if (filter.variationFlavor != TypefaceVariationFlavorAny) {
+        if ((filter.variationFlavor == TypefaceVariationFlavorOpenType && !self.attributes.isOpenTypeVariable) ||
+            (filter.variationFlavor == TypefaceVariationFlavorAdobeMM && !self.attributes.isAdobeMultiMaster))
+            return NO;
+    }
+    
     if ((filter.format != TypefaceFormatAny) && (self.attributes.format != filter.format))
         return NO;
     
@@ -186,6 +203,7 @@ static TypefaceListWindowController * sharedTypefaceListWC;
 
 @property (weak) IBOutlet NSTextField *familyNameTextField;
 @property (weak) IBOutlet NSSegmentedControl *serifStyleSegments;
+@property (weak) IBOutlet NSSegmentedControl *variationSegments;
 @property (weak) IBOutlet NSTextField *designLanguagesTextField;
 @property (weak) IBOutlet NSSegmentedControl *formatSegments;
 
@@ -296,6 +314,7 @@ static uint32_t   toolBarTags[] = {
     BOOL showBadge = NO;
     showBadge = (self.filter.serifStyle != TypefaceSerifStyleAny) ||
     (self.filter.format != TypefaceFormatAny) ||
+    (self.filter.variationFlavor != TypefaceVariationFlavorAny) ||
     (self.filter.designLanguages.count != 0) ||
     (self.filter.openTypeScripts.count != 0) ||
     (self.filter.openTypeLanguages.count != 0) ||
@@ -600,6 +619,8 @@ static uint32_t   toolBarTags[] = {
     
     [self.formatSegments setSelected:YES forSegment:self.filter.format + 1];
     
+    [self.variationSegments setSelected:YES forSegment:self.filter.variationFlavor];
+
     
     // let's make an order. toolbar ligatures on first row, others are in second row and sorted
     
@@ -650,6 +671,7 @@ static uint32_t   toolBarTags[] = {
     
     self.filter.serifStyle = (TypefaceSerifStyle)self.serifStyleSegments.selectedSegment;
     self.filter.format = (TypefaceFormat)(self.formatSegments.selectedSegment - 1);
+    self.filter.variationFlavor = (TypefaceVariationFlavor)(self.variationSegments.selectedSegment);
     self.filter.familyName = self.familyNameTextField.stringValue;
     
     // OpenType scripts

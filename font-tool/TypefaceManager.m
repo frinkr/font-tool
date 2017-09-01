@@ -23,58 +23,7 @@ NSString * TMProgressNotificationFileKey = @"TMProgressNotificationFileKey";
 NSString * TMProgressNotificationTotalKey = @"TMProgressNotificationTotalKey";
 NSString * TMProgressNotificationCurrentKey = @"TMProgressNotificationCurrentKey";
 
-static TypefaceAttributesCache * typefaceAttributesCache;
-
-@interface TypefaceAttributesCache() {
-    NSMutableDictionary<NSString *, TypefaceAttributes *> * cache;
-}
-@end
-
-@implementation TypefaceAttributesCache
-
-- (instancetype)init {
-    if (self = [super init]) {
-        NSData *serialized = [[NSUserDefaults standardUserDefaults] objectForKey:@"TypefaceAttributesCache"];
-        if (serialized)
-            cache = [[NSKeyedUnarchiver unarchiveObjectWithData: serialized] mutableCopy];
-        if (!cache)
-            cache = [[NSMutableDictionary<NSString *, TypefaceAttributes *> alloc] init];
-        
-        NSNotificationCenter* nc = [NSNotificationCenter defaultCenter];
-        [nc addObserver:self
-               selector:@selector(appWillTerminate:)
-                   name:NSApplicationWillTerminateNotification
-                 object:nil];
-        
-    }
-    return self;
-}
-
-- (void)appWillTerminate:(NSNotification*)notification {
-    NSData *serialized = [NSKeyedArchiver archivedDataWithRootObject:cache];
-    [[NSUserDefaults standardUserDefaults] setObject:serialized forKey:@"TypefaceAttributesCache"];
-}
-
-
-- (TypefaceAttributes*)attributesOfTypefaceDescriptor:(TypefaceDescriptor*)descriptor {
-    return [cache objectForKey:[self userDefaultsKeyOfTypefaceDescriptor:descriptor]];
-}
-
-- (void)setAttributes:(TypefaceAttributes*)attributes ofTypeface:(TypefaceDescriptor*)descriptor {
-    [cache setObject:attributes forKey:[self userDefaultsKeyOfTypefaceDescriptor:descriptor]];
-}
-
-- (NSString*)userDefaultsKeyOfTypefaceDescriptor:(TypefaceDescriptor*)descriptor{
-    return [NSString stringWithFormat:@"%@_%@", descriptor.family, descriptor.style];
-}
-
-+(TypefaceAttributesCache*)standardCache {
-    if (!typefaceAttributesCache) {
-        typefaceAttributesCache = [[TypefaceAttributesCache alloc] init];
-    }
-    return typefaceAttributesCache;
-}
-@end
+NSInteger TypefaceFontListVersion = 3;
 
 @interface TMTypeface()
 - (instancetype)initWithFamilyName:(NSString*)familyName styleName:(NSString*)styleName;
@@ -183,6 +132,8 @@ static TypefaceManager * defaultTypefaceManager;
 }
 
 -(void)loadFontDatabase {
+    NSUInteger databaseVersion = [[NSUserDefaults standardUserDefaults] integerForKey:@"TypefaceFontListVersion"];
+    
     NSData *serialized = [[NSUserDefaults standardUserDefaults] objectForKey:@"TypefaceFontList"];
     if (serialized)
         _fileDescriptorAttributesMapping = [[NSKeyedUnarchiver unarchiveObjectWithData: serialized] mutableCopy];
@@ -205,7 +156,7 @@ static TypefaceManager * defaultTypefaceManager;
     
     NSUInteger databaseHashNew = [allFontFiles hash];
     
-    if (databaseHash == databaseHashNew)
+    if ((databaseHash == databaseHashNew) && (databaseVersion == TypefaceFontListVersion))
         return;
     
     _fileDescriptorAttributesMapping = [[NSMutableDictionary<TypefaceDescriptor*, TypefaceAttributes*> alloc] init];
@@ -241,6 +192,7 @@ static TypefaceManager * defaultTypefaceManager;
     serialized = [NSKeyedArchiver archivedDataWithRootObject:_fileDescriptorAttributesMapping];
     [[NSUserDefaults standardUserDefaults] setObject:serialized forKey:@"TypefaceFontList"];
     [[NSUserDefaults standardUserDefaults] setInteger:databaseHashNew forKey:@"TypefaceFontListHash"];
+    [[NSUserDefaults standardUserDefaults] setInteger:TypefaceFontListVersion forKey:@"TypefaceFontListVersion"];
 
 }
 
