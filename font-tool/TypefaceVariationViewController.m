@@ -38,6 +38,7 @@
     self.nameLabel.stringValue = axis.name;
     self.valueSlider.minValue = FixedToFloat(axis.minValue);
     self.valueSlider.maxValue = FixedToFloat(axis.maxValue);
+    self.valueSlider.floatValue = (self.valueSlider.minValue + self.valueSlider.maxValue)/2;
 }
 
 - (IBAction)onSliderValueChanged:(id)sender {
@@ -87,7 +88,11 @@
     
     [self.namedVariantsCombobox reloadData];
     
-    TypefaceVariation * current = self.typeface.currentVariation;
+    [self selectVariationInCombobox: self.typeface.currentVariation];
+
+}
+
+- (void)selectVariationInCombobox:(TypefaceVariation *) current {
     for (NSUInteger i = 0; i < self.typeface.namedVariations.count; ++ i) {
         TypefaceNamedVariation * variation = [self.typeface.namedVariations objectAtIndex:i];
         if ([variation isEqualTo:current]) {
@@ -96,7 +101,7 @@
         }
     }
     
-    if ([self.namedVariantsCombobox indexOfSelectedItem] == NSNotFound) {
+    if ([self.namedVariantsCombobox indexOfSelectedItem] == -1) {
         [self.namedVariantsCombobox selectItemAtIndex:0];
     }
 }
@@ -104,6 +109,7 @@
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSString *,id> *)change context:(void *)context {
     if ([keyPath isEqualToString:@"axisValue"]) {
         [self.typeface selectVariation:[self variationFromSliders]];
+        //[self selectVariationInCombobox:[self variationFromSliders]];
     }
 }
 
@@ -133,11 +139,12 @@
     if (index != 0) {
         TypefaceVariation * variation = [self.typeface.namedVariations objectAtIndex:index - 1];
         [self.typeface selectVariation:variation];
-        
-        for (NSUInteger i = 0; i < variation.coordinates.count; ++ i) {
-            TypefaceVariationAxisViewController * vc = [self.axisesViewControllers objectAtIndex:i];
-            vc.axisValue = [variation.coordinates objectAtIndex:i].integerValue;
-        }
+    }
+    
+    TypefaceVariation * variation = self.typeface.currentVariation;
+    for (NSUInteger i = 0; i < variation.coordinates.count; ++ i) {
+        TypefaceVariationAxisViewController * vc = [self.axisesViewControllers objectAtIndex:i];
+        vc.axisValue = [variation.coordinates objectAtIndex:i].integerValue;
     }
 }
 
