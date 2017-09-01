@@ -120,6 +120,8 @@ NSString* FixedArrayToString(NSArray<NSNumber*> * array) {
     [super viewDidLoad];
     // Do view setup here.
     
+    [self.typeface addObserver:self forKeyPath:@"currentVariation" options:NSKeyValueObservingOptionNew context:nil];
+    
     [self loadCurrentTypefaceDictionary];
     
     self.tableView = [[HtmlTableView alloc] initWithFrame:CGRectMake(0, 0, 400, 600)];
@@ -137,11 +139,26 @@ NSString* FixedArrayToString(NSArray<NSNumber*> * array) {
     [self doChangeCurrentSegment:self];
 }
 
+- (void)dealloc {
+    [self.typeface removeObserver:self forKeyPath:@"currentVariation"];
+}
+
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSString *,id> *)change context:(void *)context {
+    if ([keyPath isEqualToString:@"currentVariation"]) {
+        [self reloadCurrentTypefaceDictionary];
+        [self.tableView reloadData];
+    }
+}
+
+- (Typeface*)typeface {
+    TypefaceDocument * tfDoc = (TypefaceDocument*)[[NSDocumentController sharedDocumentController] currentDocument];
+    return tfDoc.typeface;
+}
+
 #pragma mark **** Table loading ****
 - (void)loadCurrentTypefaceDictionary {
-    TypefaceDocument * tfDoc = (TypefaceDocument*)[[NSDocumentController sharedDocumentController] currentDocument];
-    Typeface * face = tfDoc.typeface;
-    FT_Face ftFace = (FT_Face) face.nativeFace;
+    Typeface * face = [self typeface];
+    FT_Face ftFace = face.nativeFace;
     self.tfDict = [[NSMutableDictionary<NSNumber*, HtmlTableRows* > alloc] init];
     
     [self.tfDict setObject:[self loadBasicTableOfFace:face ftFace:ftFace]
@@ -176,6 +193,16 @@ NSString* FixedArrayToString(NSArray<NSNumber*> * array) {
     
     [self.tfDict setObject:[self loadGPOSTableOfFace:face ftFace:ftFace]
                     forKey:[NSNumber numberWithUnsignedInteger:TF_TABLE_GPOS]];
+}
+
+- (void)reloadCurrentTypefaceDictionary {
+    Typeface * face = [self typeface];
+    FT_Face ftFace = face.nativeFace;
+    [self.tfDict setObject:[self loadBasicTableOfFace:face ftFace:ftFace]
+                    forKey:[NSNumber numberWithUnsignedInteger:TF_TABLE_BASIC]];
+    
+    [self.tfDict setObject:[self loadFaceOfFace:face ftFace:ftFace]
+                    forKey:[NSNumber numberWithUnsignedInteger:TF_TABLE_FACE]];
 }
 
 - (HtmlTableRows*)loadBasicTableOfFace:(Typeface*)face ftFace:(FT_Face)ftFace {
@@ -323,7 +350,8 @@ NSString* FixedArrayToString(NSArray<NSNumber*> * array) {
     HtmlTableRows * items = [[HtmlTableRows alloc] init];
     [items addRowWithKey:@"Family" stringValue:face.familyName];
     [items addRowWithKey:@"Style"  stringValue:face.styleName];
-    
+    [items addRowWithKey:@"Postscript Name" stringValue:[NSString stringWithUTF8String:FT_Get_Postscript_Name(ftFace)]];
+
     [items addRowWithKey:@"Face Index" unsignedIntegerValue: face.faceIndex];
     
     // Flags
@@ -443,7 +471,6 @@ NSString* FixedArrayToString(NSArray<NSNumber*> * array) {
     
     
     [items addRowWithKey:@"Has Glyph Names" boolValue: FT_HAS_GLYPH_NAMES(ftFace)];
-    [items addRowWithKey:@"Postscript Name" stringValue:[NSString stringWithUTF8String:FT_Get_Postscript_Name(ftFace)]];
     
     [items addRowWithKey:@"Number Faces" unsignedIntegerValue:ftFace->num_faces];
     [items addRowWithKey:@"Number Glyphs" unsignedIntegerValue:ftFace->num_glyphs];

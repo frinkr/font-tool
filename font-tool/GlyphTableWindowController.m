@@ -273,19 +273,47 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
 
-    
+    [self addObserver:self forKeyPath:@"typeface" options:NSKeyValueObservingOptionNew | NSKeyValueObservingOptionOld context:nil];
 }
 
-- (void)viewWillAppear {
-    [super viewWillAppear];
-    
+- (void)dealloc {
+    [self.typeface removeObserver:self forKeyPath:@"currentVariation"];
+}
 
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSString *,id> *)change context:(void *)context {
+    if ([keyPath isEqualToString:@"typeface"] && (object == self)) {
+        switch ([[change objectForKey:NSKeyValueChangeKindKey] unsignedIntegerValue]) {
+            case NSKeyValueObservingOptionOld: {
+                Typeface * old = [change objectForKey:NSKeyValueChangeOldKey];
+                [old removeObserver:self forKeyPath:@"currentVariation"];
+                break;
+            }
+            case NSKeyValueObservingOptionNew: {
+                Typeface * newFace = [change objectForKey:NSKeyValueChangeNewKey];
+                [newFace addObserver:self forKeyPath:@"currentVariation" options:NSKeyValueObservingOptionNew context:nil];
+                
+                [self reloadGlyphs];
+                break;
+            }
+            default:
+                break;
+        };
+    }
+    if ([keyPath isEqualToString:@"currentVariation"] && (object == self.typeface)) {
+        [self reloadGlyphs];
+    }
+}
+
+- (void)reloadGlyphs {
     NSMutableArray<GlyphTableRow *> * rows = [[NSMutableArray<GlyphTableRow *> alloc] init];
     for (NSUInteger index = 0; index < self.typeface.numberOfGlyphs; ++ index) {
         GlyphTableRow * row = [[GlyphTableRow alloc] initWithIndex:index
                                                           typeface:self.typeface];
         [rows addObject:row];
     }
+    
+    NSRange range = NSMakeRange(0, [[self.glyphsArrayController arrangedObjects] count]);
+    [self.glyphsArrayController removeObjectsAtArrangedObjectIndexes:[NSIndexSet indexSetWithIndexesInRange:range]];
     
     [self.glyphsArrayController addObjects:rows];
 }
