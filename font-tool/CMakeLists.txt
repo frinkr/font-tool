@@ -99,6 +99,7 @@ set(NIB_FILES
   TypefaceListWindow.storyboard
   TypefaceStylesWindow.storyboard
   TypefaceInfoWindow.storyboard
+  TypefaceVariation.storyboard
   ShapingWindow.storyboard
   GlyphTableWindow.storyboard
   ToolBox.storyboard

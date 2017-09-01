@@ -9,11 +9,50 @@
 #import "TypefaceVariationViewController.h"
 #import "TypefaceDocument.h"
 
+@interface TypefaceVariationAxisViewController : NSViewController
+@property (weak) IBOutlet NSTextField *nameLabel;
+@property (weak) IBOutlet NSSlider *valueSlider;
+@property (weak) IBOutlet NSTextField *valueTextField;
+@property Fixed axisValue;
+
+- (void)loadFromAxis:(TypefaceAxis*)axis;
+@end
+
+@implementation TypefaceVariationAxisViewController
+
+- (void)awakeFromNib {
+    [super awakeFromNib];
+    [self addObserver:self forKeyPath:@"axisValue" options:NSKeyValueObservingOptionNew context:nil];
+}
+
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSString *,id> *)change context:(void *)context {
+    if (object == self && [keyPath isEqualToString:@"axisValue"]) {
+        self.valueSlider.floatValue = FixedToFloat(self.axisValue);
+        self.valueTextField.floatValue = self.valueSlider.floatValue;
+    }
+}
+
+- (void)loadFromAxis:(TypefaceAxis *)axis {
+    [self loadView];
+    
+    self.nameLabel.stringValue = axis.name;
+    self.valueSlider.minValue = FixedToFloat(axis.minValue);
+    self.valueSlider.maxValue = FixedToFloat(axis.maxValue);
+}
+
+- (IBAction)onSliderValueChanged:(id)sender {
+    self.valueTextField.floatValue = self.valueSlider.floatValue;
+    self.axisValue = FloatToFixed(self.valueSlider.floatValue);
+}
+
+@end
+
 @interface TypefaceVariationViewController ()
 @property (weak) IBOutlet NSComboBox *namedVariantsCombobox;
 @property (weak) IBOutlet NSStackView *axisesStackView;
 @property (strong) TypefaceDocument * document;
 @property (strong) NSPopover *popover;
+@property (strong) NSMutableArray<TypefaceVariationAxisViewController*> * axisesViewControllers;
 @end
 
 @implementation TypefaceVariationViewController
@@ -33,38 +72,17 @@
     [super viewWillAppear];
     
     // Load axixes
+    self.axisesViewControllers = [[NSMutableArray<TypefaceVariationAxisViewController*> alloc] init];
+    
     for (TypefaceAxis * axis in self.typeface.axises) {
-        NSView * view = [[NSView alloc] initWithFrame:CGRectMake(0, 0, 100, 100)];
-        NSTextField * label = [[NSTextField alloc] init];
-        label.stringValue = axis.name;
-        label.bezeled = NO;
-        label.drawsBackground = NO;
-        label.editable = NO;
-        label.selectable = NO;
+        TypefaceVariationAxisViewController * vc = [[NSStoryboard storyboardWithName:@"TypefaceVariation" bundle:nil] instantiateControllerWithIdentifier:@"variationAxisViewController"];
         
-        NSSlider * slider = [[NSSlider alloc] init];
+        [vc loadFromAxis:axis];
         
-        NSTextField * value = [[NSTextField alloc] init];
-        value.editable = NO;
+        [vc addObserver:self forKeyPath:@"axisValue" options:NSKeyValueObservingOptionNew context:nil];
         
-        label.translatesAutoresizingMaskIntoConstraints = NO;
-        slider.translatesAutoresizingMaskIntoConstraints = NO;
-        value.translatesAutoresizingMaskIntoConstraints = NO;
-        
-        [view addSubview:label];
-        [view addSubview:slider];
-        [view addSubview:value];
-        NSDictionary<NSString*, id> * views = @{@"label": label,
-                                                @"slider": slider,
-                                                @"value": value
-                                                };
-        
-        [view addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"|-0-[label(==50)]-5-[slider]-5-[value(==30)]-0-|"
-                                                                     options:0
-                                                                     metrics:nil
-                                                                       views:views]];
-
-        [self.axisesStackView addArrangedSubview:view];
+        [self.axisesViewControllers addObject:vc];
+        [self.axisesStackView addArrangedSubview:vc.view];
     }
     
     [self.namedVariantsCombobox reloadData];
@@ -83,6 +101,21 @@
     }
 }
 
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSString *,id> *)change context:(void *)context {
+    if ([keyPath isEqualToString:@"axisValue"]) {
+        [self.typeface selectVariation:[self variationFromSliders]];
+    }
+}
+
+- (TypefaceVariation *)variationFromSliders {
+    TypefaceVariation * varation = [[TypefaceVariation alloc] init];
+    NSMutableArray<NSNumber*> * coords = [[NSMutableArray<NSNumber*> alloc] init];
+    for (TypefaceVariationAxisViewController * vc in self.axisesViewControllers) {
+        [coords addObject:@(vc.axisValue)];
+    }
+    varation.coordinates = coords;
+    return varation;
+}
 
 - (NSInteger)numberOfItemsInComboBox:(NSComboBox *)aComboBox {
     return self.typeface.namedVariations.count + 1;
@@ -100,6 +133,11 @@
     if (index != 0) {
         TypefaceVariation * variation = [self.typeface.namedVariations objectAtIndex:index - 1];
         [self.typeface selectVariation:variation];
+        
+        for (NSUInteger i = 0; i < variation.coordinates.count; ++ i) {
+            TypefaceVariationAxisViewController * vc = [self.axisesViewControllers objectAtIndex:i];
+            vc.axisValue = [variation.coordinates objectAtIndex:i].integerValue;
+        }
     }
 }
 
@@ -134,7 +172,7 @@
 }
 
 + (instancetype)createViewController {
-    TypefaceVariationViewController * vc = [[NSStoryboard storyboardWithName:@"Main" bundle:nil] instantiateControllerWithIdentifier:@"variationViewController"];
+    TypefaceVariationViewController * vc = [[NSStoryboard storyboardWithName:@"TypefaceVariation" bundle:nil] instantiateControllerWithIdentifier:@"variationViewController"];
     [vc forceLoadView];
     return vc;
 }
