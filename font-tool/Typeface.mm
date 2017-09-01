@@ -858,14 +858,9 @@ typedef struct {
             [_axises addObject:a];
         }
         
-        std::vector<FT_Fixed> defaultCoords(mmvar->num_axis);
-        if (FT_Get_Var_Design_Coordinates(face, mmvar->num_axis, &defaultCoords[0])
-            || (defaultCoords.size() != mmvar->num_axis))
-            defaultCoords.clear();
-        
         _namedVariations = [[NSMutableArray<TypefaceNamedVariation*> alloc] init];
         
-        TypefaceVariation * currentVariation = nil;
+        TypefaceVariation * defaultVariat = nil;
         
         for (FT_UInt i = 0; i < mmvar->num_namedstyles; ++ i) {
             const FT_Var_Named_Style * namedStyle = mmvar->namedstyle + i;
@@ -874,7 +869,7 @@ typedef struct {
             BOOL isDefault = YES;
             for (FT_UInt j = 0; j < mmvar->num_axis; ++ j) {
                 [coords addObject:@(namedStyle->coords[j])];
-                if (isDefault && defaultCoords.size() && (namedStyle->coords[j] != defaultCoords[j]))
+                if (isDefault && (namedStyle->coords[j] != (mmvar->axis + j)->def))
                     isDefault = NO;
             }
             
@@ -887,23 +882,30 @@ typedef struct {
             
             [_namedVariations addObject:variation];
             
-            if (isDefault && !currentVariation)
-                currentVariation = variation;
+            if (isDefault && !defaultVariat)
+                defaultVariat = variation;
         }
         
-        if (!currentVariation && defaultCoords.size()) {
+        if (!defaultVariat) {
             TypefaceNamedVariation * variation = [[TypefaceNamedVariation alloc] init];
             variation.name = @"<default>";
             variation.isDefault = YES;
             
             NSMutableArray<NSNumber*> * coords = [[NSMutableArray<NSNumber*> alloc] init];
-            for (FT_Fixed v : defaultCoords)
-                [coords addObject:@(v)];
+            for (FT_UInt i = 0; i < mmvar->num_axis; ++ i) {
+                const FT_Var_Axis * axis = mmvar->axis + i;
+                [coords addObject:@(axis->def)];
+            }
+            
             variation.coordinates = coords;
             
             // Add the default instance at beginning.
             [_namedVariations insertObject:variation atIndex:0];
-            
+            defaultVariat = variation;
+        }
+        
+        if (defaultVariat) {
+            [self selectVariation:defaultVariat];
         }
     }
 }
@@ -952,8 +954,7 @@ typedef struct {
     for (NSNumber * c in variation.coordinates)
         coords.push_back([c integerValue]);
     FT_Set_Var_Design_Coordinates(face, coords.size(), &coords[0]);
-    
-    
+
     [imageCache invalidateImageCache];
     
     [self didChangeValueForKey:@"currentVariation"];

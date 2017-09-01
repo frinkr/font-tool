@@ -28,19 +28,43 @@
     // Do view setup here.
 }
 
+- (void)viewWillAppear {
+    [super viewWillAppear];
+    
+    [self.namedVariantsCombobox reloadData];
+    
+    TypefaceVariation * current = self.typeface.currentVariation;
+    for (NSUInteger i = 0; i < self.typeface.namedVariations.count; ++ i) {
+        TypefaceNamedVariation * variation = [self.typeface.namedVariations objectAtIndex:i];
+        if ([variation isEqualTo:current]) {
+            [self.namedVariantsCombobox selectItemAtIndex:i+1];
+            break;
+        }
+    }
+    
+    if ([self.namedVariantsCombobox indexOfSelectedItem] == NSNotFound) {
+        [self.namedVariantsCombobox selectItemAtIndex:0];
+    }
+}
+
 
 - (NSInteger)numberOfItemsInComboBox:(NSComboBox *)aComboBox {
-    return self.typeface.namedVariations.count;
+    return self.typeface.namedVariations.count + 1;
 }
 
 - (id)comboBox:(NSComboBox *)aComboBox objectValueForItemAtIndex:(NSInteger)index {
-    return [self.typeface.namedVariations objectAtIndex:index].name;
+    if (index == 0)
+        return @"<CURRENT>";
+    return [self.typeface.namedVariations objectAtIndex:index - 1].name;
 }
 
 - (void)comboBoxSelectionDidChange:(NSNotification *)notification {
-    TypefaceVariation * variation = [self.typeface.namedVariations objectAtIndex:self.namedVariantsCombobox.indexOfSelectedItem];
+    NSInteger index = self.namedVariantsCombobox.indexOfSelectedItem;
     
-    [self.typeface selectVariation:variation];
+    if (index != 0) {
+        TypefaceVariation * variation = [self.typeface.namedVariations objectAtIndex:index - 1];
+        [self.typeface selectVariation:variation];
+    }
 }
 
 - (Typeface*)typeface {
