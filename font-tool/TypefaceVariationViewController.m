@@ -11,6 +11,7 @@
 
 @interface TypefaceVariationViewController ()
 @property (weak) IBOutlet NSComboBox *namedVariantsCombobox;
+@property (weak) IBOutlet NSStackView *axisesStackView;
 @property (strong) TypefaceDocument * document;
 @property (strong) NSPopover *popover;
 @end
@@ -30,6 +31,41 @@
 
 - (void)viewWillAppear {
     [super viewWillAppear];
+    
+    // Load axixes
+    for (TypefaceAxis * axis in self.typeface.axises) {
+        NSView * view = [[NSView alloc] initWithFrame:CGRectMake(0, 0, 100, 100)];
+        NSTextField * label = [[NSTextField alloc] init];
+        label.stringValue = axis.name;
+        label.bezeled = NO;
+        label.drawsBackground = NO;
+        label.editable = NO;
+        label.selectable = NO;
+        
+        NSSlider * slider = [[NSSlider alloc] init];
+        
+        NSTextField * value = [[NSTextField alloc] init];
+        value.editable = NO;
+        
+        label.translatesAutoresizingMaskIntoConstraints = NO;
+        slider.translatesAutoresizingMaskIntoConstraints = NO;
+        value.translatesAutoresizingMaskIntoConstraints = NO;
+        
+        [view addSubview:label];
+        [view addSubview:slider];
+        [view addSubview:value];
+        NSDictionary<NSString*, id> * views = @{@"label": label,
+                                                @"slider": slider,
+                                                @"value": value
+                                                };
+        
+        [view addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"|-0-[label(==50)]-5-[slider]-5-[value(==30)]-0-|"
+                                                                     options:0
+                                                                     metrics:nil
+                                                                       views:views]];
+
+        [self.axisesStackView addArrangedSubview:view];
+    }
     
     [self.namedVariantsCombobox reloadData];
     
@@ -80,7 +116,7 @@
         self.popover = [[NSPopover alloc] init];
         self.popover.contentViewController = self;
         self.popover.delegate = self;
-        self.popover.appearance = [NSAppearance appearanceNamed:NSAppearanceNameVibrantLight];
+        self.popover.appearance = [NSAppearance appearanceNamed:NSAppearanceNameVibrantDark];
         self.popover.behavior = NSPopoverBehaviorTransient;
     }
     
