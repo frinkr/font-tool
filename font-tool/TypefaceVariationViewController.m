@@ -72,6 +72,24 @@
 - (void)viewWillAppear {
     [super viewWillAppear];
     
+    if (!self.typeface.isFontVariation && !self.typeface.isAdobeMM) {
+        NSTextField * warning = [[NSTextField alloc] init];
+        warning.stringValue = @"Not an OpenType Variable or Adobe Multiple Master font";
+        warning.bezeled = NO;
+        warning.drawsBackground = NO;
+        warning.editable = NO;
+        warning.selectable = YES;
+        warning.usesSingleLineMode = NO;
+        warning.lineBreakMode = NSLineBreakByWordWrapping;
+        warning.alignment = NSTextAlignmentCenter;
+        warning.font = [NSFont labelFontOfSize:14];
+        
+        [self.axisesStackView addArrangedSubview:warning];
+        
+        [self.namedVariantsCombobox setEnabled:NO];
+        return;
+    }
+    
     // Load axixes
     self.axisesViewControllers = [[NSMutableArray<TypefaceVariationAxisViewController*> alloc] init];
     
