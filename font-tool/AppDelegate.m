@@ -82,7 +82,7 @@
 }
 
 - (BOOL)application:(NSApplication *)sender openFile:(NSString *)filename {
-    return NO;
+    return [(TypefaceDocumentController*)[NSDocumentController sharedDocumentController] openFontFromFilePath:[NSURL fileURLWithPath:filename]];
 }
 
 - (void)openURL:(NSURL *)url {

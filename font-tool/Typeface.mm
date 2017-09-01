@@ -740,6 +740,8 @@ typedef struct {
 }
 
 - (BOOL) setupTypeface:(NSURL*)fileURL {
+    [self loadT1AttachmentOfMasterFile:fileURL];
+    
     cmaps = [[NSMutableArray<TypefaceCMap*> alloc] init];
     imageCache = [[TypefaceGlyphImageCache alloc] initWithCacheSize:500];
     
@@ -776,6 +778,31 @@ typedef struct {
     glyphNameCache = [[TypefaceGlyphNameCache alloc] initWithFace:face
                                                     isUnicodeCMap:self.currentCMap.isUnicode];
     return YES;
+}
+
+- (void)loadT1AttachmentOfMasterFile:(NSURL*)fileURL {
+    NSString * ext = [fileURL.pathExtension lowercaseString];
+    NSURL * path = [fileURL URLByDeletingPathExtension];
+
+    if ([ext isEqualToString:@"pfb"] || [ext isEqualToString:@"pfa"]) {
+        NSURL * attachment = nil;
+        NSURL * mmm = [path URLByAppendingPathExtension:@"mmm"];
+        NSURL * pfm = [path URLByAppendingPathExtension:@"pfm"];
+        NSURL * afm = [path URLByAppendingPathExtension:@"afm"];
+        
+        if ([mmm checkResourceIsReachableAndReturnError:nil] == YES)
+            attachment = mmm;
+        else if ([pfm checkResourceIsReachableAndReturnError:nil] == YES)
+            attachment = pfm;
+        else if ([afm checkResourceIsReachableAndReturnError:nil] == YES)
+            attachment = afm;
+        
+        if (attachment) {
+            FT_Attach_File(face, [attachment.path UTF8String]);
+        }
+        
+        
+    }
 }
 
 #pragma mark *** Metrics ***

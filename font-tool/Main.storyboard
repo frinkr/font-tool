@@ -67,7 +67,7 @@
                                         </menuItem>
                                         <menuItem title="Open from File..." keyEquivalent="O" id="7KX-zL-ulf">
                                             <connections>
-                                                <action selector="openFontFromFile:" target="Ady-hI-5gd" id="5ZG-e0-8OG"/>
+                                                <action selector="openFontFromFilePanel:" target="I8j-Ym-xVt" id="X52-72-wTl"/>
                                             </connections>
                                         </menuItem>
                                         <menuItem title="Open Recent" id="tXI-mr-wws">

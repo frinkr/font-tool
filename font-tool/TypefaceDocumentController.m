@@ -66,18 +66,11 @@
     
 }
 
-- (IBAction)openFontFromFile:(id)sender {
+- (IBAction)openFontFromFilePanel:(id)sender {
     [self beginOpenPanelWithCompletionHandler:^(NSArray<NSURL *> * files) {
         for (NSURL * url in files) {
-            
-            NSInteger face = [TypefaceStylesWindowController selectTypefaceOfFile:url];
-            if (face == -1)
-                continue;
-            
-            NSURL * faceURL = [TypefaceDocument documentURLWithTypefaceDescriptor:[TypefaceDescriptor descriptorWithFileURL:url faceIndex:face]];
-            [self openDocumentForURL:faceURL];
+            [self openFontFromFilePath:url];
         }
-        
     }];
 }
 
@@ -92,6 +85,16 @@
 - (IBAction)doSearch:(id)sender {
     TypefaceWindowController * twc = (TypefaceWindowController*)[self.currentDocument.windowControllers objectAtIndex:0];
     [twc lookupCharacter:sender];
+}
+
+- (BOOL)openFontFromFilePath:(NSURL*)file {
+    NSInteger face = [TypefaceStylesWindowController selectTypefaceOfFile:file];
+    if (face == -1)
+        return YES;
+    
+    NSURL * faceURL = [TypefaceDocument documentURLWithTypefaceDescriptor:[TypefaceDescriptor descriptorWithFileURL:file faceIndex:face]];
+    [self openDocumentForURL:faceURL];
+    return YES;
 }
 
 - (void)openDocumentForURL:(NSURL*)url {

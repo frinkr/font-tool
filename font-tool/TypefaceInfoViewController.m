@@ -140,7 +140,10 @@ NSString* FixedArrayToString(NSArray<NSNumber*> * array) {
 }
 
 - (void)dealloc {
-    [self.typeface removeObserver:self forKeyPath:@"currentVariation"];
+    @try {
+        [self.typeface removeObserver:self forKeyPath:@"currentVariation"];
+    }
+    @catch(...) {}
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSString *,id> *)change context:(void *)context {
@@ -326,20 +329,21 @@ NSString* FixedArrayToString(NSArray<NSNumber*> * array) {
     [items addRowWithKey:@"Units per EM" unsignedIntegerValue:ftFace->units_per_EM];
     
     // tables size
-    NSMutableArray<NSString*> * tableNames = [[NSMutableArray<NSString*> alloc] init];
-    FT_UInt tableIndex = 0;
-    while (error != FT_Err_Table_Missing) {
-        FT_ULong length = 0, tag = 0;
-        error = FT_Sfnt_Table_Info(ftFace, tableIndex, &tag, &length);
-        ++ tableIndex;
-        if (!error) {
-            // add tag
-            //[items addRowWithKey:SFNTTagName(tag) unsignedIntegerValue:length];
-            [tableNames addObject:[NSString stringWithFormat:@"%@ (%ld)", SFNTTagName(tag), length]];
+    if (FT_IS_SFNT(ftFace)) {
+        NSMutableArray<NSString*> * tableNames = [[NSMutableArray<NSString*> alloc] init];
+        FT_UInt tableIndex = 0;
+        while (error != FT_Err_Table_Missing) {
+            FT_ULong length = 0, tag = 0;
+            error = FT_Sfnt_Table_Info(ftFace, tableIndex, &tag, &length);
+            ++ tableIndex;
+            if (!error) {
+                // add tag
+                //[items addRowWithKey:SFNTTagName(tag) unsignedIntegerValue:length];
+                [tableNames addObject:[NSString stringWithFormat:@"%@ (%ld)", SFNTTagName(tag), length]];
+            }
         }
+        [items addRowWithKey:@"Tables (bytes)" stringValue:[tableNames componentsJoinedByString:@", "]];
     }
-    [items addRowWithKey:@"Tables (bytes)" stringValue:[tableNames componentsJoinedByString:@", "]];
-    
     
     return items;
 }

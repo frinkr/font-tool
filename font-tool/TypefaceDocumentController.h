@@ -28,10 +28,11 @@
 
 @interface TypefaceDocumentController : NSDocumentController
 
-- (IBAction)openFontFromFile:(id)sender;
+- (IBAction)openFontFromFilePanel:(id)sender;
 - (IBAction)openFontFromList:(id)sender;
 - (IBAction)doSearch:(id)sender;
 
+- (BOOL)openFontFromFilePath:(NSURL*)file;
 - (TypefaceRecentDocumentInfo*)mostRecentDocument;
 
 - (NSMenu*)buildRecentMenuWithAction:(SEL)action clearAction:(SEL)clearAction;
