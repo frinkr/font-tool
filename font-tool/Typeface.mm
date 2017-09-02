@@ -452,7 +452,7 @@ typedef struct {
 
 @implementation TypefaceAttributes
 - (void)encodeWithCoder:(NSCoder *)coder {
-    [coder encodeBool:_isOpenTypeVariable forKey:@"isOpenTypeVariable"];
+    [coder encodeBool:_isOpenTypeVariation forKey:@"isOpenTypeVariation"];
     [coder encodeBool:_isAdobeMultiMaster forKey:@"isAdobeMM"];
     [coder encodeObject:_openTypeScripts forKey:@"openTypeScripts"];
     [coder encodeObject:_openTypeLanguages forKey:@"openTypeLanguages"];
@@ -473,7 +473,7 @@ typedef struct {
 
 - (id)initWithCoder:(NSCoder *)decoder {
     if (self = [super init]) {
-        _isOpenTypeVariable = [decoder decodeBoolForKey:@"isOpenTypeVariable"];
+        _isOpenTypeVariation = [decoder decodeBoolForKey:@"isOpenTypeVariation"];
         _isAdobeMultiMaster = [decoder decodeBoolForKey:@"isAdobeMM"];
         _openTypeScripts = [decoder decodeObjectForKey:@"openTypeScripts"];
         _openTypeLanguages = [decoder decodeObjectForKey:@"openTypeLanguages"];
@@ -871,11 +871,11 @@ typedef struct {
     if (!mmvar && !_isAdobeMM)
         return;
     
-    _isFontVariation = YES;
+    _isOpenTypeVariation = !!mmvar;
     
     _axises = [[NSMutableArray<TypefaceAxis*> alloc] init];
     
-    if (mmvar && !_isAdobeMM) {
+    if (_isOpenTypeVariation && !_isAdobeMM) {
         for (FT_UInt i = 0; i < mmvar->num_axis; ++ i) {
             const FT_Var_Axis * axis = mmvar->axis + i;
             TypefaceAxis * a = [[TypefaceAxis alloc] init];
@@ -951,7 +951,7 @@ typedef struct {
 
 - (TypefaceVariation*)currentVariation {
     
-    if (!_isFontVariation)
+    if (!_isOpenTypeVariation)
         return nil;
     
     std::vector<FT_Fixed> defaultCoords(_axises.count);
@@ -1042,7 +1042,7 @@ typedef struct {
         
         // MM
         _attributes.isAdobeMultiMaster = _isAdobeMM;
-        _attributes.isOpenTypeVariable = _isFontVariation;
+        _attributes.isOpenTypeVariation = _isOpenTypeVariation;
         
         // OT features
         Shapper * shapper = [[Shapper alloc] initWithTypeface:self];

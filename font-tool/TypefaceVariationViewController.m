@@ -72,7 +72,7 @@
 - (void)viewWillAppear {
     [super viewWillAppear];
     
-    if (!self.typeface.isFontVariation && !self.typeface.isAdobeMM) {
+    if (!self.typeface.isOpenTypeVariation && !self.typeface.isAdobeMM) {
         NSTextField * warning = [[NSTextField alloc] init];
         warning.stringValue = @"Not an OpenType Variable or Adobe Multiple Master font";
         warning.bezeled = NO;

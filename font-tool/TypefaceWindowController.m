@@ -67,6 +67,15 @@
 }
 
 - (IBAction)selectVariant:(id)sender {
+    if (!self.typefaceDocument.typeface.isAdobeMM && !self.typefaceDocument.typeface.isOpenTypeVariation) {
+        NSAlert *alert = [[NSAlert alloc] init];
+        [alert addButtonWithTitle:@"OK"];
+        [alert setMessageText:@"The font is not an OpenType Variant or Adobe Multiple Master."];
+        [alert setAlertStyle:NSCriticalAlertStyle];
+        [alert runModal];
+        return;
+    }
+        
     TypefaceVariationViewController * vc = [TypefaceVariationViewController createViewController];
     NSView * view = nil;
     if ([sender isKindOfClass:[NSView class]])

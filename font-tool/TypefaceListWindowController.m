@@ -94,7 +94,7 @@ typedef NS_ENUM(NSInteger, TypefaceVariationFlavor) {
         return NO;
     
     if (filter.variationFlavor != TypefaceVariationFlavorAny) {
-        if ((filter.variationFlavor == TypefaceVariationFlavorOpenType && !self.attributes.isOpenTypeVariable) ||
+        if ((filter.variationFlavor == TypefaceVariationFlavorOpenType && !self.attributes.isOpenTypeVariation) ||
             (filter.variationFlavor == TypefaceVariationFlavorAdobeMM && !self.attributes.isAdobeMultiMaster))
             return NO;
     }

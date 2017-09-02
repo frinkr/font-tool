@@ -424,7 +424,7 @@ NSString* FixedArrayToString(NSArray<NSNumber*> * array) {
     }
     
     // Multiple master/ font variation
-    if (face.isFontVariation)
+    if (face.isOpenTypeVariation)
     {
         for (TypefaceAxis * axis in face.axises) {
             NSString * str = [NSString stringWithFormat:@"TAG: '%@'<br> Name: %@<br> Min:%f<br> Max:%f<br> Default:%f",

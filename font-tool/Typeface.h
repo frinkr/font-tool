@@ -144,7 +144,7 @@ typedef NS_ENUM(NSInteger, TypefaceFormat) {
 
 @interface TypefaceAttributes : NSObject
 
-@property BOOL isOpenTypeVariable;
+@property BOOL isOpenTypeVariation;
 @property BOOL isAdobeMultiMaster;
 
 
@@ -202,7 +202,7 @@ typedef NS_ENUM(NSInteger, TypefaceFormat) {
 
 // variations
 @property (readonly) BOOL isAdobeMM;
-@property (readonly) BOOL isFontVariation;
+@property (readonly) BOOL isOpenTypeVariation;
 @property (readonly) NSArray<TypefaceAxis*> * axises;
 @property (readonly) NSArray<TypefaceNamedVariation*> * namedVariations;
 
