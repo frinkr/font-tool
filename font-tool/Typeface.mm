@@ -13,8 +13,8 @@
 #include FT_SIZES_H
 #include FT_MULTIPLE_MASTERS_H
 
-#ifndef FT_CONFIG_OPTION_USE_PNG
-#error "Enable PNG to use colour fonts"
+#if !defined(FT_CONFIG_OPTION_USE_PNG) || !defined(TT_CONFIG_OPTION_EMBEDDED_BITMAPS)
+#warning "Enable PNG & embedded bitmap to use colour fonts"
 #endif
 
 static int FT_DEFAULT_FONTSIZE = 24 * 4;
