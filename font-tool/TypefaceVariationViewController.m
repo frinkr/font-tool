@@ -179,7 +179,7 @@
         self.popover = [[NSPopover alloc] init];
         self.popover.contentViewController = self;
         self.popover.delegate = self;
-        self.popover.appearance = [NSAppearance appearanceNamed:NSAppearanceNameVibrantDark];
+        self.popover.appearance = [NSAppearance appearanceNamed:NSAppearanceNameVibrantLight];
         self.popover.behavior = NSPopoverBehaviorTransient;
     }
     

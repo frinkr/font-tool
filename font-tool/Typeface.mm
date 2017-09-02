@@ -13,6 +13,10 @@
 #include FT_SIZES_H
 #include FT_MULTIPLE_MASTERS_H
 
+#ifndef FT_CONFIG_OPTION_USE_PNG
+#error "Enable PNG to use colour fonts"
+#endif
+
 static int FT_DEFAULT_FONTSIZE = 24 * 4;
 static int FT_DEFAULT_DPI      = 72;
 
@@ -679,6 +683,8 @@ typedef struct {
     
     TypefaceGlyphNameCache * glyphNameCache;
     NSSet<OpenTypeFeatureTag*> * openTypeFeatureTags;
+    
+    BOOL _isColourFont;
 }
 -(NSUInteger)numOfGlyphs;
 
@@ -742,8 +748,12 @@ typedef struct {
 - (BOOL) setupTypeface:(NSURL*)fileURL {
     [self loadT1AttachmentOfMasterFile:fileURL];
     
-    cmaps = [[NSMutableArray<TypefaceCMap*> alloc] init];
-    imageCache = [[TypefaceGlyphImageCache alloc] initWithCacheSize:500];
+    // setup colour fonts
+    ot_tag_t tag = MAKE_TAG4('C', 'B', 'D', 'T');
+    unsigned long length = 0;
+    FT_Load_Sfnt_Table(face, tag, 0, nullptr, &length);
+    if (length)
+        _isColourFont = YES;
     
     // load variations
     [self loadVariations];
@@ -761,6 +771,7 @@ typedef struct {
     }
     
     // read all cmaps
+    cmaps = [[NSMutableArray<TypefaceCMap*> alloc] init];
     for (FT_Int i = 0; i < face->num_charmaps; ++ i) {
         [cmaps addObject:[[TypefaceCMap alloc] initWithFace:face cmapIndex:i]];
     }
@@ -774,6 +785,8 @@ typedef struct {
     _fileURL = fileURL;
     _faceIndex = face->face_index;
     
+    imageCache = [[TypefaceGlyphImageCache alloc] initWithCacheSize:500];
+
     // build glyph name cache
     glyphNameCache = [[TypefaceGlyphNameCache alloc] initWithFace:face
                                                     isUnicodeCMap:self.currentCMap.isUnicode];
@@ -812,11 +825,28 @@ typedef struct {
     
     // set size
     const FT_Short pt = self.fontSize;
-    FT_Set_Char_Size(face,
-                     0,     // same as height
-                     pt << 6,
-                     self.dpi,
-                     self.dpi);
+    if (_isColourFont) {
+        if (face->num_fixed_sizes) {
+            int bestMatch = 0;
+            int pixSize = [self ptToPixel:_fontSize];
+            int diff = abs(pixSize - face->available_sizes[0].width);
+            for (int i = 1; i < face->num_fixed_sizes; ++i) {
+                int ndiff =
+                abs(pixSize - face->available_sizes[i].width);
+                if (ndiff < diff) {
+                    bestMatch = i;
+                    diff = ndiff;
+                }
+            }
+            FT_Select_Size(face, bestMatch);
+        }
+        else {
+            FT_Set_Char_Size(face, 0/*same as height*/, pt << 6, self.dpi, self.dpi);
+        }
+    }
+    else {
+        FT_Set_Char_Size(face, 0/*same as height*/, pt << 6, self.dpi, self.dpi);
+    }
     
     [imageCache invalidateImageCache];
 }
@@ -1249,7 +1279,7 @@ typedef struct {
     // glyph image
     TypefaceGlyphImageCacheItem * item = [imageCache cachedImageItemForGID:gid];
     if (!item) {
-        FT_Load_Glyph(face, gid, FT_LOAD_RENDER);
+        FT_Load_Glyph(face, gid, FT_LOAD_RENDER | (_isColourFont? FT_LOAD_COLOR : 0));
         FT_GlyphSlot slot = face->glyph;
         NSImage * image = [self imageFromBitmap:slot->bitmap];
         NSInteger offsetX = slot->bitmap_left;
@@ -1425,6 +1455,30 @@ typedef struct {
         image = [[NSImage alloc] initWithSize:imageSize];
         [image addRepresentation:imageRep];
     }
+    else if (bm.pixel_mode == FT_PIXEL_MODE_BGRA) {
+        size_t length = bm.rows * bm.pitch;
+        unsigned char * planes[5] = {NULL};
+        NSBitmapImageRep * imageRep = [[NSBitmapImageRep alloc] initWithBitmapDataPlanes:planes
+                                                                              pixelsWide:bm.width
+                                                                              pixelsHigh:bm.rows
+                                                                           bitsPerSample:8
+                                                                         samplesPerPixel:2
+                                                                                hasAlpha:YES
+                                                                                isPlanar:YES
+                                                                          colorSpaceName:NSDeviceRGBColorSpace
+                                                                            bitmapFormat: NSAlphaFirstBitmapFormat
+                                                                             bytesPerRow:bm.pitch
+                                                                            bitsPerPixel:8];
+        
+        [imageRep getBitmapDataPlanes:planes];
+        
+        memcpy(planes[0], bm.buffer, length);  // alpha plane
+        
+        NSSize imageSize = NSMakeSize(CGImageGetWidth([imageRep CGImage]), CGImageGetHeight([imageRep CGImage]));
+        image = [[NSImage alloc] initWithSize:imageSize];
+        [image addRepresentation:imageRep];
+    }
+    
     return image;
 }
 
