@@ -338,7 +338,7 @@ typedef struct {
         
         // tint
         NSImage * glyphImage = glyph.image;
-        {
+        if (!self.face.isBitmap) {
             glyphImage = [glyphImage copy];
             [glyphImage lockFocus];
             [[NSColor textColor] set];
@@ -608,7 +608,7 @@ typedef struct {
 }
 
 - (CGFloat)fontUnitToPixel:(CGFloat)u {
-    return [self ptToPixel:u/(CGFloat)(self.face.upem) * self.fontSize];
+    return [self.face fontUnitToPixel: u withFontSize:self.fontSize];
 }
 
 - (CGPoint)fontUnitToPixelPoint:(CGPoint)p {
@@ -622,7 +622,7 @@ typedef struct {
 }
 
 - (CGFloat)ptToPixel:(CGFloat)pt {
-    return pt * self.face.dpi / 72.0;
+    return [self.face ptToPixel:pt];
 }
 
 @end

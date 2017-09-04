@@ -687,6 +687,7 @@ typedef struct {
     int _bmStrikeIndex;
     BOOL _isColourFont;
     BOOL _isScalable;
+    CGFloat _headUPEM;
 }
 -(NSUInteger)numOfGlyphs;
 
@@ -750,9 +751,12 @@ typedef struct {
 - (BOOL) setupTypeface:(NSURL*)fileURL {
     [self loadT1AttachmentOfMasterFile:fileURL];
     
-    // some flags
+    // setup bitmap fonts
     _isColourFont = FT_HAS_COLOR(face);
     _isScalable = FT_IS_SCALABLE(face);
+    TT_Header * head = (TT_Header *)FT_Get_Sfnt_Table(face, FT_SFNT_HEAD);
+    if (head)
+        _headUPEM = head->Units_Per_EM;
     
     // load variations
     [self loadVariations];
@@ -868,7 +872,7 @@ typedef struct {
     if (_isScalable)
         return face->units_per_EM;
     else
-        return 10240;
+        return _headUPEM? _headUPEM: 10240;
 }
 
 - (CGFloat)getAscender {
@@ -915,7 +919,6 @@ typedef struct {
 }
 
 - (CGFloat)fontUnitToPixel:(NSInteger)u withFontSize:(CGFloat)fontSize {
-    //NSAssert(_isScalable, @"Must be called with scalable fonts!");
     return [self ptToPixel:u/(CGFloat)[self getUPEM] * fontSize];
 }
 
