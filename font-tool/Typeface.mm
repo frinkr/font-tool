@@ -826,8 +826,13 @@ typedef struct {
 - (void)setFontSize:(CGFloat)fontSize {
     _fontSize = fontSize;
     
-    // set size
-    const FT_Short pt = self.fontSize;
+    [self selectFaceSizeFromFontSize:fontSize];
+    
+    [imageCache invalidateImageCache];
+}
+
+- (void)selectFaceSizeFromFontSize: (CGFloat) fontSize{
+    const FT_Short pt = fontSize;
     if (!_isScalable) {
         if (face->num_fixed_sizes) {
             _bmStrikeIndex = 0;
@@ -849,8 +854,6 @@ typedef struct {
     else {
         FT_Set_Char_Size(face, 0/*same as height*/, pt << 6, self.dpi, self.dpi);
     }
-    
-    [imageCache invalidateImageCache];
 }
 
 - (CGFloat)fontSize {
@@ -861,26 +864,24 @@ typedef struct {
     self.fontSize = px * 72.0 / self.dpi;
 }
 
-- (NSUInteger)getUPEM {
+- (CGFloat)getUPEM {
     if (_isScalable)
         return face->units_per_EM;
     else
         return 10240;
 }
 
-- (NSInteger)getAscender {
+- (CGFloat)getAscender {
     if (_isScalable)
         return face->ascender;
     else
-        //return [self getUPEM];
         return [self pixelToFontUnit:face->size->metrics.ascender/64.0];
 }
 
-- (NSInteger)getDescender {
+- (CGFloat)getDescender {
     if (_isScalable)
         return face->descender;
     else
-        //return 0;
         return [self pixelToFontUnit:face->size->metrics.descender/64.0];
 }
 
@@ -1442,17 +1443,12 @@ typedef struct {
     FT_New_Size(face, &newSize);
     FT_Activate_Size(newSize);
     
-    const FT_Short pt = fontSize;
-    FT_Set_Char_Size(face,
-                     0,     // same as height
-                     pt << 6,
-                     self.dpi,
-                     self.dpi);
+    [self selectFaceSizeFromFontSize:fontSize];
     
     TypefaceGlyph * g = [[TypefaceGlyph alloc] init];
 
     {
-        FT_Load_Glyph(face, gid, FT_LOAD_RENDER);
+        FT_Load_Glyph(face, gid, FT_LOAD_RENDER | (_isScalable? 0: FT_LOAD_COLOR));
         FT_GlyphSlot slot = face->glyph;
         NSImage * image = [self imageFromBitmap:slot->bitmap];
         NSInteger offsetX = slot->bitmap_left;

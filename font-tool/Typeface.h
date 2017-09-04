@@ -214,9 +214,9 @@ typedef NS_ENUM(NSInteger, TypefaceFormat) {
 // size
 @property (nonatomic, getter=fontSize, setter=setFontSize:) CGFloat fontSize;
 @property (nonatomic, readonly) NSUInteger dpi;
-@property (nonatomic, readonly, getter=getUPEM) NSUInteger upem;
-@property (nonatomic, readonly, getter=getAscender) NSInteger ascender;
-@property (nonatomic, readonly, getter=getDescender) NSInteger descender;
+@property (nonatomic, readonly, getter=getUPEM) CGFloat upem;
+@property (nonatomic, readonly, getter=getAscender) CGFloat ascender;
+@property (nonatomic, readonly, getter=getDescender) CGFloat descender;
 @property (nonatomic, readonly, getter=getBBox) CGRect bbox;
 @property (nonatomic, readonly, getter=getNumberOfGlyphs) NSUInteger numberOfGlyphs;
 
