@@ -179,7 +179,7 @@
         }
         
         NSImage * glyphImage = glyph.image;
-        if (foreground && ![foreground isEqual:[NSColor blackColor]]) {
+        if (!typeface.isBitmap && foreground && ![foreground isEqual:[NSColor blackColor]]) {
             glyphImage= [glyph.image copy];
             [glyphImage lockFocus];
             [foreground set];

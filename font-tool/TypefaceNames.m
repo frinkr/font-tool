@@ -2057,7 +2057,7 @@ NSArray<UnicodeBlock*> * OS2GetUnicodeRanges(uint32_t range1, uint32_t range2, u
         @[@"Deseret"],
         @[@"Byzantine Musical Symbols", @"Musical Symbols", @"Ancient Greek Musical Notation"],
         @[@"Mathematical Alphanumeric Symbols"],
-        @[@"Private Use (plane 15) ", @"Private Use (plane 16) "],
+        @[@"Supplementary Private Use Area-A", @"Supplementary Private Use Area-B"],
         @[@"Variation Selectors", @"Variation Selectors Supplement"],
         @[@"Tags"],
         @[@"Limbu"],

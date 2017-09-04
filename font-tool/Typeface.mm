@@ -684,7 +684,9 @@ typedef struct {
     TypefaceGlyphNameCache * glyphNameCache;
     NSSet<OpenTypeFeatureTag*> * openTypeFeatureTags;
     
+    int _bmStrikeIndex;
     BOOL _isColourFont;
+    BOOL _isScalable;
 }
 -(NSUInteger)numOfGlyphs;
 
@@ -748,12 +750,9 @@ typedef struct {
 - (BOOL) setupTypeface:(NSURL*)fileURL {
     [self loadT1AttachmentOfMasterFile:fileURL];
     
-    // setup colour fonts
-    ot_tag_t tag = MAKE_TAG4('C', 'B', 'D', 'T');
-    unsigned long length = 0;
-    FT_Load_Sfnt_Table(face, tag, 0, nullptr, &length);
-    if (length)
-        _isColourFont = YES;
+    // some flags
+    _isColourFont = FT_HAS_COLOR(face);
+    _isScalable = FT_IS_SCALABLE(face);
     
     // load variations
     [self loadVariations];
@@ -776,18 +775,18 @@ typedef struct {
         [cmaps addObject:[[TypefaceCMap alloc] initWithFace:face cmapIndex:i]];
     }
     
-    self.fontSize = FT_DEFAULT_FONTSIZE;
+    // dpi and font size
     _dpi = FT_DEFAULT_DPI;
+    self.fontSize = FT_DEFAULT_FONTSIZE;
     
     // info
     _familyName = [NSString stringWithUTF8String:face->family_name];
     _styleName = [NSString stringWithUTF8String:face->style_name];
     _fileURL = fileURL;
     _faceIndex = face->face_index;
-    
-    imageCache = [[TypefaceGlyphImageCache alloc] initWithCacheSize:500];
 
-    // build glyph name cache
+    // cache
+    imageCache = [[TypefaceGlyphImageCache alloc] initWithCacheSize:500];
     glyphNameCache = [[TypefaceGlyphNameCache alloc] initWithFace:face
                                                     isUnicodeCMap:self.currentCMap.isUnicode];
     return YES;
@@ -818,6 +817,10 @@ typedef struct {
     }
 }
 
+- (BOOL)isBitmap {
+    return !_isScalable;
+}
+
 #pragma mark *** Metrics ***
 
 - (void)setFontSize:(CGFloat)fontSize {
@@ -825,20 +828,19 @@ typedef struct {
     
     // set size
     const FT_Short pt = self.fontSize;
-    if (_isColourFont) {
+    if (!_isScalable) {
         if (face->num_fixed_sizes) {
-            int bestMatch = 0;
+            _bmStrikeIndex = 0;
             int pixSize = [self ptToPixel:_fontSize];
             int diff = abs(pixSize - face->available_sizes[0].width);
             for (int i = 1; i < face->num_fixed_sizes; ++i) {
-                int ndiff =
-                abs(pixSize - face->available_sizes[i].width);
+                int ndiff = abs(pixSize - face->available_sizes[i].width);
                 if (ndiff < diff) {
-                    bestMatch = i;
+                    _bmStrikeIndex = i;
                     diff = ndiff;
                 }
             }
-            FT_Select_Size(face, bestMatch);
+            FT_Select_Size(face, _bmStrikeIndex);
         }
         else {
             FT_Set_Char_Size(face, 0/*same as height*/, pt << 6, self.dpi, self.dpi);
@@ -860,20 +862,43 @@ typedef struct {
 }
 
 - (NSUInteger)getUPEM {
-    return face->units_per_EM;
+    if (_isScalable)
+        return face->units_per_EM;
+    else
+        return 10240;
 }
 
 - (NSInteger)getAscender {
-    return face->ascender;
+    if (_isScalable)
+        return face->ascender;
+    else
+        //return [self getUPEM];
+        return [self pixelToFontUnit:face->size->metrics.ascender/64.0];
 }
 
 - (NSInteger)getDescender {
-    return face->descender;
+    if (_isScalable)
+        return face->descender;
+    else
+        //return 0;
+        return [self pixelToFontUnit:face->size->metrics.descender/64.0];
 }
 
 - (CGRect)getBBox {
-    FT_BBox box = face->bbox;
-    return CGRectMake(box.xMin, box.yMin, box.xMax - box.xMin, box.yMax - box.yMin);
+    if (_isScalable) {
+        FT_BBox box = face->bbox;
+        return CGRectMake(box.xMin, box.yMin, box.xMax - box.xMin, box.yMax - box.yMin);
+    }
+    else {
+        FT_Bitmap_Size bmSize = [self getBmSize];
+        return CGRectMake(0, 0,
+                          [self pixelToFontUnit:bmSize.width/64.0],
+                          [self pixelToFontUnit:bmSize.width/64.0]);
+    }
+}
+
+- (FT_Bitmap_Size)getBmSize {
+    return face->available_sizes[_bmStrikeIndex];
 }
 
 - (NSUInteger)getNumberOfGlyphs {
@@ -883,6 +908,36 @@ typedef struct {
 - (OpaqueFTFace)nativeFace {
     return face;
 }
+
+- (CGFloat)fontUnitToPixelWithDefaultFontSize:(NSInteger)u {
+    return [self fontUnitToPixel:u];
+}
+
+- (CGFloat)fontUnitToPixel:(NSInteger)u withFontSize:(CGFloat)fontSize {
+    //NSAssert(_isScalable, @"Must be called with scalable fonts!");
+    return [self ptToPixel:u/(CGFloat)[self getUPEM] * fontSize];
+}
+
+- (CGFloat)fontUnitToPixel:(NSInteger)u {
+    return [self fontUnitToPixel:u withFontSize:_fontSize];
+}
+
+- (NSInteger)pixelToFontUnit:(CGFloat)p withFontSize:(CGFloat)fontSize {
+    return [self pixelToPt:p] / fontSize * [self getUPEM];
+}
+
+- (NSInteger)pixelToFontUnit:(CGFloat)p {
+    return [self pixelToFontUnit:p withFontSize:_fontSize];
+}
+
+- (CGFloat)ptToPixel:(CGFloat)pt {
+    return pt * self.dpi / 72.0;
+}
+
+- (CGFloat)pixelToPt:(CGFloat)px {
+    return px * 72.0 / self.dpi;
+}
+
 
 #pragma mark *** Variations ***
 
@@ -1279,7 +1334,7 @@ typedef struct {
     // glyph image
     TypefaceGlyphImageCacheItem * item = [imageCache cachedImageItemForGID:gid];
     if (!item) {
-        FT_Load_Glyph(face, gid, FT_LOAD_RENDER | (_isColourFont? FT_LOAD_COLOR : 0));
+        FT_Load_Glyph(face, gid, FT_LOAD_RENDER | ((!_isScalable)? FT_LOAD_COLOR : 0));
         FT_GlyphSlot slot = face->glyph;
         NSImage * image = [self imageFromBitmap:slot->bitmap];
         NSInteger offsetX = slot->bitmap_left;
@@ -1346,7 +1401,7 @@ typedef struct {
 #endif
     
     // glyph metrics
-    FT_Load_Glyph(face, gid, FT_LOAD_NO_SCALE);
+    FT_Load_Glyph(face, gid, _isScalable?FT_LOAD_NO_SCALE : 0);
     FT_Glyph_Metrics * metrics = &face->glyph->metrics;
     g.width = metrics->width;
     g.height = metrics->height;
@@ -1356,6 +1411,17 @@ typedef struct {
     g.vertBearingX = metrics->vertBearingX;
     g.vertBearingY = metrics->vertBearingY;
     g.vertAdvance = metrics->vertAdvance;
+
+    if (!_isScalable) {
+        g.width = [self pixelToFontUnit:g.width / 64.0];
+        g.height = [self pixelToFontUnit:g.height / 64.0];
+        g.horiBearingX = [self pixelToFontUnit:g.horiBearingX / 64.0];
+        g.horiBearingY = [self pixelToFontUnit:g.horiBearingY / 64.0];
+        g.horiAdvance = [self pixelToFontUnit:g.horiAdvance / 64.0];
+        g.vertBearingX = [self pixelToFontUnit:g.vertBearingX / 64.0];
+        g.vertBearingY = [self pixelToFontUnit:g.vertBearingY / 64.0];
+        g.vertAdvance = [self pixelToFontUnit:g.vertAdvance / 64.0];
+    }
     
     g.typeface = self;
     return g;
@@ -1462,13 +1528,12 @@ typedef struct {
                                                                               pixelsWide:bm.width
                                                                               pixelsHigh:bm.rows
                                                                            bitsPerSample:8
-                                                                         samplesPerPixel:2
+                                                                         samplesPerPixel:4
                                                                                 hasAlpha:YES
-                                                                                isPlanar:YES
+                                                                                isPlanar:NO
                                                                           colorSpaceName:NSDeviceRGBColorSpace
-                                                                            bitmapFormat: NSAlphaFirstBitmapFormat
                                                                              bytesPerRow:bm.pitch
-                                                                            bitsPerPixel:8];
+                                                                            bitsPerPixel:8*4];
         
         [imageRep getBitmapDataPlanes:planes];
         
@@ -1613,22 +1678,6 @@ typedef struct {
     return nil;
 }
 
-
-- (CGFloat)fontUnitToPixelWithDefaultFontSize:(NSInteger)u {
-    return [self fontUnitToPixel:u];
-}
-
-- (CGFloat)fontUnitToPixel:(NSInteger)u withFontSize:(CGFloat)fontSize {
-    return [self ptToPixel:u/(CGFloat)(face->units_per_EM) * fontSize];
-}
-
-- (CGFloat)fontUnitToPixel:(NSInteger)u {
-    return [self fontUnitToPixel:u withFontSize:_fontSize];
-}
-
-- (CGFloat)ptToPixel:(CGFloat)pt {
-    return pt * self.dpi / 72.0;
-}
 
 
 #pragma mark *** Names ***

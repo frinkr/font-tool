@@ -230,6 +230,9 @@ typedef NS_ENUM(NSInteger, TypefaceFormat) {
 @property (nonatomic, readonly, getter=getPreferedLocalizedStyleName) NSString * preferedLocalizedStyleName;
 @property (nonatomic, readonly, getter=getPreferedLocalizedFullName) NSString * preferedLocalizedFullName;
 
+// Color & bitmap
+@property (readonly) BOOL isBitmap;
+
 // attributes
 @property (readonly, getter=getAttributes) TypefaceAttributes * attributes;
 @property (readonly) NSArray<NSString*> * glyphNames;
