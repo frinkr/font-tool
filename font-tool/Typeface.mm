@@ -18,7 +18,7 @@
 #endif
 
 static int FT_DEFAULT_FONTSIZE = 24 * 4;
-static int FT_DEFAULT_DPI      = 72;
+static int FT_DEFAULT_DPI      = 72*4;
 
 #import "CharEncoding.h"
 #import "Typeface.h"
@@ -684,7 +684,8 @@ typedef struct {
     TypefaceGlyphNameCache * glyphNameCache;
     NSSet<OpenTypeFeatureTag*> * openTypeFeatureTags;
     
-    int _bmStrikeIndex;
+    NSInteger _bmStrikeIndex;
+    CGFloat _bmImageScale;
     BOOL _isColourFont;
     BOOL _isScalable;
     CGFloat _headUPEM;
@@ -754,6 +755,7 @@ typedef struct {
     // setup bitmap fonts
     _isColourFont = FT_HAS_COLOR(face);
     _isScalable = FT_IS_SCALABLE(face);
+    _bmImageScale = 1;
     TT_Header * head = (TT_Header *)FT_Get_Sfnt_Table(face, FT_SFNT_HEAD);
     if (head)
         _headUPEM = head->Units_Per_EM;
@@ -830,26 +832,36 @@ typedef struct {
 - (void)setFontSize:(CGFloat)fontSize {
     _fontSize = fontSize;
     
-    [self selectFaceSizeFromFontSize:fontSize];
+    [self selectFaceSizeFromFontSize:fontSize
+                     outBmImageScale:&_bmImageScale
+                    outBmStrikeIndex:&_bmStrikeIndex];
+    
+    if (!_isScalable)
+        _fontSize /= _bmImageScale;
     
     [imageCache invalidateImageCache];
 }
 
-- (void)selectFaceSizeFromFontSize: (CGFloat) fontSize{
+- (void)selectFaceSizeFromFontSize: (CGFloat) fontSize outBmImageScale:(CGFloat*)bmScale outBmStrikeIndex:(NSInteger*)bmIndex{
     const FT_Short pt = fontSize;
+    if (bmScale) *bmScale = 1;
     if (!_isScalable) {
         if (face->num_fixed_sizes) {
-            _bmStrikeIndex = 0;
-            int pixSize = [self ptToPixel:_fontSize];
-            int diff = abs(pixSize - face->available_sizes[0].width);
+            NSInteger strikeIndex = 0;
+            CGFloat pixSize = [self ptToPixel:fontSize];
+            CGFloat diff = fabs(pixSize - face->available_sizes[0].width);
             for (int i = 1; i < face->num_fixed_sizes; ++i) {
-                int ndiff = abs(pixSize - face->available_sizes[i].width);
+                CGFloat ndiff = fabs(pixSize - face->available_sizes[i].width);
                 if (ndiff < diff) {
-                    _bmStrikeIndex = i;
+                    strikeIndex = i;
                     diff = ndiff;
                 }
             }
-            FT_Select_Size(face, _bmStrikeIndex);
+            FT_Select_Size(face, strikeIndex);
+            if (bmScale)
+                *bmScale = pixSize * 64 / face->available_sizes[strikeIndex].x_ppem;
+            if (bmIndex)
+                *bmIndex = strikeIndex;
         }
         else {
             FT_Set_Char_Size(face, 0/*same as height*/, pt << 6, self.dpi, self.dpi);
@@ -1387,23 +1399,6 @@ typedef struct {
     }
     free(gnames);
     
-#if 0
-    TypefaceGlyphName * gname = nil;
-    if (gc.isGID)
-        gname = [glyphNameCache lookupByGID:gc.GID];
-    else
-        gname = [glyphNameCache lookupByCharcode:gc.charcode];
-    
-    if (gname) {
-        g.name = [NSString stringWithUTF8String:gname->name.c_str()];//[self composeNameForGlyph:gid code:gc.charcode isUnicode:g.isUnicode];
-        g.charcode = gc.isGID? gname->charcode: gc.charcode;
-    }
-    else {
-        g.name = [self composeNameForGlyph:gid code:gc.charcode isUnicode:[self currentCMapIsUnicode]];
-        g.charcode = gc.charcode;
-    }
-#endif
-    
     // glyph metrics
     FT_Load_Glyph(face, gid, _isScalable?FT_LOAD_NO_SCALE : 0);
     FT_Glyph_Metrics * metrics = &face->glyph->metrics;
@@ -1446,7 +1441,8 @@ typedef struct {
     FT_New_Size(face, &newSize);
     FT_Activate_Size(newSize);
     
-    [self selectFaceSizeFromFontSize:fontSize];
+    CGFloat bmScale = 1;
+    [self selectFaceSizeFromFontSize:fontSize outBmImageScale:&bmScale outBmStrikeIndex:nil];
     
     TypefaceGlyph * g = [[TypefaceGlyph alloc] init];
 
@@ -1458,9 +1454,9 @@ typedef struct {
         NSInteger offsetY = slot->bitmap_top - image.size.height;
         
         g.GID = gid;
-        g.image = image;
-        g.imageOffsetX = offsetX;
-        g.imageOffsetY = offsetY;
+        g.image = [self scaleImage:image scale:bmScale];
+        g.imageOffsetX = offsetX * bmScale;
+        g.imageOffsetY = offsetY * bmScale;
         g.imageFontSize = fontSize;
     }
     
@@ -1544,6 +1540,29 @@ typedef struct {
     }
     
     return image;
+}
+
+- (NSImage*) scaleImage:(NSImage*)sourceImage scale:(CGFloat)scale
+{
+    if (scale == 1 || !sourceImage)
+        return sourceImage;
+    NSSize size = NSMakeSize(sourceImage.size.width * scale, sourceImage.size.height * scale);
+    NSRect targetFrame = NSMakeRect(0, 0, size.width, size.height);
+    NSImage*  targetImage = [[NSImage alloc] initWithSize:size];
+    
+    [targetImage lockFocus];
+    
+    [sourceImage drawInRect:targetFrame
+                   fromRect:NSZeroRect       //portion of source image to draw
+                  operation:NSCompositeCopy  //compositing operation
+                   fraction:1.0              //alpha (transparency) value
+             respectFlipped:YES              //coordinate system
+                      hints:@{NSImageHintInterpolation:
+                                  [NSNumber numberWithInt:NSImageInterpolationLow]}];
+    
+    [targetImage unlockFocus];
+    
+    return targetImage;
 }
 
 - (NSImage*)loadGlyphImageFromSlot:(FT_GlyphSlot)slot {
