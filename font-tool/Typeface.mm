@@ -1022,6 +1022,7 @@ typedef struct {
             TypefaceNamedVariation * variation = [[TypefaceNamedVariation alloc] init];
             variation.name = @"<default>";
             variation.isDefault = YES;
+            variation.isArtificial = YES;
             
             NSMutableArray<NSNumber*> * coords = [[NSMutableArray<NSNumber*> alloc] init];
             for (FT_UInt i = 0; i < mmvar->num_axis; ++ i) {

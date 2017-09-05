@@ -447,7 +447,7 @@ NSString* FixedArrayToString(NSArray<NSNumber*> * array) {
                               variation.psName,
                               FixedArrayToString(variation.coordinates)];
             
-            [items addRowWithKey:@"MM Current Variatoin" stringValue:str];
+            [items addRowWithKey:@"MM Current Variation" stringValue:str];
         }
         else {
             NSString * str = [NSString stringWithFormat:@"Coords: %@",
@@ -457,12 +457,15 @@ NSString* FixedArrayToString(NSArray<NSNumber*> * array) {
         }
         
         for (TypefaceNamedVariation * variation in face.namedVariations) {
+            if (variation.isArtificial)
+                continue;
+            
             NSString * str = [NSString stringWithFormat:@"Name : %@<br> PS Name: %@<br> Coords: %@",
                               variation.name,
                               variation.psName,
                               FixedArrayToString(variation.coordinates)];
             
-            [items addRowWithKey:[NSString stringWithFormat:@"MM Named Variatoin %lu", (unsigned long)variation.index]
+            [items addRowWithKey:[NSString stringWithFormat:@"MM Named Variation %lu", (unsigned long)variation.index]
                      stringValue:str];
         }
     }

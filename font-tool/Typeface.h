@@ -193,7 +193,8 @@ typedef NS_ENUM(NSInteger, TypefaceFormat) {
 @interface TypefaceNamedVariation : TypefaceVariation
 @property NSString * name;
 @property NSString * psName;
-@property NSUInteger index;
+@property NSInteger index;
+@property BOOL isArtificial;
 @property BOOL isDefault;
 -(BOOL)isEqualToNamedVariation:(TypefaceNamedVariation*)other;
 @end
