@@ -24,7 +24,7 @@ function copy_deps {
         if [[ "$dep" == ${depin}* ]]; then
             local file_name=$(basename "$dep")
             local new_path=$depout/$file_name
-            echo copy "$dep" to "$new_path"
+            echo Copying "$dep" to "$new_path"
             cp -rf "$dep" "$new_path"
             chmod +w "$new_path"
             install_name_tool -id "@rpath/$file_name" "$new_path"
