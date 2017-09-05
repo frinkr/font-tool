@@ -1,7 +1,6 @@
 cmake_minimum_required(VERSION 3.2)
-set(APP_NAME font-tool)
-
-project(font-tool)
+set(PROJECT_NAME font-tool)
+project(${PROJECT_NAME})
 
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -10,12 +9,12 @@ add_compile_options("-Wno-nullability-completeness")
 
 option(BUILD_FREETYPE_HARFBUZZ "Enable building of Freetype and harfbuzz" ON)
 set(APP_VERSION "1.0.0" CACHE STRING "The version of the application")
+set(APP_NAME "Font Tool")
 
+  find_package(PkgConfig)
 if(BUILD_FREETYPE_HARFBUZZ)
   
   add_definitions(-DHAVE_HARFBUZZ_SOURCE=1)
-  
-  find_package(PkgConfig)
   pkg_check_modules(PC_HBFT REQUIRED harfbuzz-icu-freetype)
   include_directories(AFTER ${PC_HBFT_INCLUDE_DIRS})
   list(APPEND THIRD_PARTY_LIBS ${PC_HBFT_LIBRARIES})
@@ -23,7 +22,6 @@ if(BUILD_FREETYPE_HARFBUZZ)
 else()
   
   # Freeetype
-  find_package(PkgConfig)
   pkg_check_modules(PC_FREETYPE2 QUIET freetype2)
   find_path(FREETYPE2_HEADER_DIR NAMES freetype.h HINTS ${PC_FREETYPE2_INCLUDE_DIRS} ${PC_FREETYPE2_INCLUDEDIR} $ENV{FREETYPE_DIR}/include PATH_SUFFIXES freetype)
   find_path(FREETYPE2_ROOT_INCLUDE_DIR NAMES freetype/freetype.h HINTS ${PC_FREETYPE2_INCLUDE_DIRS} ${PC_FREETYPE2_INCLUDEDIR} $ENV{FREETYPE_DIR}/include)
@@ -37,7 +35,6 @@ else()
   list(APPEND THIRD_PARTY_LIBS ${FREETYPE2_LIBRARIES})
 
   # Harfbuzz
-  find_package(PkgConfig)  
   pkg_check_modules(PC_HARFBUZZ QUIET harfbuzz)
   find_path(HARFBUZZ_INCLUDE_DIR NAMES hb.h HINTS ${PC_HARFBUZZ_INCLUDE_DIRS} ${PC_HARFBUZZ_INCLUDEDIR})
   find_library(HARFBUZZ_LIBRARY NAMES harfbuzz HINTS ${PC_HARFBUZZ_LIBRARY_DIRS} ${PC_HARFBUZZ_LIBDIR})
@@ -45,7 +42,6 @@ else()
   list(APPEND THIRD_PARTY_LIBS ${HARFBUZZ_LIBRARY}) 
 
   # icu
-  find_package(PkgConfig)
   pkg_check_modules(PC_ICU QUIET icu-uc)
   find_path(ICU_INCLUDE_DIR NAMES unicode/utypes.h HINTS ${PC_ICU_INCLUDE_DIRS} ${PC_ICU_INCLUDEDIR})
   find_library(ICU_LIBRARY NAMES libicuuc cygicuuc cygicuuc32 icuuc HINTS ${PC_ICU_LIBRARY_DIRS} ${PC_ICU_LIBDIR})
@@ -117,7 +113,7 @@ set(RESOURCE_FILES
 
 
 add_executable(
-    ${APP_NAME}
+    ${PROJECT_NAME}
     MACOSX_BUNDLE
     ${HEADER_FILES}
     ${SOURCE_FILES}
@@ -125,12 +121,12 @@ add_executable(
     ${RESOURCE_FILES}
 )
 
-target_link_libraries(${APP_NAME}
+target_link_libraries(${PROJECT_NAME}
   ${THIRD_PARTY_LIBS}
   )
 
 set_target_properties(
-    ${APP_NAME}
+    ${PROJECT_NAME}
     PROPERTIES
     MACOSX_BUNDLE YES
 
@@ -142,7 +138,7 @@ set_target_properties(
     MACOSX_BUNDLE_LONG_VERSION_STRING ${APP_VERSION}
     MACOSX_BUNDLE_COPYRIGHT "Copyright © 2017 Yuqing Jiang. All rights reserved."
     
-    XCODE_ATTRIBUTE_PRODUCT_NAME   "Font Tool"
+    XCODE_ATTRIBUTE_PRODUCT_NAME   ${APP_NAME}
     XCODE_ATTRIBUTE_BUNDLE_IDENTIFIER   "me.frinkr.fonttool"
     XCODE_ATTRIBUTE_CLANG_ENABLE_OBJC_ARC YES
     XCODE_ATTRIBUTE_INSTALL_PATH "${CMAKE_BINARY_DIR}/ProductRelease"
@@ -152,7 +148,7 @@ set_target_properties(
     RESOURCE "${NIB_FILES};${RESOURCE_FILES}"    
 )
 
-target_link_libraries(${APP_NAME}
+target_link_libraries(${PROJECT_NAME}
     "-framework Cocoa"
     "-framework AppKit"
     "-framework CoreData"
@@ -160,3 +156,11 @@ target_link_libraries(${APP_NAME}
     "-framework Foundation"
     "-framework Webkit"
 )
+
+if(NOT BUILD_FREETYPE_HARFBUZZ)
+ADD_CUSTOM_COMMAND(TARGET ${PROJECT_NAME}
+  POST_BUILD
+  COMMAND /bin/bash ${CMAKE_CURRENT_SOURCE_DIR}/CopyLibs.sh "${CMAKE_CURRENT_BINARY_DIR}/\${CONFIGURATION}/${APP_NAME}.app/Contents/MacOS/${APP_NAME}"
+  )
+endif()
+
