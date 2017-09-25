@@ -29,6 +29,6 @@
 - (NSInteger)collectionView:(NSCollectionView *)collectionView numberOfItemsInSection:(NSInteger)section;
 - (NSCollectionViewItem *)collectionView:(NSCollectionView *)collectionView itemForRepresentedObjectAtIndexPath:(NSIndexPath *)indexPath;
 
-- (void)selectItem:(NSUInteger)itemIndex inSection:(NSUInteger) sectionIndex;
+- (void)selectItem:(NSUInteger)itemIndex inSection:(NSUInteger) sectionIndex scrollPosition: (NSCollectionViewScrollPosition) scrollPosition;
 
 @end

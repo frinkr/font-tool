@@ -198,7 +198,9 @@
         [self selectGlyphListAtIndex:blockIndex];
     
     dispatch_async(dispatch_get_main_queue(), ^{
-        [self.glyphCollectionViewController selectItem:itemIndex inSection:sectionIndex];
+        [self.glyphCollectionViewController selectItem:itemIndex
+                                             inSection:sectionIndex
+                                        scrollPosition:NSCollectionViewScrollPositionCenteredVertically];
     });
 }
 

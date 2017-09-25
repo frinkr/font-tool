@@ -96,12 +96,12 @@
     [self.collectionView reloadData];
 }
 
-- (void)selectItem:(NSUInteger)itemIndex inSection:(NSUInteger) sectionIndex {
+- (void)selectItem:(NSUInteger)itemIndex inSection:(NSUInteger) sectionIndex scrollPosition: (NSCollectionViewScrollPosition) scrollPosition{
     [self.collectionView deselectItemsAtIndexPaths:[self.collectionView selectionIndexPaths]];
     
     NSIndexPath * path = [NSIndexPath indexPathForItem:itemIndex inSection:sectionIndex];
     NSSet<NSIndexPath*> * set = [NSSet setWithObjects:path, nil];
-    [self.collectionView selectItemsAtIndexPaths:set scrollPosition:NSCollectionViewScrollPositionCenteredVertically];
+    [self.collectionView selectItemsAtIndexPaths:set scrollPosition:scrollPosition];
 }
 
 #pragma mark *** NSCollectionView datasource and delegate ***
@@ -132,6 +132,7 @@
 - (NSCollectionViewItem *)collectionView:(NSCollectionView *)collectionView itemForRepresentedObjectAtIndexPath:(NSIndexPath *)indexPath {
     GlyphCollectionViewItem * item = [collectionView makeItemWithIdentifier:@"GlyphCollectionViewItem" forIndexPath:indexPath];
     item.delegate = self;
+    item.indexPath = indexPath;
     
     NSUInteger section = indexPath.section;
     NSUInteger index = indexPath.item;
@@ -157,6 +158,12 @@
                                                                 preferredEdge:NSRectEdgeMaxY
                                                                     withGlyph:item.glyphCode
                                                                    ofDocument:item.document];
+}
+
+- (void)rightClickGlyphCollectionViewItem:(GlyphCollectionViewItem *)item event:(NSEvent *)event {
+    [self selectItem:item.indexPath.item
+           inSection:item.indexPath.section
+     scrollPosition:NSCollectionViewScrollPositionNone];
 }
 
 @end

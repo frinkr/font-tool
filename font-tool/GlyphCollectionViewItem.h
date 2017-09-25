@@ -15,6 +15,7 @@
 @protocol GlyphCollectionViewItemDelegate <NSObject>
 @optional
 - (void) doubleClickGlyphCollectionViewItem:(GlyphCollectionViewItem*)item;
+- (void) rightClickGlyphCollectionViewItem:(GlyphCollectionViewItem*)item event:(NSEvent*)event;
 @end
 
 
@@ -32,6 +33,7 @@ typedef NS_ENUM(NSInteger, GlyphLabelCategory) {
 @property (nonatomic, strong) TypefaceGlyphcode * glyphCode;
 
 @property (nonatomic, assign) NSObject<GlyphCollectionViewItemDelegate> * delegate;
+@property (retain) NSIndexPath * indexPath;
 
 - (void)setGlyphCode:(TypefaceGlyphcode*)gc ofDocument:(TypefaceDocument*)document GlyphLabelCategory:(GlyphLabelCategory)category;
 

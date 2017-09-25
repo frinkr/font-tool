@@ -26,4 +26,8 @@ clean:
 	[ -d "$(BUILD_DIR)" ] && rm -rf "$(BUILD_DIR)" || true
 
 help:
-	echo "Options: version=<any-version-string>"
+	@echo "Options: version=<any-version-string, e.g 1.2.3>"
+	@echo "   - make debug : build debug version of application"
+	@echo "   - make release version=1.2.3 : build release version of application of version 1.2.3"
+	@echo "   - make : alias of 'make debug'"
+	@echo "   - make clean : remove build dir"

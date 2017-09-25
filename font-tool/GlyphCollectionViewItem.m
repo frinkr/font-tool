@@ -39,6 +39,12 @@
     
 }
 
+- (IBAction)rightMouseDown:(NSEvent *)event {
+    if ([self.delegate respondsToSelector:@selector(rightClickGlyphCollectionViewItem:event:)])
+        [self.delegate rightClickGlyphCollectionViewItem:self event:event];
+}
+
+
 - (IBAction)doubleClick:(id)sender {
     if ([self.delegate respondsToSelector:@selector(doubleClickGlyphCollectionViewItem:)])
         [self.delegate doubleClickGlyphCollectionViewItem:self];
