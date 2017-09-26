@@ -34,6 +34,7 @@ FT_END_DECLS
 // Matching with UNI_CODEPOINT_LOOKUP_REGEX
 +(NSUInteger)charcodeOfString:(NSString*)str;
 +(NSUInteger)unicodeOfString:(NSString*)str; // alias of charcodeOfString
++(NSString*)NSStringFromUnicode:(NSUInteger)unicode;
 
 //support \g12345, matching with GLYPH_INDEX_LOOKUP_REGEX
 +(NSInteger)gidOfString:(NSString*)str;

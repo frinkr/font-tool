@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="12121" systemVersion="17A358a" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="13196" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
-        <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="12121"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="13196"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -285,7 +284,7 @@
                                     <nil key="toolTip"/>
                                     <size key="minSize" width="99" height="26"/>
                                     <size key="maxSize" width="266" height="26"/>
-                                    <comboBox key="view" verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="hWE-Sq-d5u">
+                                    <comboBox key="view" verticalHuggingPriority="750" id="hWE-Sq-d5u">
                                         <rect key="frame" x="0.0" y="14" width="180" height="26"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                         <comboBoxCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" drawsBackground="YES" usesSingleLineMode="YES" usesDataSource="YES" numberOfVisibleItems="10" id="XWQ-sk-7bE">
@@ -303,7 +302,7 @@
                                     <nil key="toolTip"/>
                                     <size key="minSize" width="99" height="26"/>
                                     <size key="maxSize" width="209" height="26"/>
-                                    <comboBox key="view" focusRingType="none" verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="ea4-di-TsU">
+                                    <comboBox key="view" focusRingType="none" verticalHuggingPriority="750" id="ea4-di-TsU">
                                         <rect key="frame" x="0.0" y="14" width="209" height="26"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                         <comboBoxCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" focusRingType="none" drawsBackground="YES" usesSingleLineMode="YES" usesDataSource="YES" numberOfVisibleItems="10" id="G1j-o1-gYq">
@@ -363,6 +362,9 @@
                                 <toolbarItem reference="B3e-Vs-hXg"/>
                             </defaultToolbarItems>
                         </toolbar>
+                        <connections>
+                            <outlet property="delegate" destination="jGA-0Y-lOj" id="oH9-bv-HIG"/>
+                        </connections>
                     </window>
                     <connections>
                         <outlet property="cmapCombobox" destination="ea4-di-TsU" id="y8X-o8-CK3"/>
@@ -383,6 +385,9 @@
                         <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
                         <rect key="contentRect" x="1734" y="62" width="338" height="205"/>
                         <rect key="screenRect" x="1440" y="-300" width="1920" height="1177"/>
+                        <connections>
+                            <outlet property="delegate" destination="5N2-vg-6ys" id="uG5-O1-ooI"/>
+                        </connections>
                     </window>
                     <connections>
                         <segue destination="NB2-zk-ETc" kind="relationship" relationship="window.shadowedContentViewController" id="8aw-zB-Wj8"/>
@@ -415,7 +420,7 @@
                                     <action selector="doChangeLookupType:" target="NB2-zk-ETc" id="30u-Km-Lwr"/>
                                 </connections>
                             </segmentedControl>
-                            <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" translatesAutoresizingMaskIntoConstraints="NO" id="94u-ys-UaL">
+                            <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="94u-ys-UaL">
                                 <rect key="frame" x="12" y="44" width="255" height="19"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="XF2-Fg-D2U">
                                     <font key="font" metaFont="smallSystem"/>
@@ -508,9 +513,35 @@ DQ
                     </view>
                     <connections>
                         <outlet property="collectionView" destination="Ger-En-HC3" id="8ob-F0-AeX"/>
+                        <outlet property="contextMenu" destination="NwG-4R-3gY" id="0ia-Dx-PIR"/>
+                        <outlet property="menuItemCopyChar" destination="wLR-vb-STN" id="hVw-xl-CXp"/>
+                        <outlet property="menuItemCopyCode" destination="DMs-aK-lqY" id="btI-FE-cBe"/>
+                        <outlet property="menuItemSearch" destination="ddk-Ro-t2N" id="Ku2-He-cbc"/>
                     </connections>
                 </viewController>
                 <customObject id="AaC-cT-HC3" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+                <menu id="NwG-4R-3gY">
+                    <items>
+                        <menuItem title="Copy Character" id="wLR-vb-STN">
+                            <modifierMask key="keyEquivalentModifierMask"/>
+                            <connections>
+                                <action selector="onCopyCharMenuItem:" target="Sgs-dL-3FM" id="Qha-4k-OPU"/>
+                            </connections>
+                        </menuItem>
+                        <menuItem title="Copy Code" id="DMs-aK-lqY">
+                            <modifierMask key="keyEquivalentModifierMask"/>
+                            <connections>
+                                <action selector="onCopyCodeMenuItem:" target="Sgs-dL-3FM" id="8wC-HK-962"/>
+                            </connections>
+                        </menuItem>
+                        <menuItem title="Search in codepoints.net" id="ddk-Ro-t2N">
+                            <modifierMask key="keyEquivalentModifierMask"/>
+                            <connections>
+                                <action selector="onSearchMenuItem:" target="Sgs-dL-3FM" id="4ST-DX-rKO"/>
+                            </connections>
+                        </menuItem>
+                    </items>
+                </menu>
             </objects>
             <point key="canvasLocation" x="361" y="947"/>
         </scene>

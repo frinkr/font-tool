@@ -12,11 +12,17 @@
 #import "GlyphCollectionViewItem.h"
 #import "GlyphInfoViewController.h"
 #import "Typeface.h"
+#import "CharEncoding.h"
 #import "Common.h"
+#import "AppDelegate.h"
 
 @interface GlyphCollectionViewController ()
 @property (nonatomic, readonly, getter=document) TypefaceDocument * document;
 @property (nonatomic, readonly, getter=currentBlock) TypefaceGlyphBlock * block;
+@property (strong) IBOutlet NSMenu *contextMenu;
+@property (weak) IBOutlet NSMenuItem *menuItemCopyChar;
+@property (weak) IBOutlet NSMenuItem *menuItemCopyCode;
+@property (weak) IBOutlet NSMenuItem *menuItemSearch;
 @end
 
 @implementation GlyphCollectionViewController
@@ -65,6 +71,9 @@
     return self.representedObject;
 }
 
+- (TypefaceCMap*)currentCMap {
+    return self.document.currentCMap;
+}
 - (TypefaceGlyphBlock*)currentBlock {
     return [self.document.currentCMap.blocks objectAtIndex:self.currentBlockIndex];
 }
@@ -102,6 +111,56 @@
     NSIndexPath * path = [NSIndexPath indexPathForItem:itemIndex inSection:sectionIndex];
     NSSet<NSIndexPath*> * set = [NSSet setWithObjects:path, nil];
     [self.collectionView selectItemsAtIndexPaths:set scrollPosition:scrollPosition];
+}
+
+- (NSIndexPath*)currentSelectionIndexPath {
+    NSArray<NSIndexPath*> * indexes = self.collectionView.selectionIndexPaths.allObjects;
+    if (!indexes.count)
+        return nil;
+    return [indexes objectAtIndex:0];
+}
+
+- (TypefaceGlyphcode*)currentGlyphCode {
+    NSIndexPath* indexPath = [self currentSelectionIndexPath];
+    NSUInteger section = indexPath.section;
+    NSUInteger index = indexPath.item;
+    TypefaceGlyphcode * gc = [[self.currentBlock.sections objectAtIndex:section] glyphCodeAtIndex:index];
+    return gc;
+}
+
+- (NSUInteger)currentUnicode {
+    TypefaceGlyphcode * code = self.currentGlyphCode;
+    if (code && !code.isGID && self.currentCMap.isUnicode)
+        return code.charcode;
+    return INVALID_CODE_POINT;
+}
+
+#pragma mark *** Actions ***
+
+- (IBAction)onCopyCharMenuItem:(id)sender {
+    NSUInteger code = self.currentUnicode;
+    if (code != INVALID_CODE_POINT)
+        [self copyToClipboard:[CharEncoding NSStringFromUnicode:code]];
+}
+
+- (IBAction)onCopyCodeMenuItem:(id)sender {
+    NSUInteger code = self.currentUnicode;
+    if (code != INVALID_CODE_POINT)
+        [self copyToClipboard:[CharEncoding hexForCharcode:code unicodeFlavor:YES]];
+}
+
+- (IBAction)onSearchMenuItem:(id)sender {
+    NSUInteger code = self.currentUnicode;
+    if (code != INVALID_CODE_POINT) {
+        NSString * url = [CharEncoding infoLinkOfUnicode:code];
+        [(AppDelegate*)NSApp.delegate openURL:[NSURL URLWithString:url]];
+    }
+}
+
+- (void)copyToClipboard:(NSString*)string {
+    NSPasteboard *pasteBoard = [NSPasteboard generalPasteboard];
+    [pasteBoard declareTypes:[NSArray arrayWithObjects:NSStringPboardType, nil] owner:nil];
+    [pasteBoard setString: string forType:NSStringPboardType];
 }
 
 #pragma mark *** NSCollectionView datasource and delegate ***
@@ -161,9 +220,12 @@
 }
 
 - (void)rightClickGlyphCollectionViewItem:(GlyphCollectionViewItem *)item event:(NSEvent *)event {
-    [self selectItem:item.indexPath.item
-           inSection:item.indexPath.section
-     scrollPosition:NSCollectionViewScrollPositionNone];
+    if (!item.isSelected)
+        return;
+    
+    [self.contextMenu popUpMenuPositioningItem:nil
+                                    atLocation:[item.view convertPoint:event.locationInWindow fromView:nil]
+                                        inView:item.view];
 }
 
 @end

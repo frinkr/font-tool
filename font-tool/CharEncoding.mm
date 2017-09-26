@@ -205,6 +205,11 @@ NSString * RegexReplace(NSString * string,
     return [CharEncoding charcodeOfString:str];
 }
 
++(NSString*)NSStringFromUnicode:(NSUInteger)unicode {
+    unichar c = unicode;
+    return [[NSString alloc] initWithCharacters:&c length:1];
+}
+
 +(NSInteger)gidOfString:(NSString *)str {
     NSString * prefix = @"\\g";
     
@@ -243,7 +248,7 @@ NSString * RegexReplace(NSString * string,
 + (NSString*)decodeUnicodeMixed:(NSString*)string {
     return RegexReplace(string, UNI_CODEPOINT_LOOKUP_REGEX, ^NSString *(NSRange range, BOOL *stop) {
         unichar unichar = [CharEncoding unicodeOfString:[string substringWithRange:range]];
-        return [[NSString alloc] initWithCharacters:&unichar length:1];
+        return [CharEncoding NSStringFromUnicode:unichar];
     });
 }
 
