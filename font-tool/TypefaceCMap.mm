@@ -23,7 +23,7 @@
 
 +(instancetype)glyphCodeWithCharcode:(NSUInteger)charcode {
     TypefaceGlyphcode * gc = [[TypefaceGlyphcode alloc] init];
-    gc.charcode = charcode;
+    gc.codepoint = charcode;
     gc.isGID = NO;
     return gc;
 }
@@ -49,7 +49,7 @@
     return nil;
 }
 
-- (BOOL)containsCode:(NSUInteger)code outIndex:(NSUInteger*)outIndex {
+- (BOOL)containsCode:(codepoint_t)code outIndex:(NSUInteger*)outIndex {
     [NSException raise:NSInternalInconsistencyException
                 format:@"You must override %@ in a subclass", NSStringFromSelector(_cmd)];
     return NO;
@@ -72,7 +72,7 @@
 
 @implementation TypefaceGlyphRangeSection
 
-- (id)initWithFrom: (NSUInteger) from to:(NSUInteger)to isGID:(BOOL)isGID name:(NSString*)name {
+- (id)initWithFrom: (codepoint_t) from to:(codepoint_t)to isGID:(BOOL)isGID name:(NSString*)name {
     if (self = [super init]) {
         self.from = from;
         self.to = to;
@@ -96,12 +96,12 @@
     if (self.isGID)
         gc.GID = code;
     else
-        gc.charcode = code;
+        gc.codepoint = code;
     gc.isGID = self.isGID;
     return gc;
 }
 
-- (BOOL)containsCode:(NSUInteger)code  outIndex:(NSUInteger*)outIndex {
+- (BOOL)containsCode:(codepoint_t)code  outIndex:(NSUInteger*)outIndex {
     *outIndex = code - self.from;
     return code >= self.from && code <= self.to;
 }
@@ -134,7 +134,7 @@
     if (self.isGID)
         gc.GID = code;
     else
-        gc.charcode = code;
+        gc.codepoint = code;
     gc.isGID = self.isGID;
     return gc;
 }

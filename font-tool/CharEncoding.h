@@ -22,19 +22,19 @@ FT_END_DECLS
 
 @interface CharEncoding : NSObject
 // return nil if charcode outof unicode range
-+(NSString*)hexForCharcode:(NSUInteger)charcode unicodeFlavor:(BOOL)unicode;
++(NSString*)hexForCharcode:(codepoint_t)charcode unicodeFlavor:(BOOL)unicode;
 
-+(NSArray<NSNumber*>*)utf8ForUnicode:(NSUInteger)unicode;
-+(NSArray<NSNumber*>*)utf16ForUnicode:(NSUInteger)unicode;
-+(NSString*)utf8HexStringForUnicode:(NSUInteger)unicode;
-+(NSString*)utf16HexStringForUnicode:(NSUInteger)unicode;
++(NSArray<NSNumber*>*)utf8ForUnicode:(codepoint_t)unicode;
++(NSArray<NSNumber*>*)utf16ForUnicode:(codepoint_t)unicode;
++(NSString*)utf8HexStringForUnicode:(codepoint_t)unicode;
++(NSString*)utf16HexStringForUnicode:(codepoint_t)unicode;
 
 // support U+BBBBBB, u+BBBBBB \uBBBBBB, \UBBBBBB, 0XBBBBBB, 0xBBBBBB,
 // 12345 in Dec or one character, return INVALID_CODE_POINT if not valid.
 // Matching with UNI_CODEPOINT_LOOKUP_REGEX
-+(NSUInteger)charcodeOfString:(NSString*)str;
-+(NSUInteger)unicodeOfString:(NSString*)str; // alias of charcodeOfString
-+(NSString*)NSStringFromUnicode:(NSUInteger)unicode;
++(codepoint_t)codepointOfString:(NSString*)str;
++(codepoint_t)unicodeOfString:(NSString*)str; // alias of charcodeOfString
++(NSString*)NSStringFromUnicode:(codepoint_t)unicode;
 
 //support \g12345, matching with GLYPH_INDEX_LOOKUP_REGEX
 +(NSInteger)gidOfString:(NSString*)str;
@@ -43,10 +43,10 @@ FT_END_DECLS
 +(NSInteger)integerOfString:(NSString*)str; // 12345 only
 
 
-+(NSString*)infoLinkOfUnicode:(NSUInteger)unicode;
++(NSString*)infoLinkOfUnicode:(codepoint_t)unicode;
 +(NSString*)infoLinkOfUnicodeHex:(NSString*)unicodeHex;
 
-+(NSString*)gotoLinkOfUnicode:(NSUInteger)unicode;
++(NSString*)gotoLinkOfUnicode:(codepoint_t)unicode;
 +(NSString*)gotoLinkOfUnicodeHex:(NSString*)unicodeHex;
 
 // input mix of U+ notation and chars, ABCU+AFFEF.
@@ -58,8 +58,8 @@ FT_END_DECLS
 
 
 @interface UnicodeBlock : NSObject
-@property NSUInteger from;
-@property NSUInteger to;
+@property codepoint_t from;
+@property codepoint_t to;
 @property (copy) NSString * name;
 
 - (BOOL)isEqual:(id)other;
@@ -69,8 +69,8 @@ FT_END_DECLS
 @property (readonly, getter=codepointCount) NSUInteger codepointCount;
 @property (readonly, getter=isFullRange) BOOL isFullRange;
 
--(id) initWithName:(NSString*)name from:(NSUInteger)from to:(NSUInteger)to;
--(BOOL)containsUnicode:(uint32_t)unicode;
+-(id) initWithName:(NSString*)name from:(codepoint_t)from to:(codepoint_t)to;
+-(BOOL)containsUnicode:(codepoint_t)unicode;
 @end
 
 typedef UnicodeBlock UnicodeScriptBlock;
@@ -86,13 +86,13 @@ typedef UnicodeBlock UnicodePropListBlock;
 
 
 @interface UnicodeCharCoreAttributes : NSObject
-@property uint32_t codepoint;
+@property codepoint_t codepoint;
 @property (strong) NSString * name;
 @property (strong) UnicodeGeneralCategory * generalCategory;
 @property (strong) NSString * decomposition;
-@property NSUInteger simpleUppercase;
-@property NSUInteger simpleLowercase;
-@property NSUInteger simpleTitlecase;
+@property codepoint_t simpleUppercase;
+@property codepoint_t simpleLowercase;
+@property codepoint_t simpleTitlecase;
 @end
 
 
@@ -112,12 +112,12 @@ typedef UnicodeBlock UnicodePropListBlock;
 - (UnicodeBlock*)unicodeBlockWithName:(NSString*)blockName;
 
 
-- (UnicodeCharCoreAttributes*)coreAttributesOfChar:(uint32_t)unicode;
-- (UnicodeBlock*)blockOfChar:(uint32_t)unicode;
-- (NSString*)scriptOfChar:(uint32_t)unicode;
-- (NSString*)derivedAgeOfChar:(uint32_t)unicode;
-- (NSString*)propListOfChar:(uint32_t)unicode;
-- (BOOL)isPUA:(uint32_t)unicode;
+- (UnicodeCharCoreAttributes*)coreAttributesOfChar:(codepoint_t)unicode;
+- (UnicodeBlock*)blockOfChar:(codepoint_t)unicode;
+- (NSString*)scriptOfChar:(codepoint_t)unicode;
+- (NSString*)derivedAgeOfChar:(codepoint_t)unicode;
+- (NSString*)propListOfChar:(codepoint_t)unicode;
+- (BOOL)isPUA:(codepoint_t)unicode;
 
 - (uint32_t)codepointFromName:(NSString*)charName;
 

@@ -6,8 +6,8 @@
 #define UNICODE_FULL_REPERTOIRE 2
 
 @interface TypefaceGlyphcode : NSObject
-@property NSUInteger charcode;
-@property NSUInteger GID;
+@property codepoint_t codepoint;
+@property NSUInteger  GID;
 @property BOOL       isGID;  // image loaded by charcode or glyphIndex
 
 +(instancetype)glyphCodeWithGID:(NSUInteger)gid;
@@ -18,18 +18,18 @@
 - (NSString *) name;
 - (NSUInteger) numOfGlyphs;
 - (TypefaceGlyphcode*)glyphCodeAtIndex:(NSUInteger)index;
-- (BOOL)containsCode:(NSUInteger)code outIndex:(NSUInteger*)outIndex;
+- (BOOL)containsCode:(codepoint_t)code outIndex:(NSUInteger*)outIndex;
 @end
 
 
 @interface TypefaceGlyphRangeSection : TypefaceGlyphSection
-@property NSUInteger from;
-@property NSUInteger to;
+@property codepoint_t from;
+@property codepoint_t to;
 @property (strong) NSString * blockName;
 @property BOOL isGID;
 
-- (id)initWithFrom: (NSUInteger) from to:(NSUInteger)to isGID:(BOOL)isGID name:(NSString*)name;
-- (BOOL)containsCode:(NSUInteger)code outIndex:(NSUInteger*)outIndex;
+- (id)initWithFrom: (codepoint_t) from to:(codepoint_t)to isGID:(BOOL)isGID name:(NSString*)name;
+- (BOOL)containsCode:(codepoint_t)code outIndex:(NSUInteger*)outIndex;
 @end
 
 @interface TypefaceGlyphArraySection : TypefaceGlyphSection

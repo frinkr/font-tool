@@ -81,7 +81,7 @@ static GlyphLookupWindowController * lookupWindowController;
 - (IBAction)doChangeLookupType:(id)sender {
     _lookupType = self.lookupTypeSegments.selectedSegment;
     switch (_lookupType - 1) {
-        case GlyphLookupByCharcode:
+        case GlyphLookupByCodepoint:
             [self.lookupValueTextEdit setPlaceholderString:@"U+DEAD, 0xBEEF, \\uFB01, uniFB02, 12345"];
             break;
         case GlyphLookupByGlyphIndex:

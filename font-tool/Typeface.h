@@ -26,7 +26,7 @@ typedef uint32_t ot_tag_t;
 
 
 typedef NS_ENUM(NSInteger, GlyphLookupType) {
-    GlyphLookupByCharcode,
+    GlyphLookupByCodepoint,
     GlyphLookupByGlyphIndex,
     GlyphLookupByName,
 };
@@ -36,7 +36,7 @@ typedef NS_ENUM(NSInteger, GlyphLookupType) {
 @property id lookupValue;
 @property NSUInteger preferedBlock;
 
-+(instancetype)createRequestWithCharcode:(NSUInteger)charcode preferedBlock:(NSUInteger)preferedBlock;
++(instancetype)createRequestWithCodepoint:(codepoint_t)codepoint preferedBlock:(NSUInteger)preferedBlock;
 +(instancetype)createRequestWithId:(NSUInteger)gid preferedBlock:(NSUInteger)preferedBlock;
 +(instancetype)createRequestWithName:(NSString*)name preferedBlock:(NSUInteger)preferedBlock;
 
@@ -62,8 +62,8 @@ extern NSString * const TypefaceErrorDomain;
 - (NSString *)description;
 - (NSComparisonResult)compare:(TypefaceTag*)other;
 
-+ (NSString*)codeToText:(NSUInteger)tag;
-+ (NSUInteger)textToCode:(NSString*)text;
++ (NSString*)codeToText:(uint32_t)tag;
++ (uint32_t)textToCode:(NSString*)text;
 + (TypefaceTag*)tagFromCode:(uint32_t)code;
 
 @end
@@ -76,8 +76,8 @@ extern NSString * const TypefaceErrorDomain;
 
 
 @interface TypefaceGlyph : NSObject
-@property NSUInteger          charcode;     // the requested charcode, usually the first element in charcodes
-@property NSArray<NSNumber*> *charcodes;    // multiple charcodes may map to same glyph
+@property codepoint_t         codepoint;     // the requested charcode, usually the first element in charcodes
+@property NSArray<NSNumber*> *codepoints;    // multiple charcodes may map to same glyph
 @property NSUInteger          GID;
 @property (strong) NSString * name;
 

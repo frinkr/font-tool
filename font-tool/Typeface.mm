@@ -32,10 +32,10 @@ NSString * const TypefaceErrorDomain = @"TypefaceErrorDomain";
 #pragma mark ###### GlyphLookupRequest #####
 @implementation GlyphLookupRequest
 
-+(instancetype)createRequestWithCharcode:(NSUInteger)charcode preferedBlock:(NSUInteger)preferedBlock {
++(instancetype)createRequestWithCodepoint:(codepoint_t)codepoint preferedBlock:(NSUInteger)preferedBlock {
     GlyphLookupRequest * request = [[GlyphLookupRequest alloc] init];
-    request.lookupType = GlyphLookupByCharcode;
-    request.lookupValue = [NSNumber numberWithUnsignedInteger:charcode];
+    request.lookupType = GlyphLookupByCodepoint;
+    request.lookupValue = [NSNumber numberWithUnsignedInteger:codepoint];
     request.preferedBlock = preferedBlock;
     return request;
 }
@@ -57,9 +57,9 @@ NSString * const TypefaceErrorDomain = @"TypefaceErrorDomain";
 }
 
 +(instancetype)createRequestWithExpression:(NSString*)expression preferedBlock:(NSUInteger)preferedBlock {
-    NSUInteger code = [CharEncoding charcodeOfString:expression];
+    NSUInteger code = [CharEncoding codepointOfString:expression];
     if (code != INVALID_CODE_POINT)
-        return [GlyphLookupRequest createRequestWithCharcode:code preferedBlock:preferedBlock];
+        return [GlyphLookupRequest createRequestWithCodepoint:code preferedBlock:preferedBlock];
     
     code = [CharEncoding gidOfString:expression];
     if (code != INVALID_CODE_POINT)
@@ -130,7 +130,7 @@ NSString * const TypefaceErrorDomain = @"TypefaceErrorDomain";
     return [self.text compare:other.text];
 }
 
-+ (NSString*)codeToText:(NSUInteger)code {
++ (NSString*)codeToText:(uint32_t)code {
     char str[] = {
         (char)(code >> 24),
         (char)(code >> 16),
@@ -142,7 +142,7 @@ NSString * const TypefaceErrorDomain = @"TypefaceErrorDomain";
     return [NSString stringWithCString:str encoding:NSASCIIStringEncoding];
 }
 
-+ (NSUInteger)textToCode:(NSString*)text {
++ (uint32_t)textToCode:(NSString*)text {
     if (text.length == 3)
         text = [NSString stringWithFormat:@"%@ ", text];
     
@@ -156,10 +156,10 @@ NSString * const TypefaceErrorDomain = @"TypefaceErrorDomain";
 //    NSAssert(text.length == 4, @"text must be 4 chars");
     
     return
-    NSUInteger([text characterAtIndex:0] << 24) +
-    NSUInteger([text characterAtIndex:1] << 16) +
-    NSUInteger([text characterAtIndex:2] << 8) +
-    NSUInteger([text characterAtIndex:3]);
+    uint32_t([text characterAtIndex:0] << 24) +
+    uint32_t([text characterAtIndex:1] << 16) +
+    uint32_t([text characterAtIndex:2] << 8) +
+    uint32_t([text characterAtIndex:3]);
 };
 
 +(TypefaceTag*)tagFromCode:(uint32_t)code {
@@ -182,7 +182,7 @@ NSString * const TypefaceErrorDomain = @"TypefaceErrorDomain";
 
 @implementation TypefaceGlyph
 - (NSString*)charcodeHex {
-    NSString * hex = [CharEncoding hexForCharcode:self.charcode
+    NSString * hex = [CharEncoding hexForCharcode:self.codepoint
                           unicodeFlavor:self.typeface.currentCMapIsUnicode];
     return hex? hex: UNDEFINED_UNICODE_CODEPOINT;
 }
@@ -1346,7 +1346,7 @@ typedef struct {
 - (TypefaceGlyph*)loadGlyph:(TypefaceGlyphcode *)gc {
     uint32_t gid = gc.GID;
     if (!gc.isGID)
-        gid = FT_Get_Char_Index(face, gc.charcode);
+        gid = FT_Get_Char_Index(face, gc.codepoint);
     
     // glyph image
     TypefaceGlyphImageCacheItem * item = [imageCache cachedImageItemForGID:gid];
@@ -1383,20 +1383,20 @@ typedef struct {
         [charcodes addObject:[NSNumber numberWithUnsignedInteger:gname->charcode]];
     }
     if (!g.name && !gc.isGID)
-        g.name = [self composeNameForGlyph:gid code:gc.charcode isUnicode:[self currentCMapIsUnicode]];
+        g.name = [self composeNameForGlyph:gid code:gc.codepoint isUnicode:[self currentCMapIsUnicode]];
     if (!g.name)
         g.name = @"nil";
     
-    g.charcodes = charcodes;
+    g.codepoints = charcodes;
     if (gc.isGID) {
         // take the first one
         if (charcodes.count)
-            g.charcode = [charcodes objectAtIndex:0].unsignedIntegerValue;
+            g.codepoint = [charcodes objectAtIndex:0].unsignedIntegerValue;
         else
-            g.charcode = INVALID_CODE_POINT;
+            g.codepoint = INVALID_CODE_POINT;
     }
     else {
-        g.charcode = gc.charcode;
+        g.codepoint = gc.codepoint;
     }
     free(gnames);
     
@@ -1435,7 +1435,7 @@ typedef struct {
     
     uint32_t gid = gc.GID;
     if (!gc.isGID)
-        gid = FT_Get_Char_Index(face, gc.charcode);
+        gid = FT_Get_Char_Index(face, gc.codepoint);
     
     // select the new fontsize
     FT_Size newSize;
@@ -1471,8 +1471,8 @@ typedef struct {
     TypefaceGlyph * defaultGlyph = [self loadGlyph:code];
     
     g.name = defaultGlyph.name;
-    g.charcode = gc.isGID? defaultGlyph.charcode : gc.charcode;
-    g.charcodes = defaultGlyph.charcodes;
+    g.codepoint = gc.isGID? defaultGlyph.codepoint : gc.codepoint;
+    g.codepoints = defaultGlyph.codepoints;
     g.width = defaultGlyph.width;
     g.height = defaultGlyph.height;
     g.horiBearingX = defaultGlyph.horiBearingX;
@@ -1580,7 +1580,7 @@ typedef struct {
     
     TypefaceCMap * currCMap = [self currentCMap];
     NSError * error = nil;
-    if (type == GlyphLookupByCharcode) {
+    if (type == GlyphLookupByCodepoint) {
         NSUInteger code = [request.lookupValue unsignedIntegerValue];
         
         if (code == INVALID_CODE_POINT) {
@@ -1641,7 +1641,7 @@ typedef struct {
         if (preferedBlockIndex != FULL_GLYPH_LIST_BLOCK_INDEX) {
             TypefaceGlyphName * tgn = [glyphNameCache lookupByGID:gid];
             if (tgn && tgn->charcode != INVALID_CODE_POINT) {
-                return [self lookupGlyph:[GlyphLookupRequest createRequestWithCharcode:tgn->charcode preferedBlock:preferedBlockIndex]
+                return [self lookupGlyph:[GlyphLookupRequest createRequestWithCodepoint:tgn->charcode preferedBlock:preferedBlockIndex]
                          completeHandler:handler];
             }
         }
@@ -1665,7 +1665,7 @@ typedef struct {
                              completeHandler:handler];
                 }
                 else {
-                    return [self lookupGlyph:[GlyphLookupRequest createRequestWithCharcode:tgn->charcode preferedBlock:preferedBlockIndex]
+                    return [self lookupGlyph:[GlyphLookupRequest createRequestWithCodepoint:tgn->charcode preferedBlock:preferedBlockIndex]
                              completeHandler:handler];
                 }
             }

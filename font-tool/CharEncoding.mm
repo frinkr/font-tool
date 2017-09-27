@@ -79,19 +79,19 @@ NSString * RegexReplace(NSString * string,
 
 @implementation CharEncoding
 
-+(NSString*)hexForCharcode:(NSUInteger)charcode unicodeFlavor:(BOOL)unicode {
++(NSString*)hexForCharcode:(codepoint_t)charcode unicodeFlavor:(BOOL)unicode {
     if (unicode) {
         if (charcode <= 0x10FFFF)
-            return [NSString stringWithFormat:@"U+%04lX", charcode];
+            return [NSString stringWithFormat:@"U+%04X", charcode];
         else
             return nil;
     }
     else
-        return [NSString stringWithFormat:@"0x%04lX", charcode];
+        return [NSString stringWithFormat:@"0x%04X", charcode];
 }
 
 
-+(NSArray<NSNumber*>*)utf8ForUnicode:(NSUInteger)unicode {
++(NSArray<NSNumber*>*)utf8ForUnicode:(codepoint_t)unicode {
     NSMutableArray<NSNumber*>* utf8 = [[NSMutableArray<NSNumber*> alloc] init];
     
     unsigned char b1= 0, b2 = 0, b3 = 0, b4 = 0;
@@ -128,7 +128,7 @@ NSString * RegexReplace(NSString * string,
     return utf8;
 }
 
-+(NSArray<NSNumber*>*)utf16ForUnicode:(NSUInteger)unicode {
++(NSArray<NSNumber*>*)utf16ForUnicode:(codepoint_t)unicode {
     NSMutableArray<NSNumber*>* utf16 = [[NSMutableArray<NSNumber*> alloc] init];
     
     if (unicode < 0xFFFF)
@@ -142,7 +142,7 @@ NSString * RegexReplace(NSString * string,
     return utf16;
 }
 
-+(NSString*)utf8HexStringForUnicode:(NSUInteger)unicode {
++(NSString*)utf8HexStringForUnicode:(codepoint_t)unicode {
     NSMutableArray<NSString*>* all = [[NSMutableArray<NSString*> alloc] init];
     for (NSNumber * c in [CharEncoding utf8ForUnicode:unicode]) {
         [all addObject:[NSString stringWithFormat:@"%02lX", c.unsignedIntegerValue]];
@@ -153,7 +153,7 @@ NSString * RegexReplace(NSString * string,
         return nil;
 }
 
-+(NSString*)utf16HexStringForUnicode:(NSUInteger)unicode{
++(NSString*)utf16HexStringForUnicode:(codepoint_t)unicode{
     NSMutableArray<NSString*>* all = [[NSMutableArray<NSString*> alloc] init];
     for (NSNumber * c in [CharEncoding utf16ForUnicode:unicode]) {
         [all addObject:[NSString stringWithFormat:@"%04lX", c.unsignedIntegerValue]];
@@ -164,7 +164,7 @@ NSString * RegexReplace(NSString * string,
         return nil;
 }
 
-+(NSUInteger)charcodeOfString:(NSString*)str {
++(codepoint_t)codepointOfString:(NSString*)str {
     NSScanner * scanner = [NSScanner scannerWithString:str];
     NSUInteger code = INVALID_CODE_POINT;
     
@@ -201,11 +201,11 @@ NSString * RegexReplace(NSString * string,
     return code;
 }
 
-+(NSUInteger)unicodeOfString:(NSString *)str {
-    return [CharEncoding charcodeOfString:str];
++(codepoint_t)unicodeOfString:(NSString *)str {
+    return [CharEncoding codepointOfString:str];
 }
 
-+(NSString*)NSStringFromUnicode:(NSUInteger)unicode {
++(NSString*)NSStringFromUnicode:(codepoint_t)unicode {
     unichar c = unicode;
     return [[NSString alloc] initWithCharacters:&c length:1];
 }
@@ -229,16 +229,16 @@ NSString * RegexReplace(NSString * string,
     return ll;
 }
 
-+(NSString*)infoLinkOfUnicode:(NSUInteger)unicode {
-    return [NSString stringWithFormat:@"https://codepoints.net/U+%lX", unicode];
++(NSString*)infoLinkOfUnicode:(codepoint_t)unicode {
+    return [NSString stringWithFormat:@"https://codepoints.net/U+%04X", unicode];
 }
 
 +(NSString*)infoLinkOfUnicodeHex:(NSString*)unicodeHex {
     return [NSString stringWithFormat:@"https://codepoints.net/U+%@", unicodeHex];
 }
 
-+(NSString*)gotoLinkOfUnicode:(NSUInteger)unicode {
-    return [NSString stringWithFormat:@"lookup://U+%lX", unicode];
++(NSString*)gotoLinkOfUnicode:(codepoint_t)unicode {
+    return [NSString stringWithFormat:@"lookup://U+%04X", unicode];
 }
 
 +(NSString*)gotoLinkOfUnicodeHex:(NSString*)unicodeHex {
@@ -271,7 +271,7 @@ NSString * RegexReplace(NSString * string,
 static NSMutableArray<UnicodeBlock*> * blocks;
 
 @implementation UnicodeBlock
--(id) initWithName:(NSString*)name from:(NSUInteger)from to:(NSUInteger)to {
+-(id) initWithName:(NSString*)name from:(codepoint_t)from to:(codepoint_t)to {
     if (self = [super init]) {
         self.from = from;
         self.to = to;
@@ -293,10 +293,10 @@ static NSMutableArray<UnicodeBlock*> * blocks;
 }
 
 - (NSString *)description {
-    return [NSString stringWithFormat:@"%@ (%04lX-%04lX)", self.name, self.from, self.to];
+    return [NSString stringWithFormat:@"%@ (%04X-%04X)", self.name, self.from, self.to];
 }
 
-+(id)unicodeBlockWithName:(NSString*)name from:(NSUInteger)from to:(NSUInteger)to {
++(id)unicodeBlockWithName:(NSString*)name from:(codepoint_t)from to:(codepoint_t)to {
     return [[UnicodeBlock alloc] initWithName:name from:from to:to];
 }
 
@@ -308,7 +308,7 @@ static NSMutableArray<UnicodeBlock*> * blocks;
     return self.from == 0 && self.to == 0x10FFFF;
 }
 
--(BOOL)containsUnicode:(uint32_t)unicode {
+-(BOOL)containsUnicode:(codepoint_t)unicode {
     return unicode >= self.from && unicode <= self.to;
 }
 @end
@@ -491,23 +491,23 @@ static UnicodeDatabase *standardUnicodDatabase = nil;
     return nil;
 }
 
-- (UnicodeCharCoreAttributes*)coreAttributesOfChar:(uint32_t)unicode {
+- (UnicodeCharCoreAttributes*)coreAttributesOfChar:(codepoint_t)unicode {
     return [self.coreAttributesDictionary objectForKey:[NSNumber numberWithInteger:unicode]];
 }
 
-- (UnicodeBlock*)blockOfChar:(uint32_t)unicode {
+- (UnicodeBlock*)blockOfChar:(codepoint_t)unicode {
     return [self binarySearchUnicode:unicode inBlocks:self.unicodeBlocks];
 }
 
-- (NSString*)scriptOfChar:(uint32_t)unicode {
+- (NSString*)scriptOfChar:(codepoint_t)unicode {
     return [self linearSearchUnicode:unicode inBlocks:self.scriptBlocks].name;
 }
 
-- (NSString*)derivedAgeOfChar:(uint32_t)unicode {
+- (NSString*)derivedAgeOfChar:(codepoint_t)unicode {
     return [self linearSearchUnicode:unicode inBlocks:self.derivedAgeBlocks].name;
 }
 
-- (BOOL)isPUA:(uint32_t)unicode {
+- (BOOL)isPUA:(codepoint_t)unicode {
     if (unicode >= 0xE000 && unicode <= 0xF8FF)
         return YES;
     if (unicode >= 0xF0000 && unicode <= 0xFFFFD)
@@ -517,7 +517,7 @@ static UnicodeDatabase *standardUnicodDatabase = nil;
     return NO;
 }
 
-- (NSString*)propListOfChar:(uint32_t)unicode {
+- (NSString*)propListOfChar:(codepoint_t)unicode {
     return [self linearSearchUnicode:unicode inBlocks:self.propListBlocks].name;
 }
 
@@ -526,7 +526,7 @@ static UnicodeDatabase *standardUnicodDatabase = nil;
 }
 
 
-- (UnicodeBlock*)linearSearchUnicode:(uint32_t)unicode inBlocks:(NSArray<UnicodeBlock*>*)blocks {
+- (UnicodeBlock*)linearSearchUnicode:(codepoint_t)unicode inBlocks:(NSArray<UnicodeBlock*>*)blocks {
     for (UnicodeBlock * block in blocks) {
         if ([block containsUnicode:unicode])
             return block;
@@ -534,7 +534,7 @@ static UnicodeDatabase *standardUnicodDatabase = nil;
     return nil;
 }
 
-- (UnicodeBlock*)binarySearchUnicode:(uint32_t)unicode inBlocks:(NSArray<UnicodeBlock*>*)blocks {
+- (UnicodeBlock*)binarySearchUnicode:(codepoint_t)unicode inBlocks:(NSArray<UnicodeBlock*>*)blocks {
     NSUInteger from = 0, to = blocks.count;
 
     while (from < to) {

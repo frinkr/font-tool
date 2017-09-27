@@ -166,10 +166,10 @@
                 if (index != INVALID_CODE_POINT)
                     request = [GlyphLookupRequest createRequestWithId:index preferedBlock:self.indexOfSelectedGlyphBlock];
             } break;
-            case GlyphLookupByCharcode: {
-                NSInteger code = [CharEncoding charcodeOfString:value];
+            case GlyphLookupByCodepoint: {
+                NSInteger code = [CharEncoding codepointOfString:value];
                 if (code != INVALID_CODE_POINT)
-                    request = [GlyphLookupRequest createRequestWithCharcode:code preferedBlock:self.indexOfSelectedGlyphBlock];
+                    request = [GlyphLookupRequest createRequestWithCodepoint:code preferedBlock:self.indexOfSelectedGlyphBlock];
             } break;
         }
     }

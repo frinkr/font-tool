@@ -77,19 +77,19 @@
 - (NSString*)unicode {
     
     BOOL isUnicode = self.glyph.typeface.currentCMapIsUnicode;
-    NSString * hex = [CharEncoding hexForCharcode:self.glyph.charcode
+    NSString * hex = [CharEncoding hexForCharcode:self.glyph.codepoint
                                     unicodeFlavor:isUnicode];
     if (!hex)
         hex = UNDEFINED_UNICODE_CODEPOINT;
     
-    if (isUnicode && [[UnicodeDatabase standardDatabase] isPUA:self.glyph.charcode])
+    if (isUnicode && [[UnicodeDatabase standardDatabase] isPUA:self.glyph.codepoint])
         return [NSString stringWithFormat:@"%@ (PUA)", hex];
     else
         return hex;
 }
 
 - (NSString*)character {
-    unichar c = self.glyph.charcode;
+    unichar c = self.glyph.codepoint;
     return [NSString stringWithCharacters:&c length:1];
 }
 
@@ -203,7 +203,7 @@
                 GlyphTableRow * row = [[GlyphTableRow alloc] initWithIndex:gid typeface:typeface];
                 
                 NSString * character = row.character;
-                switch(row.glyph.charcode) {
+                switch(row.glyph.codepoint) {
                     case '\'': character = @"<quote>"; break;
                     case ',': character = @"<comma>"; break;
                     case '"': character = @"<double quote>"; break;

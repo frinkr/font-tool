@@ -93,15 +93,15 @@
         [items addRowWithKey:@"Glyph Name" stringValue:self.glyph.name];
         [items addRowWithKey:@"Glyph Index" unsignedIntegerValue:self.glyph.GID];
         
-        NSString * hex = [CharEncoding hexForCharcode:self.glyph.charcode unicodeFlavor:isUnicode];
+        NSString * hex = [CharEncoding hexForCharcode:self.glyph.codepoint unicodeFlavor:isUnicode];
         
-        [items addRowWithKey:@"Unicode" stringValue:hex? [NSString stringWithFormat:@"<a href=%@>%@</a>", [CharEncoding infoLinkOfUnicode:self.glyph.charcode], hex]: nil];
-        [items addRowWithKey:@"UTF8" stringValue:[CharEncoding utf8HexStringForUnicode:self.glyph.charcode]];
-        [items addRowWithKey:@"UTF16" stringValue:[CharEncoding utf16HexStringForUnicode:self.glyph.charcode]];
+        [items addRowWithKey:@"Unicode" stringValue:hex? [NSString stringWithFormat:@"<a href=%@>%@</a>", [CharEncoding infoLinkOfUnicode:self.glyph.codepoint], hex]: nil];
+        [items addRowWithKey:@"UTF8" stringValue:[CharEncoding utf8HexStringForUnicode:self.glyph.codepoint]];
+        [items addRowWithKey:@"UTF16" stringValue:[CharEncoding utf16HexStringForUnicode:self.glyph.codepoint]];
         
         NSMutableArray<NSNumber*> * altCharcodes = [[NSMutableArray<NSNumber*> alloc] init];
-        for (NSNumber * num in self.glyph.charcodes) {
-            if (num.unsignedIntegerValue != self.glyph.charcode) {
+        for (NSNumber * num in self.glyph.codepoints) {
+            if (num.unsignedIntegerValue != self.glyph.codepoint) {
                 [altCharcodes addObject:num];
             }
         }
@@ -111,14 +111,14 @@
                 NSUInteger code = num.unsignedIntegerValue;
                 hex = [CharEncoding hexForCharcode:code unicodeFlavor:YES];
                 if (hex)
-                    [altStrings addObject:[NSString stringWithFormat:@"<a href=%@>%@</a>", [CharEncoding infoLinkOfUnicode:self.glyph.charcode], hex]];
+                    [altStrings addObject:[NSString stringWithFormat:@"<a href=%@>%@</a>", [CharEncoding infoLinkOfUnicode:self.glyph.codepoint], hex]];
                 else
                     [altStrings addObject:[CharEncoding hexForCharcode:code unicodeFlavor:NO]];
             }
             [items addRowWithKey:@"Alternate" stringValue:[altStrings componentsJoinedByString:@"<br>"]];
         }
         
-        UnicodeCharCoreAttributes * coreAttrs = [[UnicodeDatabase standardDatabase] coreAttributesOfChar:self.glyph.charcode];
+        UnicodeCharCoreAttributes * coreAttrs = [[UnicodeDatabase standardDatabase] coreAttributesOfChar:self.glyph.codepoint];
 
         [items addRowWithKey:@"Unicode Name" stringValue:coreAttrs.name];
         
@@ -136,16 +136,16 @@
             [items addRowWithKey:@"Decomposition" stringValue:string];
         }
         
-        [items addRowWithKey:@"Block" stringValue:[[UnicodeDatabase standardDatabase] blockOfChar:self.glyph.charcode].name];
-        [items addRowWithKey:@"Script" stringValue:[[UnicodeDatabase standardDatabase] scriptOfChar:self.glyph.charcode]];
-        [items addRowWithKey:@"Derived Age" stringValue:[[UnicodeDatabase standardDatabase] derivedAgeOfChar:self.glyph.charcode]];
+        [items addRowWithKey:@"Block" stringValue:[[UnicodeDatabase standardDatabase] blockOfChar:self.glyph.codepoint].name];
+        [items addRowWithKey:@"Script" stringValue:[[UnicodeDatabase standardDatabase] scriptOfChar:self.glyph.codepoint]];
+        [items addRowWithKey:@"Derived Age" stringValue:[[UnicodeDatabase standardDatabase] derivedAgeOfChar:self.glyph.codepoint]];
         [items addRowWithKey:@"General Category" stringValue:coreAttrs.generalCategory.fullDescription];
 
     }
     else {
         [items addRowWithKey:@"Glyph Name" stringValue:self.glyph.name];
         [items addRowWithKey:@"Glyph Index" unsignedIntegerValue:self.glyph.GID];
-        [items addRowWithKey:@"Charcode" stringValue:[NSString stringWithFormat:@"%@(%ld)", self.glyph.charcodeHex, self.glyph.charcode]];
+        [items addRowWithKey:@"Codepoint" stringValue:[NSString stringWithFormat:@"%@(%u)", self.glyph.charcodeHex, self.glyph.codepoint]];
     }
     
     // metrics

@@ -128,29 +128,29 @@
     return gc;
 }
 
-- (NSUInteger)currentUnicode {
+- (codepoint_t)currentUnicode {
     TypefaceGlyphcode * code = self.currentGlyphCode;
     if (code && !code.isGID && self.currentCMap.isUnicode)
-        return code.charcode;
+        return code.codepoint;
     return INVALID_CODE_POINT;
 }
 
 #pragma mark *** Actions ***
 
 - (IBAction)onCopyCharMenuItem:(id)sender {
-    NSUInteger code = self.currentUnicode;
+    codepoint_t code = self.currentUnicode;
     if (code != INVALID_CODE_POINT)
         [self copyToClipboard:[CharEncoding NSStringFromUnicode:code]];
 }
 
 - (IBAction)onCopyCodeMenuItem:(id)sender {
-    NSUInteger code = self.currentUnicode;
+    codepoint_t code = self.currentUnicode;
     if (code != INVALID_CODE_POINT)
         [self copyToClipboard:[CharEncoding hexForCharcode:code unicodeFlavor:YES]];
 }
 
 - (IBAction)onSearchMenuItem:(id)sender {
-    NSUInteger code = self.currentUnicode;
+    codepoint_t code = self.currentUnicode;
     if (code != INVALID_CODE_POINT) {
         NSString * url = [CharEncoding infoLinkOfUnicode:code];
         [(AppDelegate*)NSApp.delegate openURL:[NSURL URLWithString:url]];
