@@ -24,8 +24,8 @@ FT_END_DECLS
 // return nil if charcode outof unicode range
 +(NSString*)hexForCharcode:(codepoint_t)charcode unicodeFlavor:(BOOL)unicode;
 
-+(NSArray<NSNumber*>*)utf8ForUnicode:(codepoint_t)unicode;
-+(NSArray<NSNumber*>*)utf16ForUnicode:(codepoint_t)unicode;
++(NSUInteger)utf8ForUnicode:(codepoint_t)unicode outUTF8:(unsigned char*)utf8;
++(NSUInteger)utf16ForUnicode:(codepoint_t)unicode outUTF16:(uint16_t*)utf16;
 +(NSString*)utf8HexStringForUnicode:(codepoint_t)unicode;
 +(NSString*)utf16HexStringForUnicode:(codepoint_t)unicode;
 

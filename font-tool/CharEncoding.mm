@@ -91,62 +91,56 @@ NSString * RegexReplace(NSString * string,
 }
 
 
-+(NSArray<NSNumber*>*)utf8ForUnicode:(codepoint_t)unicode {
-    NSMutableArray<NSNumber*>* utf8 = [[NSMutableArray<NSNumber*> alloc] init];
-    
-    unsigned char b1= 0, b2 = 0, b3 = 0, b4 = 0;
++(NSUInteger)utf8ForUnicode:(codepoint_t)unicode outUTF8:(unsigned char*)utf8 {
     if (unicode <= 0x007F) {
-        b1 = unicode;
-        [utf8 addObject:[NSNumber numberWithShort:b1]];
+        utf8[0] = unicode;
+        return 1;
     }
     else if (unicode <= 0x07FF) {
-        b1 = ((unicode >> 6) & 0x1F) | 0xC0;
-        b2 = ((unicode >> 0) & 0x3F) | 0x80;
-        [utf8 addObject:[NSNumber numberWithShort:b1]];
-        [utf8 addObject:[NSNumber numberWithShort:b2]];
+        utf8[0] = ((unicode >> 6) & 0x1F) | 0xC0;
+        utf8[1] = ((unicode >> 0) & 0x3F) | 0x80;
+        return 2;
     }
     else if (unicode <= 0xFFFF) {
-        b1 = ((unicode >> 12) & 0x0F) | 0xE0;
-        b2 = ((unicode >> 6) & 0x3F) | 0x80;
-        b3 = ((unicode >> 0) & 0x3F) | 0x80;
-        [utf8 addObject:[NSNumber numberWithShort:b1]];
-        [utf8 addObject:[NSNumber numberWithShort:b2]];
-        [utf8 addObject:[NSNumber numberWithShort:b3]];
+        utf8[0] = ((unicode >> 12) & 0x0F) | 0xE0;
+        utf8[1] = ((unicode >> 6) & 0x3F) | 0x80;
+        utf8[2] = ((unicode >> 0) & 0x3F) | 0x80;
+        return 3;
         
     }
     else if (unicode <= 0x10FFFF) {
-        b1 = ((unicode >> 18) & 0x07) | 0xF0;
-        b2 = ((unicode >> 12) & 0x3F) | 0x80;
-        b3 = ((unicode >> 6)  & 0x3F) | 0x80;
-        b4 = ((unicode >> 0)  & 0x3F) | 0x80;
-        [utf8 addObject:[NSNumber numberWithShort:b1]];
-        [utf8 addObject:[NSNumber numberWithShort:b2]];
-        [utf8 addObject:[NSNumber numberWithShort:b3]];
-        [utf8 addObject:[NSNumber numberWithShort:b4]];
+        utf8[0] = ((unicode >> 18) & 0x07) | 0xF0;
+        utf8[1] = ((unicode >> 12) & 0x3F) | 0x80;
+        utf8[2] = ((unicode >> 6)  & 0x3F) | 0x80;
+        utf8[3] = ((unicode >> 0)  & 0x3F) | 0x80;
+        return 4;
     }
     
-    return utf8;
+    return 0;
 }
 
-+(NSArray<NSNumber*>*)utf16ForUnicode:(codepoint_t)unicode {
-    NSMutableArray<NSNumber*>* utf16 = [[NSMutableArray<NSNumber*> alloc] init];
-    
-    if (unicode < 0xFFFF)
-        [utf16 addObject:[NSNumber numberWithUnsignedInteger:unicode]];
++(NSUInteger)utf16ForUnicode:(codepoint_t)unicode outUTF16:(uint16_t*)utf16  {
+    if (unicode < 0xFFFF) {
+        utf16[0] = unicode;
+        return 1;
+    }
     else if ( unicode <= 0x10FFFF) {
         // souragate
         NSUInteger d = unicode - 0x010000;
-        [utf16 addObject:[NSNumber numberWithUnsignedInteger:((d >> 10) & 0x03FF) + 0xD800]]; // top ten bits
-        [utf16 addObject:[NSNumber numberWithUnsignedInteger:(d & 0x03FF) + 0xDC00]]; // low ten bits
+        utf16[0] = ((d >> 10) & 0x03FF) + 0xD800; // top ten bits
+        utf16[1] = (d & 0x03FF) + 0xDC00; // low ten bits
+        return 2;
     }
-    return utf16;
+    return 0;
 }
 
 +(NSString*)utf8HexStringForUnicode:(codepoint_t)unicode {
     NSMutableArray<NSString*>* all = [[NSMutableArray<NSString*> alloc] init];
-    for (NSNumber * c in [CharEncoding utf8ForUnicode:unicode]) {
-        [all addObject:[NSString stringWithFormat:@"%02lX", c.unsignedIntegerValue]];
-    }
+    unsigned char utf8[4];
+    NSUInteger c = [CharEncoding utf8ForUnicode:unicode outUTF8:utf8];
+    for (NSUInteger i = 0; i < c; ++ i)
+        [all addObject:[NSString stringWithFormat:@"%02X", utf8[i]]];
+    
     if (all.count)
         return [NSString stringWithFormat:@"%@", [all componentsJoinedByString:@" "]];
     else
@@ -155,9 +149,11 @@ NSString * RegexReplace(NSString * string,
 
 +(NSString*)utf16HexStringForUnicode:(codepoint_t)unicode{
     NSMutableArray<NSString*>* all = [[NSMutableArray<NSString*> alloc] init];
-    for (NSNumber * c in [CharEncoding utf16ForUnicode:unicode]) {
-        [all addObject:[NSString stringWithFormat:@"%04lX", c.unsignedIntegerValue]];
-    }
+    uint16_t utf16[2];
+    NSUInteger c = [CharEncoding utf16ForUnicode:unicode outUTF16:utf16];
+    for (NSUInteger i = 0; i < c; ++ i)
+        [all addObject:[NSString stringWithFormat:@"%04X", utf16[i]]];
+    
     if (all.count)
         return [NSString stringWithFormat:@"U+%@", [all componentsJoinedByString:@","]];
     else
@@ -206,13 +202,9 @@ NSString * RegexReplace(NSString * string,
 }
 
 +(NSString*)NSStringFromUnicode:(codepoint_t)unicode {
-    unichar chars[2];
-    NSArray<NSNumber*> * utf16 = [CharEncoding utf16ForUnicode:unicode];
-    
-    for (NSUInteger i = 0; i < utf16.count; ++ i)
-        chars[i] = [utf16 objectAtIndex:i].unsignedIntValue;
-    
-    return [[NSString alloc] initWithCharacters:chars length:utf16.count];
+    uint16_t utf16[2];
+    NSUInteger c = [CharEncoding utf16ForUnicode:unicode outUTF16:utf16];
+    return [[NSString alloc] initWithCharacters:utf16 length:c];
 }
 
 +(NSInteger)gidOfString:(NSString *)str {
