@@ -143,14 +143,17 @@
 
 - (IBAction)onCopyCharMenuItem:(id)sender {
     codepoint_t code = self.currentUnicode;
-    if (code != INVALID_CODE_POINT)
-        [self copyToClipboard:[CharEncoding NSStringFromUnicode:code]];
+    if (code != INVALID_CODE_POINT) {
+        NSString * str = [CharEncoding NSStringFromUnicode:code];
+        [self copyToPasteboard:str];
+        [self postNotificationWithTitle:@"Character has been copied to pasteboard"  message:str];
+    }
 }
 
 - (IBAction)onCopyCodeMenuItem:(id)sender {
     codepoint_t code = self.currentUnicode;
     if (code != INVALID_CODE_POINT)
-        [self copyToClipboard:[CharEncoding hexForCharcode:code unicodeFlavor:YES]];
+        [self copyToPasteboard:[CharEncoding hexForCharcode:code unicodeFlavor:YES]];
 }
 
 - (IBAction)onSearchMenuItem:(id)sender {
@@ -161,7 +164,14 @@
     }
 }
 
-- (void)copyToClipboard:(NSString*)string {
+- (void)postNotificationWithTitle:(NSString*) title message:(NSString*)message {
+    NSUserNotification * notification = [[NSUserNotification alloc] init];
+    notification.title = title;
+    notification.informativeText = message;
+    [[NSUserNotificationCenter defaultUserNotificationCenter] deliverNotification:notification];
+}
+
+- (void)copyToPasteboard:(NSString*)string {
     NSPasteboard *pasteBoard = [NSPasteboard generalPasteboard];
     [pasteBoard declareTypes:[NSArray arrayWithObjects:NSStringPboardType, nil] owner:nil];
     [pasteBoard setString: string forType:NSStringPboardType];

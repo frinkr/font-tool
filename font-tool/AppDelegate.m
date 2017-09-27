@@ -69,7 +69,7 @@
 }
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
-    
+    [[NSUserNotificationCenter defaultUserNotificationCenter] setDelegate:self];
 }
 
 - (void)applicationWillTerminate:(NSNotification *)aNotification {
@@ -83,6 +83,10 @@
 
 - (BOOL)application:(NSApplication *)sender openFile:(NSString *)filename {
     return [(TypefaceDocumentController*)[NSDocumentController sharedDocumentController] openFontFromFilePath:[NSURL fileURLWithPath:filename]];
+}
+
+- (BOOL)userNotificationCenter:(NSUserNotificationCenter *)center shouldPresentNotification:(NSUserNotification *)notification {
+    return YES;
 }
 
 - (void)openURL:(NSURL *)url {
