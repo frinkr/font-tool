@@ -137,6 +137,10 @@
 
 #pragma mark *** Actions ***
 
+- (IBAction)copy:(id)sender {
+    [self onCopyCharMenuItem:sender];
+}
+
 - (IBAction)onCopyCharMenuItem:(id)sender {
     codepoint_t code = self.currentUnicode;
     if (code != INVALID_CODE_POINT)
