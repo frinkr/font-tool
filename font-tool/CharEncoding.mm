@@ -206,8 +206,13 @@ NSString * RegexReplace(NSString * string,
 }
 
 +(NSString*)NSStringFromUnicode:(codepoint_t)unicode {
-    unichar c = unicode;
-    return [[NSString alloc] initWithCharacters:&c length:1];
+    unichar chars[2];
+    NSArray<NSNumber*> * utf16 = [CharEncoding utf16ForUnicode:unicode];
+    
+    for (NSUInteger i = 0; i < utf16.count; ++ i)
+        chars[i] = [utf16 objectAtIndex:i].unsignedIntValue;
+    
+    return [[NSString alloc] initWithCharacters:chars length:utf16.count];
 }
 
 +(NSInteger)gidOfString:(NSString *)str {
@@ -247,7 +252,7 @@ NSString * RegexReplace(NSString * string,
 
 + (NSString*)decodeUnicodeMixed:(NSString*)string {
     return RegexReplace(string, UNI_CODEPOINT_LOOKUP_REGEX, ^NSString *(NSRange range, BOOL *stop) {
-        unichar unichar = [CharEncoding unicodeOfString:[string substringWithRange:range]];
+        codepoint_t unichar = [CharEncoding unicodeOfString:[string substringWithRange:range]];
         return [CharEncoding NSStringFromUnicode:unichar];
     });
 }
