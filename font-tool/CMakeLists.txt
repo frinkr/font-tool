@@ -56,6 +56,7 @@ set(SOURCE_FILES
   main.m
   AppDelegate.m
   CharEncoding.mm
+  Common.m
   HtmlTableView.m
   GlyphImageView.m
   GlyphLookupWindowController.m

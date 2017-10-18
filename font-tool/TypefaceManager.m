@@ -268,8 +268,8 @@ static TypefaceManager * defaultTypefaceManager;
     
     [self enumurateFacesOfURL:url handler:^BOOL(OpaqueFTFace opaqueFace, NSUInteger index) {
         [faces addObject:[NSString stringWithFormat:@"%@ %@",
-                          [NSString stringWithUTF8String:((FT_Face)opaqueFace)->family_name],
-                          [NSString stringWithUTF8String:((FT_Face)opaqueFace)->style_name]]];
+                          [NSString stringWithUTF8StringNilFallback:opaqueFace->family_name],
+                          [NSString stringWithUTF8StringNilFallback:opaqueFace->style_name]]];
         return true;
     }];
     return faces;
@@ -284,7 +284,7 @@ static TypefaceManager * defaultTypefaceManager;
     __block NSString * style;
     [self enumurateFacesOfURL:url handler:^BOOL(OpaqueFTFace opaqueFace, NSUInteger theIndex) {
         if (index == theIndex) {
-            style = [NSString stringWithUTF8String:((FT_Face)opaqueFace)->family_name];
+            style = [NSString stringWithUTF8StringNilFallback:((FT_Face)opaqueFace)->family_name];
             return NO;
         }
         return YES;
@@ -296,7 +296,7 @@ static TypefaceManager * defaultTypefaceManager;
     __block NSString * style;
     [self enumurateFacesOfURL:url handler:^BOOL(OpaqueFTFace opaqueFace, NSUInteger theIndex) {
         if (index == theIndex) {
-            style = [NSString stringWithUTF8String:((FT_Face)opaqueFace)->style_name];
+            style = [NSString stringWithUTF8StringNilFallback:opaqueFace->style_name];
             return NO;
         }
         return YES;
@@ -346,8 +346,8 @@ static TypefaceManager * defaultTypefaceManager;
 -(NSInteger)indexOfFamily:(NSString*)family style:(NSString*)style ofURL:(NSURL*)url {
     __block NSInteger faceIndex = INVALID_FACE_INDEX;
     [self enumurateFacesOfURL:url handler:^BOOL(OpaqueFTFace opaqueFace, NSUInteger index) {
-        if ([family isEqualToString:[NSString stringWithUTF8String:((FT_Face)opaqueFace)->family_name]]) {
-            if ([style isEqualToString:[NSString stringWithUTF8String:((FT_Face)opaqueFace)->style_name]]) {
+        if ([family isEqualToString:[NSString stringWithUTF8StringNilFallback:((FT_Face)opaqueFace)->family_name]]) {
+            if ([style isEqualToString:[NSString stringWithUTF8StringNilFallback:((FT_Face)opaqueFace)->style_name]]) {
                 faceIndex = index;
                 return NO;
             }

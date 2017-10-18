@@ -219,7 +219,7 @@ NSString* FixedArrayToString(NSArray<NSNumber*> * array) {
     [items addRowWithKey:@"Localized Family Name" stringValue:face.preferedLocalizedFamilyName];
     [items addRowWithKey:@"Localized Style Name"  stringValue:face.preferedLocalizedStyleName];
     
-    [items addRowWithKey:@"Postscript Name" stringValue:[NSString stringWithUTF8String:FT_Get_Postscript_Name(ftFace)]];
+    [items addRowWithKey:@"Postscript Name" stringValue:[NSString stringWithUTF8StringNilFallback:FT_Get_Postscript_Name(ftFace)]];
     [items addRowWithKey:@"File"   stringValue:face.fileURL.path];
     
     
@@ -354,7 +354,7 @@ NSString* FixedArrayToString(NSArray<NSNumber*> * array) {
     HtmlTableRows * items = [[HtmlTableRows alloc] init];
     [items addRowWithKey:@"Family" stringValue:face.familyName];
     [items addRowWithKey:@"Style"  stringValue:face.styleName];
-    [items addRowWithKey:@"Postscript Name" stringValue:[NSString stringWithUTF8String:FT_Get_Postscript_Name(ftFace)]];
+    [items addRowWithKey:@"Postscript Name" stringValue:[NSString stringWithUTF8StringNilFallback:FT_Get_Postscript_Name(ftFace)]];
 
     [items addRowWithKey:@"Face Index" unsignedIntegerValue: face.faceIndex];
     

@@ -19,3 +19,8 @@
 
 typedef uint32_t codepoint_t;
 typedef struct FT_FaceRec_ * OpaqueFTFace;
+
+@interface NSString (NilFallback)
++ (instancetype)stringWithUTF8StringNilFallback:(const char *)utf8;
++ (instancetype)stringWithUTF8String:(const char *)utf8 withNullFallback:(NSString*)fallback;
+@end

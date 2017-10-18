@@ -786,8 +786,8 @@ typedef struct {
     self.fontSize = FT_DEFAULT_FONTSIZE;
     
     // info
-    _familyName = [NSString stringWithUTF8String:face->family_name];
-    _styleName = [NSString stringWithUTF8String:face->style_name];
+    _familyName = [NSString stringWithUTF8StringNilFallback:face->family_name];
+    _styleName = [NSString stringWithUTF8StringNilFallback:face->style_name];
     _fileURL = fileURL;
     _faceIndex = face->face_index;
 
@@ -1257,8 +1257,8 @@ typedef struct {
         }
     }
     
-    attributes.familyName = [NSString stringWithUTF8String:face->family_name];
-    attributes.styleName = [NSString stringWithUTF8String:face->style_name];
+    attributes.familyName = [NSString stringWithUTF8StringNilFallback:face->family_name];
+    attributes.styleName = [NSString stringWithUTF8StringNilFallback:face->style_name];
  
 #if DEBUG
     BOOL foundFamily = NO, foundStyle = NO;

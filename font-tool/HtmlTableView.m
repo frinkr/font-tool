@@ -143,6 +143,7 @@ static HtmlTableViewAppearance * defaultHtmlTableViewApperance;
         
         if ([self.delegate respondsToSelector:@selector(htmlTableView:didOpenURL:)])
             [self.delegate htmlTableView:self didOpenURL:url];
+        return;
     }
     decisionHandler(WKNavigationActionPolicyAllow);
 
