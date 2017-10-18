@@ -431,58 +431,110 @@ NSString * FTDateTimeToString(NSInteger value) {
     return [FTDateTime(value) description];
 }
 
-NSString * FTGetUnicodeString(FT_UShort platformId, FT_UShort encodingId, void * string, uint32_t stringLen) {
+static NSString * FTGetUnicodeStringMacintosh(FT_UShort encodingId, void * string, uint32_t stringLen) {
+    if (encodingId == TT_MAC_ID_ROMAN)
+        return [[NSString alloc] initWithBytes:string length:stringLen encoding:NSMacOSRomanStringEncoding];
     
     NSString * name = nil;
     
-    if (platformId== TT_PLATFORM_MACINTOSH && encodingId == TT_MAC_ID_ROMAN)
-        return [[NSString alloc] initWithBytes:string length:stringLen encoding:NSMacOSRomanStringEncoding];
-    
-    bool isUnicode = (platformId == TT_PLATFORM_APPLE_UNICODE)
-    ||
-    ((platformId == TT_PLATFORM_MICROSOFT) && ((encodingId == TT_MS_ID_UNICODE_CS) || (encodingId == TT_MS_ID_UCS_4) || (encodingId == TT_MS_ID_SYMBOL_CS)));
-    
-    if (isUnicode) {
-        name = [[NSString alloc] initWithBytes:string length:stringLen encoding:NSUnicodeStringEncoding];
-    }
-    else {
-        while (platformId == TT_PLATFORM_MACINTOSH) {
-            OSStatus error = 0;
-            TextEncoding textEncoding;
-            error = UpgradeScriptInfoToTextEncoding(encodingId,
-                                                    kTextLanguageDontCare,
-                                                    kTextRegionDontCare,
-                                                    NULL,
-                                                    &textEncoding);
-            if (error) break;
-            
-            TextToUnicodeInfo textToUnicodeInfo;
-            error = CreateTextToUnicodeInfoByEncoding(textEncoding, &textToUnicodeInfo);
-            if (error) break;
-            
-            ByteCount sourceRead = 0, unicodeLen = 0;
-            
-            int bufLen = stringLen * 4;
-            UniChar * buf = (UniChar*)malloc(bufLen * sizeof(UniChar));
-            error = ConvertFromTextToUnicode(textToUnicodeInfo,
-                                             stringLen, string,
-                                             0, 0, 0, 0, 0, // no font offset
-                                             bufLen, &sourceRead, &unicodeLen,
-                                             buf);
-            
-            if (!error)
-                name = [[NSString alloc] initWithCharacters:buf length:unicodeLen/2];
-            
-            DisposeTextToUnicodeInfo(&textToUnicodeInfo);
-            free(buf);
-            break;
-        }
+    while (true) {
+        OSStatus error = 0;
+        TextEncoding textEncoding;
+        error = UpgradeScriptInfoToTextEncoding(encodingId,
+                                                kTextLanguageDontCare,
+                                                kTextRegionDontCare,
+                                                NULL,
+                                                &textEncoding);
+        if (error) break;
         
-        if (!name) {
-            name = [[NSString alloc] initWithBytes:string length:stringLen encoding:NSASCIIStringEncoding];
-        }
+        TextToUnicodeInfo textToUnicodeInfo;
+        error = CreateTextToUnicodeInfoByEncoding(textEncoding, &textToUnicodeInfo);
+        if (error) break;
+        
+        ByteCount sourceRead = 0, unicodeLen = 0;
+        
+        int bufLen = stringLen * 4;
+        UniChar * buf = (UniChar*)malloc(bufLen * sizeof(UniChar));
+        error = ConvertFromTextToUnicode(textToUnicodeInfo,
+                                         stringLen, string,
+                                         0, 0, 0, 0, 0, // no font offset
+                                         bufLen, &sourceRead, &unicodeLen,
+                                         buf);
+        
+        if (!error)
+            name = [[NSString alloc] initWithCharacters:buf length:unicodeLen/2];
+        
+        DisposeTextToUnicodeInfo(&textToUnicodeInfo);
+        free(buf);
+        break;
     }
+    
     return name;
+}
+
+static NSString * FTGetUnicodeStringAppleUnicode(FT_UShort encodingId, void * string, uint32_t stringLen) {
+    return [[NSString alloc] initWithBytes:string length:stringLen encoding:NSUnicodeStringEncoding];
+}
+
+static NSString * FTGetUnicodeStringMicrosoft(FT_UShort encodingId, void * string, uint32_t stringLen) {
+    NSStringEncoding enc = kCFStringEncodingInvalidId;
+    
+    BOOL mbs = NO;
+    switch(encodingId) {
+        case TT_MS_ID_UNICODE_CS: // UTF16-BE
+        case TT_MS_ID_SYMBOL_CS:
+            enc = NSUTF16BigEndianStringEncoding;
+            break;
+        case TT_MS_ID_UCS_4:
+            enc = NSUTF32BigEndianStringEncoding;
+            break;
+        case TT_MS_ID_PRC:
+            enc = (NSStringEncoding)CFStringConvertEncodingToNSStringEncoding(kCFStringEncodingGB_18030_2000);
+            mbs = YES;
+            break;
+        case TT_MS_ID_SJIS:
+            enc = NSShiftJISStringEncoding;
+            mbs = YES;
+            break;
+        case TT_MS_ID_BIG_5:
+            enc = (NSStringEncoding)CFStringConvertEncodingToNSStringEncoding(kCFStringEncodingBig5);
+            mbs = YES;
+            break;
+        default:
+            break;
+    }
+    
+    if (enc == kCFStringEncodingInvalidId)
+        return nil;
+    
+    if (mbs) {
+        // byte 0 is not valid in MBS, so remove all byte 0
+        unsigned char * trimed = (unsigned char *) malloc(stringLen);
+        uint32_t trimedLen = 0;
+        for (uint32_t i = 0; i < stringLen; ++ i) {
+            unsigned char c = ((unsigned char *)string)[i];
+            if (c) trimed[trimedLen++] = c;
+        }
+        if (trimedLen)
+            return [[NSString alloc] initWithBytes:trimed length:trimedLen encoding:enc];
+        else
+            return nil;
+    }
+    return [[NSString alloc] initWithBytes:string length:stringLen encoding:enc];
+}
+
+NSString * FTGetUnicodeString(FT_UShort platformId, FT_UShort encodingId, void * string, uint32_t stringLen) {
+    NSString * str = nil;
+    switch(platformId) {
+        case TT_PLATFORM_MACINTOSH: str = FTGetUnicodeStringMacintosh(encodingId, string, stringLen); break;
+        case TT_PLATFORM_MICROSOFT: str = FTGetUnicodeStringMicrosoft(encodingId, string, stringLen); break;
+        case TT_PLATFORM_APPLE_UNICODE: str = FTGetUnicodeStringAppleUnicode(encodingId, string, stringLen); break;
+        default: break;
+    }
+    
+    if (!str)
+        str = [[NSString alloc] initWithBytes:string length:stringLen encoding:NSISOLatin1StringEncoding]; // IEC_8859-1
+    return str;
 }
 
 
