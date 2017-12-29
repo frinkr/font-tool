@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.2)
-project(tx-master)
+project(font-tool)
 
 if(NOT CMAKE_GENERATOR MATCHES Xcode)
   message(FATAL_ERROR "Only Xcode generator is supported.")

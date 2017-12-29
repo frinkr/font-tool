@@ -11,7 +11,9 @@ option(BUILD_FREETYPE_HARFBUZZ "Enable building of Freetype and harfbuzz" ON)
 set(APP_VERSION "1.0.0" CACHE STRING "The version of the application")
 set(APP_NAME "Font Tool")
 
-  find_package(PkgConfig)
+find_package(PkgConfig)
+set(ENV{PKG_CONFIG_PATH} "$ENV{PKG_CONFIG_PATH}:/usr/local/opt/icu4c/lib/pkgconfig")
+
 if(BUILD_FREETYPE_HARFBUZZ)
   
   add_definitions(-DHAVE_HARFBUZZ_SOURCE=1)
@@ -22,32 +24,20 @@ if(BUILD_FREETYPE_HARFBUZZ)
 else()
   
   # Freeetype
-  pkg_check_modules(PC_FREETYPE2 QUIET freetype2)
-  find_path(FREETYPE2_HEADER_DIR NAMES freetype.h HINTS ${PC_FREETYPE2_INCLUDE_DIRS} ${PC_FREETYPE2_INCLUDEDIR} $ENV{FREETYPE_DIR}/include PATH_SUFFIXES freetype)
-  find_path(FREETYPE2_ROOT_INCLUDE_DIR NAMES freetype/freetype.h HINTS ${PC_FREETYPE2_INCLUDE_DIRS} ${PC_FREETYPE2_INCLUDEDIR} $ENV{FREETYPE_DIR}/include)
-  if (CMAKE_BUILD_TYPE MATCHES Debug)
-    set(FREETYPE2_LIBRARY_NAME freetyped)
-  else ()
-    set(FREETYPE2_LIBRARY_NAME freetype)
-  endif ()
-  find_library(FREETYPE2_LIBRARIES ${FREETYPE2_LIBRARY_NAME} HINTS ${PC_FREETYPE2_LIBDIR} ${PC_FREETYPE2_LIBRARY_DIRS} $ENV{FREETYPE_DIR}/lib)
-  include_directories(AFTER ${FREETYPE2_HEADER_DIR} ${FREETYPE2_ROOT_INCLUDE_DIR})
-  list(APPEND THIRD_PARTY_LIBS ${FREETYPE2_LIBRARIES})
+  find_package(Freetype REQUIRED)
+  include_directories(${FREETYPE_INCLUDE_DIRS})
+  list(APPEND THIRD_PARTY_LIBS ${FREETYPE_LIBRARIES})
 
   # Harfbuzz
-  pkg_check_modules(PC_HARFBUZZ QUIET harfbuzz)
-  find_path(HARFBUZZ_INCLUDE_DIR NAMES hb.h HINTS ${PC_HARFBUZZ_INCLUDE_DIRS} ${PC_HARFBUZZ_INCLUDEDIR})
-  find_library(HARFBUZZ_LIBRARY NAMES harfbuzz HINTS ${PC_HARFBUZZ_LIBRARY_DIRS} ${PC_HARFBUZZ_LIBDIR})
-  include_directories(${HARFBUZZ_INCLUDE_DIR})
-  list(APPEND THIRD_PARTY_LIBS ${HARFBUZZ_LIBRARY}) 
+  pkg_check_modules(HARFBUZZ REQUIRED harfbuzz)
+  include_directories(${HARFBUZZ_INCLUDE_DIRS})
+  list(APPEND THIRD_PARTY_LIBS ${HARFBUZZ_LDFLAGS}) 
 
   # icu
-  pkg_check_modules(PC_ICU QUIET icu-uc)
-  find_path(ICU_INCLUDE_DIR NAMES unicode/utypes.h HINTS ${PC_ICU_INCLUDE_DIRS} ${PC_ICU_INCLUDEDIR})
-  find_library(ICU_LIBRARY NAMES libicuuc cygicuuc cygicuuc32 icuuc HINTS ${PC_ICU_LIBRARY_DIRS} ${PC_ICU_LIBDIR})
-  include_directories(${ICU_INCLUDE_DIR})
-  list(APPEND THIRD_PARTY_LIBS ${ICU_LIBRARY})
-
+  pkg_check_modules(ICU REQUIRED icu-uc)
+  include_directories(${ICU_INCLUDE_DIRS})
+  list(APPEND THIRD_PARTY_LIBS ${ICU_LDFLAGS})
+  
 endif()
 
 file(GLOB HEADER_FILES "*.h")
@@ -157,6 +147,7 @@ target_link_libraries(${PROJECT_NAME}
     "-framework Foundation"
     "-framework Webkit"
 )
+
 
 if(NOT BUILD_FREETYPE_HARFBUZZ)
 ADD_CUSTOM_COMMAND(TARGET ${PROJECT_NAME}
