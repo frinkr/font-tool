@@ -831,6 +831,8 @@ NSString* FixedArrayToString(NSArray<NSNumber*> * array) {
                                 }
                                 else {
                                     nameIndex -= macGlyphNameStart;
+                                    if (nameIndex >= numNames)
+                                        break;
                                     int8_t * name = nameArray[nameIndex];
                                     glyphName = [[NSString alloc] initWithBytes:name + 1 length:*name encoding:NSASCIIStringEncoding];
                                 }
