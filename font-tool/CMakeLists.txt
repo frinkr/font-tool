@@ -24,9 +24,9 @@ if(BUILD_FREETYPE_HARFBUZZ)
 else()
   
   # Freeetype
-  find_package(Freetype REQUIRED)
+  pkg_check_modules(FREETYPE REQUIRED freetype2)
   include_directories(${FREETYPE_INCLUDE_DIRS})
-  list(APPEND THIRD_PARTY_LIBS ${FREETYPE_LIBRARIES})
+  list(APPEND THIRD_PARTY_LIBS ${FREETYPE_LDFLAGS})
 
   # Harfbuzz
   pkg_check_modules(HARFBUZZ REQUIRED harfbuzz)
@@ -37,7 +37,7 @@ else()
   pkg_check_modules(ICU REQUIRED icu-uc)
   include_directories(${ICU_INCLUDE_DIRS})
   list(APPEND THIRD_PARTY_LIBS ${ICU_LDFLAGS})
-  
+
 endif()
 
 file(GLOB HEADER_FILES "*.h")
@@ -148,11 +148,9 @@ target_link_libraries(${PROJECT_NAME}
     "-framework Webkit"
 )
 
-
 if(NOT BUILD_FREETYPE_HARFBUZZ)
 ADD_CUSTOM_COMMAND(TARGET ${PROJECT_NAME}
   POST_BUILD
   COMMAND /bin/bash ${CMAKE_CURRENT_SOURCE_DIR}/CopyLibs.sh "${CMAKE_CURRENT_BINARY_DIR}/\${CONFIGURATION}/${APP_NAME}.app/Contents/MacOS/${APP_NAME}"
   )
 endif()
-
