@@ -55,7 +55,9 @@
 }
 
 - (void)reload {
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+    // For some reason, 'itemForRepresentedObjectAtIndexPath' is not called upon 'reloadData' in Yosemit/High Sierra,
+    // so let's make a timer
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.05 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         [self.collectionView reloadData];
     });
 }
@@ -84,16 +86,7 @@
 
 - (void)setCurrentBlockIndex:(NSInteger)currentBlockIndex {
     _currentBlockIndex = currentBlockIndex;
-    
-    if (OS_IS_BELOW_SIERRA || YES) {
-        // For some reason, 'itemForRepresentedObjectAtIndexPath' is not called upon 'reloadData' in Yosemit/High Sierra
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-            [self.collectionView reloadData];
-        });
-    }
-    else {
-        [self.collectionView reloadData];
-    }
+    [self reload];
 }
 
 - (GlyphLabelCategory)glyphLabelCategory {
