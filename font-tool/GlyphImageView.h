@@ -15,7 +15,7 @@ typedef NS_ENUM(NSInteger, GlyphImageViewOptions) {
     GlyphImageViewShowOrgin        = 1 << 0,
     GlyphImageViewShowAscender     = 1 << 1,
     GlyphImageViewShowDescender    = 1 << 2,
-    GlyphImageViewShowBaeline      = 1 << 3,
+    GlyphImageViewShowBaseline     = 1 << 3,
     GlyphImageViewShowEmBox        = 1 << 4,
     GlyphImageViewShowLeftBearing  = 1 << 5,
     GlyphImageViewShowHoriAdvance  = 1 << 6,

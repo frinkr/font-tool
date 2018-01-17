@@ -194,10 +194,27 @@
                                       glyph.image.size.width * glyphImageScale,
                                       glyph.image.size.height * glyphImageScale);
         
+        if (glyph.GID == 0)
+            glyphImage = nil;//[glyphImage gaussianBlurOfRadius:3];
         [glyphImage drawInRect:imageRect
                       fromRect:NSZeroRect
                      operation:NSCompositeSourceOver
                       fraction:1];
+        
+        // let's draw system font if gid is 0
+        if (glyph.GID == 0) {
+            UInt32 cp = glyph.codepoint;
+            NSString * unicodeString = [[NSString alloc] initWithBytes:&cp length:sizeof(cp) encoding:NSUTF32LittleEndianStringEncoding];
+            
+            NSMutableParagraphStyle *style = [[NSParagraphStyle defaultParagraphStyle] mutableCopy];
+            style.alignment = NSTextAlignmentCenter;
+            
+            CGFloat fontSize = MIN(imageRect.size.height, imageRect.size.width);
+            NSDictionary * attributes = [NSDictionary dictionaryWithObjects: @[[NSFont systemFontOfSize:fontSize], [NSColor redColor], style]
+                                                                    forKeys: @[NSFontAttributeName, NSForegroundColorAttributeName, NSParagraphStyleAttributeName]];
+            
+            [unicodeString drawInRect:gbox withAttributes:attributes];
+        }
         
         if (glyphScale != 1) {
             // show marks the glyph is scaled, not the natual size
@@ -211,57 +228,58 @@
             [path fill];
         }
         
-        if (self.options & GlyphImageViewShowBaeline) {
-            [self lineFrom:NSMakePoint(MIN(gbox.origin.x, leftBearing), originY)
-                        to:NSMakePoint(MAX(gbox.origin.x + emBoxSize, rightBearing), originY)
-                      dash:NO
-                     color:[NSColor greenColor]];
-        }
-        
-        if (self.options & GlyphImageViewShowOrgin) { // draw baseline mark
-            CGFloat markSize = 10;
+        if (glyph.GID != 0) {
+            if (self.options & GlyphImageViewShowBaseline) {
+                [self lineFrom:NSMakePoint(MIN(gbox.origin.x, leftBearing), originY)
+                            to:NSMakePoint(MAX(gbox.origin.x + emBoxSize, rightBearing), originY)
+                          dash:NO
+                         color:[NSColor greenColor]];
+            }
             
-            [self lineFrom:NSMakePoint(originX - markSize / 2, originY)
-                        to:NSMakePoint(originX + markSize / 2, originY)
-                      dash:NO
-                     color:[NSColor redColor]];
+            if (self.options & GlyphImageViewShowOrgin) { // draw baseline mark
+                CGFloat markSize = 10;
+                
+                [self lineFrom:NSMakePoint(originX - markSize / 2, originY)
+                            to:NSMakePoint(originX + markSize / 2, originY)
+                          dash:NO
+                         color:[NSColor redColor]];
+                
+                [self lineFrom:NSMakePoint(originX, originY - markSize / 2)
+                            to:NSMakePoint(originX, originY + markSize / 2)
+                          dash:NO
+                         color:[NSColor redColor]];
+            }
             
-            [self lineFrom:NSMakePoint(originX, originY - markSize / 2)
-                        to:NSMakePoint(originX, originY + markSize / 2)
-                      dash:NO
-                     color:[NSColor redColor]];
+            
+            if (self.options & GlyphImageViewShowAscender) {
+                [self lineFrom:NSMakePoint(originX, ascender)
+                            to:NSMakePoint(originX + advance, ascender)
+                          dash:NO
+                         color:[NSColor blueColor]];
+            }
+            
+            if (self.options & GlyphImageViewShowDescender) {
+                [self lineFrom:NSMakePoint(originX, descender)
+                            to:NSMakePoint(originX + advance, descender)
+                          dash:NO
+                         color:[NSColor blueColor]];
+            }
+            
+            if (self.options & GlyphImageViewShowLeftBearing) {
+                [self lineFrom:NSMakePoint(leftBearing, descender)
+                            to:NSMakePoint(leftBearing, ascender)
+                          dash:YES
+                         color:[NSColor redColor]];
+            }
+            
+            
+            if (self.options & GlyphImageViewShowHoriAdvance) {
+                [self lineFrom:NSMakePoint(originX + advance, descender)
+                            to:NSMakePoint(originX + advance, ascender)
+                          dash:YES
+                         color:[NSColor redColor]];
+            }
         }
-        
-        
-        if (self.options & GlyphImageViewShowAscender) {
-            [self lineFrom:NSMakePoint(originX, ascender)
-                        to:NSMakePoint(originX + advance, ascender)
-                      dash:NO
-                     color:[NSColor blueColor]];
-        }
-        
-        if (self.options & GlyphImageViewShowDescender) {
-            [self lineFrom:NSMakePoint(originX, descender)
-                        to:NSMakePoint(originX + advance, descender)
-                      dash:NO
-                     color:[NSColor blueColor]];
-        }
-        
-        if (self.options & GlyphImageViewShowLeftBearing) {
-            [self lineFrom:NSMakePoint(leftBearing, descender)
-                        to:NSMakePoint(leftBearing, ascender)
-                      dash:YES
-                     color:[NSColor redColor]];
-        }
-        
-        
-        if (self.options & GlyphImageViewShowHoriAdvance) {
-            [self lineFrom:NSMakePoint(originX + advance, descender)
-                        to:NSMakePoint(originX + advance, ascender)
-                      dash:YES
-                     color:[NSColor redColor]];
-        }
-        
         
     }
 
