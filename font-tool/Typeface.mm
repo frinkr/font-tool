@@ -28,21 +28,6 @@ static int FT_DEFAULT_DPI      = 72*4;
 
 NSString * const TypefaceErrorDomain = @"TypefaceErrorDomain";
 
-@interface NSImage(Save)
--(void)saveToFile:(NSString*) path;
-@end
-
-@implementation NSImage(Save)
-- (void)saveToFile:(NSString*) path {
-    CGImageRef cgRef = [self CGImageForProposedRect:NULL
-                                             context:nil
-                                               hints:nil];
-    NSBitmapImageRep *newRep = [[NSBitmapImageRep alloc] initWithCGImage:cgRef];
-    [newRep setSize:[self size]];   // if you want the same resolution
-    NSData *pngData = [newRep representationUsingType:NSPNGFileType properties:nil];
-    [pngData writeToFile:path atomically:YES];
-}
-@end
 
 #pragma mark ###### GlyphLookupRequest #####
 @implementation GlyphLookupRequest
@@ -1463,7 +1448,7 @@ typedef struct {
     TypefaceGlyph * g = [[TypefaceGlyph alloc] init];
 
     {
-        FT_Load_Glyph(face, gid, FT_LOAD_RENDER | FT_LOAD_NO_HINTING | (_isScalable? 0: FT_LOAD_COLOR));
+        FT_Load_Glyph(face, gid, FT_LOAD_RENDER | (_isScalable? 0: FT_LOAD_COLOR));
         FT_GlyphSlot slot = face->glyph;
         NSImage * image = [self imageFromBitmap:slot->bitmap];
         NSInteger offsetX = slot->bitmap_left;
