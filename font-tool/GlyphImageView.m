@@ -135,14 +135,14 @@
         NSInteger glyphTop = glyph.image.size.height + glyph.imageOffsetY;
         NSInteger glyphBottom = glyph.imageOffsetY;
         
-        CGFloat scaleTop = 1.0, scaleBottom = 1.0, scaleX = 1.0;
+        CGFloat scaleTop = 1.0, scaleBottom = 1.0;
         if (glyphTop > (faceAscenderPx + self.edgeInsets.top))
             scaleTop = (faceAscenderPx + self.edgeInsets.top) / glyphTop;
         if (glyphBottom < (faceDescenderPx - self.edgeInsets.bottom))
             scaleBottom = (faceDescenderPx - self.edgeInsets.bottom) / glyphBottom;
         
         // glyph scaling related to EM box
-        CGFloat glyphScale = MIN(scaleX, MIN(scaleTop, scaleBottom));
+        CGFloat glyphScale = MIN(1.0, MIN(scaleTop, scaleBottom));
         CGFloat emBoxSize = MIN(faceBoxPx, MIN(bounds.size.width, bounds.size.height));
         CGFloat facePxScale = emBoxSize/faceBoxPx;
         
@@ -150,23 +150,23 @@
         
         // let's draw an EM box first
         
-        CGRect gbox = CGRectMake(bounds.origin.x + (bounds.size.width - emBoxSize) / 2,
+        CGRect emBox = CGRectMake(bounds.origin.x + (bounds.size.width - emBoxSize) / 2,
                                   bounds.origin.y + (bounds.size.height - emBoxSize) / 2,
                                   emBoxSize, emBoxSize);
         
         if (self.options & GlyphImageViewShowEmBox) {
             [[NSColor grayColor] set];
-            NSBezierPath * emBoxPath = [NSBezierPath bezierPathWithRect:gbox];
+            NSBezierPath * emBoxPath = [NSBezierPath bezierPathWithRect:emBox];
         
             [emBoxPath stroke];
         }
         
         CGFloat advance = [typeface fontUnitToPixel:glyph.horiAdvance withFontSize:imageFontSize] * glyphImageScale;
         CGFloat widthFixed = [typeface fontUnitToPixel:glyph.width + glyph.horiBearingX withFontSize:imageFontSize] * glyphImageScale;
-        CGFloat originX = gbox.origin.x + (emBoxSize - widthFixed) / 2;
-        CGFloat originY = gbox.origin.y - faceDescenderPx * facePxScale;
+        CGFloat originX = emBox.origin.x + (widthFixed > emBoxSize? 0: (emBoxSize - widthFixed) / 2);
+        CGFloat originY = emBox.origin.y - faceDescenderPx * facePxScale;
         CGFloat ascender  = originY + faceAscenderPx * facePxScale;
-        CGFloat descender = gbox.origin.y;
+        CGFloat descender = emBox.origin.y;
         
         
         CGFloat leftBearing = originX + [typeface fontUnitToPixel:glyph.horiBearingX withFontSize:imageFontSize] * glyphImageScale;
@@ -174,7 +174,7 @@
         
         if (background && ![background isEqual:[NSColor clearColor]]) {
             [background setFill];
-            NSBezierPath * path = [NSBezierPath bezierPathWithRect:gbox];
+            NSBezierPath * path = [NSBezierPath bezierPathWithRect:emBox];
             [path fill];
         }
         
@@ -213,15 +213,15 @@
             NSDictionary * attributes = [NSDictionary dictionaryWithObjects: @[[NSFont systemFontOfSize:fontSize], [NSColor redColor], style]
                                                                     forKeys: @[NSFontAttributeName, NSForegroundColorAttributeName, NSParagraphStyleAttributeName]];
             
-            [unicodeString drawInRect:gbox withAttributes:attributes];
+            [unicodeString drawInRect:emBox withAttributes:attributes];
         }
         
         if (glyphScale != 1) {
             // show marks the glyph is scaled, not the natual size
             CGFloat radius = 2;
             
-            NSBezierPath * path = [NSBezierPath bezierPathWithRoundedRect:NSMakeRect(gbox.origin.x + gbox.size.width - radius/2,
-                                                                                     gbox.origin.y + gbox.size.height - radius/2,
+            NSBezierPath * path = [NSBezierPath bezierPathWithRoundedRect:NSMakeRect(emBox.origin.x + emBox.size.width - radius/2,
+                                                                                     emBox.origin.y + emBox.size.height - radius/2,
                                                                                      radius*2, radius*2)
                                                                   xRadius:radius yRadius:radius];
             [[NSColor knobColor] setFill];
@@ -230,8 +230,8 @@
         
         if (glyph.GID != 0) {
             if (self.options & GlyphImageViewShowBaseline) {
-                [self lineFrom:NSMakePoint(MIN(gbox.origin.x, leftBearing), originY)
-                            to:NSMakePoint(MAX(gbox.origin.x + emBoxSize, rightBearing), originY)
+                [self lineFrom:NSMakePoint(MIN(emBox.origin.x, leftBearing), originY)
+                            to:NSMakePoint(MAX(emBox.origin.x + emBoxSize, rightBearing), originY)
                           dash:NO
                          color:[NSColor greenColor]];
             }
