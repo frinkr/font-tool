@@ -20,22 +20,22 @@
                             <allowedToolbarItems>
                                 <toolbarItem implicitItemIdentifier="NSToolbarSpaceItem" id="dhL-7h-rsW"/>
                                 <toolbarItem implicitItemIdentifier="NSToolbarFlexibleSpaceItem" id="HEc-Hj-BmQ"/>
-                                <toolbarItem implicitItemIdentifier="69F09187-E24E-4FF5-A13A-00EAB5244870" label="Load" paletteLabel="Load" toolTip="Load" tag="-1" image="Fractions" id="Tzm-Kd-JnW">
+                                <toolbarItem implicitItemIdentifier="69F09187-E24E-4FF5-A13A-00EAB5244870" label="Load" paletteLabel="Load" toolTip="Load" tag="-1" image="Open" id="Tzm-Kd-JnW">
                                     <connections>
                                         <action selector="doLoad:" target="Sf7-lD-tsG" id="wyt-C0-PJc"/>
                                     </connections>
                                 </toolbarItem>
-                                <toolbarItem implicitItemIdentifier="2E48C104-7DC0-42CF-8EE1-558C77FAACBD" label="Save" paletteLabel="Save" toolTip="Save" tag="-1" image="History" id="Bz7-Hs-q8n">
+                                <toolbarItem implicitItemIdentifier="2E48C104-7DC0-42CF-8EE1-558C77FAACBD" label="Save" paletteLabel="Save" toolTip="Save" tag="-1" image="Save" id="Bz7-Hs-q8n">
                                     <connections>
                                         <action selector="doSave:" target="Sf7-lD-tsG" id="AM7-xA-BJO"/>
                                     </connections>
                                 </toolbarItem>
-                                <toolbarItem implicitItemIdentifier="2EAAB940-D670-4376-BF86-9925075C5D75" label="OK" paletteLabel="OK" toolTip="OK" tag="-1" image="NSActionTemplate" id="i1e-ar-WvI">
+                                <toolbarItem implicitItemIdentifier="2EAAB940-D670-4376-BF86-9925075C5D75" label="OK" paletteLabel="OK" toolTip="OK" tag="-1" image="OK" id="i1e-ar-WvI">
                                     <connections>
                                         <action selector="doOK:" target="Sf7-lD-tsG" id="177-mv-vNg"/>
                                     </connections>
                                 </toolbarItem>
-                                <toolbarItem implicitItemIdentifier="D86B65CB-B7B2-4ADF-9EB1-E0EB6BDA0BE8" label="Cancel" paletteLabel="Cancel" toolTip="Cancel" tag="-1" image="NSColumnViewTemplate" id="mAe-XY-Gs9">
+                                <toolbarItem implicitItemIdentifier="D86B65CB-B7B2-4ADF-9EB1-E0EB6BDA0BE8" label="Cancel" paletteLabel="Cancel" toolTip="Cancel" tag="-1" image="Cancel" id="mAe-XY-Gs9">
                                     <connections>
                                         <action selector="doCancel:" target="Sf7-lD-tsG" id="Q9K-G0-3VA"/>
                                     </connections>
@@ -45,9 +45,10 @@
                             <defaultToolbarItems>
                                 <toolbarItem reference="Tzm-Kd-JnW"/>
                                 <toolbarItem reference="Bz7-Hs-q8n"/>
+                                <toolbarItem reference="Fkt-SP-TKq"/>
                                 <toolbarItem reference="HEc-Hj-BmQ"/>
-                                <toolbarItem reference="i1e-ar-WvI"/>
                                 <toolbarItem reference="mAe-XY-Gs9"/>
+                                <toolbarItem reference="i1e-ar-WvI"/>
                             </defaultToolbarItems>
                         </toolbar>
                         <connections>
@@ -82,7 +83,7 @@
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                             <size key="minSize" width="593" height="255"/>
-                                            <size key="maxSize" width="593" height="10000000"/>
+                                            <size key="maxSize" width="610" height="10000000"/>
                                             <color key="insertionPointColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
                                         </textView>
                                     </subviews>
@@ -476,13 +477,14 @@ Gw
         </scene>
     </scenes>
     <resources>
-        <image name="Fractions" width="256" height="256"/>
+        <image name="Cancel" width="256" height="256"/>
         <image name="History" width="128" height="128"/>
-        <image name="NSActionTemplate" width="14" height="14"/>
         <image name="NSAddTemplate" width="11" height="11"/>
-        <image name="NSColumnViewTemplate" width="16" height="10"/>
         <image name="NSInfo" width="32" height="32"/>
         <image name="NSRemoveTemplate" width="11" height="11"/>
+        <image name="OK" width="256" height="256"/>
+        <image name="Open" width="256" height="256"/>
+        <image name="Save" width="256" height="256"/>
         <image name="toolbarItem:SBk-Ws-XgN:image" width="128" height="128">
             <mutableData key="keyedArchiveRepresentation">
 YnBsaXN0MDDUAQIDBAUGPD1YJHZlcnNpb25YJG9iamVjdHNZJGFyY2hpdmVyVCR0b3ASAAGGoK0HCBMY
