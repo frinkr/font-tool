@@ -9,6 +9,7 @@
 #import "TypefaceListWindowController.h"
 #import "TypefaceDocumentController.h"
 #import "TypefaceManager.h"
+#import "LuaScript.h"
 
 static TypefaceListWindowController * sharedTypefaceListWC;
 
@@ -34,10 +35,22 @@ typedef NS_ENUM(NSInteger, TypefaceVariationFlavor) {
 @property TypefaceVariationFlavor variationFlavor;
 @property NSString * familyName;
 
+@property LuaScript * luaScript;
+
+- (instancetype)initWithLuaScript:(NSString*)script;
+- (BOOL)filter:(TMTypeface*)face;
 - (BOOL)isEmpty;
 @end
 
 @implementation TypefaceListFilter
+
+- (instancetype)initWithLuaScript:(NSString*)script{
+    if (self = [super init]) {
+        self.luaScript = [[LuaScript alloc] initWithString:script];
+    }
+    return self;
+}
+
 - (instancetype)init {
     if (self = [super init]) {
         self.openTypeScripts = [[NSMutableArray<TypefaceTag*> alloc] init];
@@ -77,8 +90,14 @@ typedef NS_ENUM(NSInteger, TypefaceVariationFlavor) {
     copy.format = self.format;
     copy.variationFlavor = self.variationFlavor;
     copy.familyName = [self.familyName mutableCopyWithZone:zone];
+    copy.luaScript = self.luaScript;
     return copy;
 }
+
+- (BOOL)filter:(TMTypeface *)face {
+    return [self.luaScript runWithFont:face];
+}
+
 @end
 
 
@@ -90,6 +109,7 @@ typedef NS_ENUM(NSInteger, TypefaceVariationFlavor) {
 
 @implementation TMTypeface(Filter)
 - (BOOL)filter:(TypefaceListFilter*)filter {
+    return [filter filter:self];
     if (self.attributes.serifStyle != filter.serifStyle)
         return NO;
     
@@ -208,6 +228,7 @@ typedef NS_ENUM(NSInteger, TypefaceVariationFlavor) {
 @property (weak) IBOutlet NSSegmentedControl *formatSegments;
 
 @property (strong) TypefaceListFilter * filter;
+
 @end
 
 static uint32_t   toolBarTags[] = {
@@ -224,7 +245,14 @@ static uint32_t   toolBarTags[] = {
     
     // Implement this method to handle any initialization after your window controller's window has been loaded from its nib file.
     self.window.delegate = self;
-    self.filter = [[TypefaceListFilter alloc] init];
+    
+    NSString * script = @" \
+        function filterFont(font) \n \
+            return string.find(string.lower(font.familyName), 'myriad') \n \
+        end \n \
+    ";
+    
+    self.filter = [[TypefaceListFilter alloc] initWithLuaScript:script];
     
     self.moreButton.wantsLayer = YES;
     //self.window.titleVisibility = NSWindowTitleHidden;
@@ -283,7 +311,7 @@ static uint32_t   toolBarTags[] = {
 - (IBAction)doShowMoreOpenTypeFeatures:(id)sender {
     NSWindowController * wc = [[NSStoryboard storyboardWithName:@"TypefaceListWindow" bundle:nil] instantiateControllerWithIdentifier:@"openTypeFeaturesWindowController"];
     TypefaceListFilterViewController * vc = (TypefaceListFilterViewController*)wc.contentViewController;
-    vc.filter = [self.filter mutableCopy];
+    vc.filter = self.filter;
     [self.window beginSheet:wc.window completionHandler:^(NSModalResponse returnCode) {
         if (returnCode == NSModalResponseOK) {
             self.filter = vc.filter;
@@ -645,16 +673,16 @@ static uint32_t   toolBarTags[] = {
     [self.otFeaturesTextField setStringValue:[sortedTags componentsJoinedByString:@", "]];
     
     // family name
-    self.familyNameTextField.stringValue = self.filter.familyName;
+    //self.familyNameTextField.stringValue = self.filter.familyName;
     
     // design langauges
-    self.designLanguagesTextField.stringValue = [self.filter.designLanguages componentsJoinedByString:@", "];
+    //self.designLanguagesTextField.stringValue = [self.filter.designLanguages componentsJoinedByString:@", "];
     
     // ot scripts
-    self.otScriptsTextField.stringValue = [self.filter.openTypeScripts componentsJoinedByString:@", "];
+    //self.otScriptsTextField.stringValue = [self.filter.openTypeScripts componentsJoinedByString:@", "];
     
     // ot languages
-    self.otLanguagesTextField.stringValue = [self.filter.openTypeLanguages componentsJoinedByString:@", "];
+    //self.otLanguagesTextField.stringValue = [self.filter.openTypeLanguages componentsJoinedByString:@", "];
 }
 
 - (void)cancelOperation:(id)sender {

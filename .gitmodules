@@ -1,3 +1,6 @@
 [submodule "harfbuzz-icu-freetype"]
 	path = harfbuzz-icu-freetype
 	url = https://github.com/frinkr/harfbuzz-icu-freetype.git
+[submodule "LuaBridge"]
+	path = LuaBridge
+	url = https://github.com/vinniefalco/LuaBridge.git

@@ -40,6 +40,13 @@ else()
 
 endif()
 
+# Lua
+pkg_check_modules(LUA REQUIRED lua)
+include_directories(${LUA_INCLUDE_DIRS})
+list(APPEND THIRD_PARTY_LIBS ${LUA_LDFLAGS})
+
+include_directories(${CMAKE_SOURCE_DIR}/LuaBridge/Source)
+
 file(GLOB HEADER_FILES "*.h")
 
 set(SOURCE_FILES
@@ -68,6 +75,7 @@ set(SOURCE_FILES
   TypefaceListWindowController.m
   TypefaceVariationViewController.m
   ToolBox.m
+  LuaScript.mm
   )
 
 if(BUILD_FREETYPE_HARFBUZZ)
