@@ -7,7 +7,7 @@
 //
 #import "TypefaceWindowController.h"
 #import "TypefaceDocumentController.h"
-#import "TypefaceListWindowController.h"
+#import "TypefaceSelectorWindowController.h"
 #import "TypefaceStylesWindowController.h"
 #import "TypefaceManager.h"
 #import "Shapper.h"
@@ -75,7 +75,7 @@
 }
 
 - (IBAction)openFontFromList:(id)sender {
-    TypefaceDescriptor * font = [TypefaceListWindowController selectTypeface];
+    TypefaceDescriptor * font = [TypefaceSelectorWindowController selectTypeface];
     if (!font)
         return;
     NSURL * path = [TypefaceDocument documentURLWithTypefaceDescriptor:font];

@@ -72,7 +72,7 @@ set(SOURCE_FILES
   TypefaceInfoViewController.m
   TypefaceWindowController.m
   TypefaceStylesWindowController.m
-  TypefaceListWindowController.m
+  TypefaceSelectorWindowController.m
   TypefaceVariationViewController.m
   ToolBox.m
   LuaScript.mm
@@ -91,7 +91,7 @@ set(LEXYACC_FILES
 
 set(NIB_FILES
   Main.storyboard
-  TypefaceListWindow.storyboard
+  TypefaceSelectorWindow.storyboard
   TypefaceStylesWindow.storyboard
   TypefaceInfoWindow.storyboard
   TypefaceVariation.storyboard

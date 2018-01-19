@@ -9,21 +9,21 @@
 #import <Cocoa/Cocoa.h>
 #import "Typeface.h"
 
-@interface TypefaceListWindowController : NSWindowController <NSWindowDelegate>
-+(TypefaceListWindowController*) sharedTypefaceListWindowController;
+@interface TypefaceSelectorWindowController : NSWindowController <NSWindowDelegate>
++(TypefaceSelectorWindowController*) sharedTypefaceListWindowController;
 +(TypefaceDescriptor*)selectTypeface;
 
 - (IBAction)doToggleFeature:(id)sender;
 
 @end
 
-@interface TypefaceListViewController : NSViewController<NSComboBoxDataSource, NSComboBoxDelegate>
+@interface TypefaceSelectorViewController : NSViewController<NSComboBoxDataSource, NSComboBoxDelegate>
 - (IBAction)cancelTypefaceSelection:(id)sender;
 - (IBAction)confirmTypeFaceSelection:(id)sender;
 @end
 
 
-@interface TypefaceListFilterViewController : NSViewController
+@interface TypefaceSelectorFilterViewController : NSViewController
 @end
 
 
