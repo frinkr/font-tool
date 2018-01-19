@@ -16,15 +16,6 @@
 namespace elua {
     class Font {
     public:
-        
-        void setVendor(const std::string & vendor) {
-            vendor_ = vendor;
-        }
-        
-        std::string vendor() const {
-            return vendor_;
-        }
-        
         void setOpenTypeFeatures(const std::set<std::string> & otFeatures) {
             openTypeFeatures_ = otFeatures;
         }
@@ -47,14 +38,23 @@ namespace elua {
         
         
     public:
-        std::set<std::string>  openTypeFeatures_;
-        std::string version;
-        std::string vendor_;
         std::string postscriptName;
+        std::string version;
         std::string familyName;
         std::string styleName;
-    
+        std::string vender;
+        
+        std::string format;
+        bool isOpenTypeVariation;
+        bool isAdobeMultiMaster;
+       
+    private:
+        std::set<std::string>  openTypeFeatures_;
     };
+    
+    void printMessage(const std::string & message) {
+        NSLog(@"<Lua> %@", [NSString stringWithUTF8String:message.c_str()]);
+    }
     
     std::string toStdString(NSString * str) {
         if (!str) return std::string();
@@ -65,22 +65,34 @@ namespace elua {
         Font f;
         f.familyName = toStdString(face.familyName);
         f.styleName = toStdString(face.styleName);
-        f.setVendor(toStdString(face.attributes.vender));
+        f.vender = toStdString(face.attributes.vender);
+        f.isOpenTypeVariation = face.attributes.isOpenTypeVariation;
+        f.isAdobeMultiMaster = face.attributes.isAdobeMultiMaster;
+        switch (face.attributes.format) {
+            case TypefaceFormatTrueType: f.format = "TrueType"; break;
+            case TypefaceFormatCFF: f.format = "CFF"; break;
+            default: f.format = "Other";
+        }
         return f;
     }
     
     void registerClasses(lua_State * L) {
         luabridge::getGlobalNamespace(L).
         beginNamespace("el")
+        .addFunction("print", printMessage)
         .beginClass<Font>("Font")
         .addConstructor<void(*)(void)>()
         .addData("postscriptName", &Font::postscriptName, false)
+        .addData("version", &Font::version, false)
         .addData("familyName", &Font::familyName, false)
         .addData("styleName", &Font::styleName, false)
-        //.addProperty("postscriptName", &Font::postscriptName, &Font::setPostscriptName)
+        .addData("vender", &Font::vender, false)
+        .addData("format", &Font::format, false)
+        .addData("isOpenTypeVariation", &Font::isOpenTypeVariation, false)
+        .addData("isAdobeMultiMaster", &Font::isAdobeMultiMaster, false)
         .addProperty("openTypeFeatures", &Font::openTypeFeatures)
         //.addProperty("name", &Font::familyName, &Font::setFamilyName)
-        .addProperty("vendor", &Font::vendor, &Font::setVendor)
+        
         .endClass()
         .endNamespace();
     }
