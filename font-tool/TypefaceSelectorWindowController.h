@@ -22,6 +22,8 @@
 - (IBAction)confirmTypeFaceSelection:(id)sender;
 @end
 
+@interface TypefaceSelectorFilterWindowController : NSWindowController <NSWindowDelegate>
+@end
 
 @interface TypefaceSelectorFilterViewController : NSViewController
 @end

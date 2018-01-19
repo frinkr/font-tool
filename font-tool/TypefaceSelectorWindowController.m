@@ -127,6 +127,9 @@ typedef NS_ENUM(NSInteger, TypefaceVariationFlavor) {
 - (IBAction)showRecentTypeMenu:(id)sender;
 @end
 
+@interface TypefaceSelectorFilterWindowController()
+@property (strong) TypefaceListFilter * filter;
+@end
 
 @interface TypefaceSelectorFilterViewController ()
 @property (unsafe_unretained) IBOutlet SourceTextView *luaScriptEditor;
@@ -190,15 +193,17 @@ typedef NS_ENUM(NSInteger, TypefaceVariationFlavor) {
 }
 
 - (IBAction)doShowMoreOpenTypeFeatures:(id)sender {
-    NSWindowController * wc = [[NSStoryboard storyboardWithName:@"TypefaceSelectorWindow" bundle:nil] instantiateControllerWithIdentifier:@"openTypeFeaturesWindowController"];
+    TypefaceSelectorFilterWindowController * wc = (TypefaceSelectorFilterWindowController*)[[NSStoryboard storyboardWithName:@"TypefaceSelectorWindow" bundle:nil] instantiateControllerWithIdentifier:@"typefaceFilterWindowController"];
     TypefaceSelectorFilterViewController * vc = (TypefaceSelectorFilterViewController*)wc.contentViewController;
+    wc.filter = self.filter;
     vc.filter = self.filter;
-    [self.window beginSheet:wc.window completionHandler:^(NSModalResponse returnCode) {
-        if (returnCode == NSModalResponseOK) {
-            TypefaceSelectorViewController * cc = (TypefaceSelectorViewController*)self.contentViewController;
-            [cc filterTypefaces:self.filter];
-        }
-    }];
+    
+    NSModalResponse response = [NSApp runModalForWindow:wc.window];
+    if (response == NSModalResponseOK) {
+        TypefaceSelectorViewController * cc = (TypefaceSelectorViewController*)self.contentViewController;
+        [cc filterTypefaces:self.filter];
+    }
+    [wc.window orderOut:nil];
 }
 
 @end
@@ -461,6 +466,59 @@ typedef NS_ENUM(NSInteger, TypefaceVariationFlavor) {
 
 @end 
 
+@implementation TypefaceSelectorFilterWindowController
+
+- (void)windowWillClose:(NSNotification *)notification {
+    [NSApp stopModal];
+}
+
+- (IBAction)doLoad:(id)sender {
+    NSOpenPanel* panel = [NSOpenPanel openPanel];
+    [panel setAllowsMultipleSelection:NO];
+    [panel setAllowedFileTypes:@[@"lua"]];
+    
+    [panel beginSheetModalForWindow:self.window completionHandler:^(NSModalResponse result) {
+        if (result == NSFileHandlingPanelOKButton) {
+            NSURL*  theDoc = [[panel URLs] objectAtIndex:0];
+            [self.vc.luaScriptEditor setSource:[NSString stringWithContentsOfURL:theDoc
+                                                                        encoding:NSUTF8StringEncoding error:NULL]];
+            
+            [self.window setRepresentedFilename:theDoc.path];
+            [self.window setTitle:theDoc.path];
+        }
+    }];
+}
+
+
+- (IBAction)doSave:(id)sender {
+    NSSavePanel*  panel = [NSSavePanel savePanel];
+    [panel setAllowedFileTypes:@[@"lua"]];
+    
+    [panel beginSheetModalForWindow:self.window completionHandler:^(NSModalResponse result) {
+        if (result == NSFileHandlingPanelOKButton) {
+            [self.vc.luaScriptEditor.source writeToURL:panel.URL
+                                            atomically:YES
+                                              encoding:NSUTF8StringEncoding
+                                                 error:NULL];
+        }
+    }];
+}
+
+- (IBAction)doOK:(id)sender {
+    [self.filter reloadWithLuaScript:self.vc.luaScriptEditor.source];
+    [NSApp stopModalWithCode:NSModalResponseOK];
+}
+
+- (IBAction)doCancel:(id)sender {
+    [NSApp stopModalWithCode:NSModalResponseCancel];
+}
+
+
+- (TypefaceSelectorFilterViewController*)vc {
+    return (TypefaceSelectorFilterViewController*)self.contentViewController;
+}
+@end
+
 @implementation TypefaceSelectorFilterViewController
 
 - (void)awakeFromNib {
@@ -478,20 +536,6 @@ typedef NS_ENUM(NSInteger, TypefaceVariationFlavor) {
     
     if (self.filter.scriptText)
         [self.luaScriptEditor setSource:self.filter.scriptText];
-    
-}
-
-- (IBAction)cancelOperation:(id)sender {
-    [self.view.window.sheetParent endSheet:self.view.window returnCode:NSModalResponseCancel];
-}
-
-- (IBAction)doConfirmOperation:(id)sender {
-    [self.filter reloadWithLuaScript:self.luaScriptEditor.source];
-    [self.view.window.sheetParent endSheet:self.view.window returnCode:NSModalResponseOK];
-}
-
-- (IBAction)doOpenWikipedia:(id)sender {
-    [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:@"https://en.wikipedia.org/wiki/List_of_typographic_features"]];
 }
 
 - (void)showAlertWithMessage:(NSString*)message {
@@ -499,7 +543,9 @@ typedef NS_ENUM(NSInteger, TypefaceVariationFlavor) {
     [alert addButtonWithTitle:@"OK"];
     [alert setMessageText:message];
     [alert setAlertStyle:NSCriticalAlertStyle];
-    [alert runModal];
+    [self.view.window beginSheet:alert completionHandler:^(NSModalResponse returnCode) {
+        
+    }];
 }
 
 @end
