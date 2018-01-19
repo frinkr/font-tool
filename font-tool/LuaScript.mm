@@ -104,7 +104,7 @@ namespace elua {
     return self;
 }
 
--(instancetype)initWithString:(NSString*)script {
+-(instancetype)initWithBuffer:(NSString*)script {
     if ((self = [super init]) && [self createState]) {
         const char* utf8 = [script UTF8String];
         int lua_error = LUA_OK;

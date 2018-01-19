@@ -11,21 +11,21 @@
         <scene sceneID="Cx3-c0-H59">
             <objects>
                 <windowController storyboardIdentifier="typefaceFilterWindowController" id="Sf7-lD-tsG" customClass="TypefaceSelectorFilterWindowController" sceneMemberID="viewController">
-                    <window key="window" title="Window" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" oneShot="NO" releasedWhenClosed="NO" showsToolbarButton="NO" visibleAtLaunch="NO" frameAutosaveName="" animationBehavior="default" id="Qcl-Fz-dk6">
+                    <window key="window" title="Untitled" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" oneShot="NO" releasedWhenClosed="NO" showsToolbarButton="NO" visibleAtLaunch="NO" frameAutosaveName="" animationBehavior="default" id="Qcl-Fz-dk6">
                         <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
                         <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
                         <rect key="contentRect" x="1734" y="62" width="365" height="143"/>
                         <rect key="screenRect" x="1440" y="-300" width="1920" height="1177"/>
-                        <toolbar key="toolbar" implicitIdentifier="2BE97926-D49F-45F4-B129-F6701B2B3BED" autosavesConfiguration="NO" allowsUserCustomization="NO" displayMode="iconOnly" sizeMode="small" id="Ily-XX-cyY">
+                        <toolbar key="toolbar" implicitIdentifier="2BE97926-D49F-45F4-B129-F6701B2B3BED" autosavesConfiguration="NO" allowsUserCustomization="NO" displayMode="iconAndLabel" sizeMode="small" id="Ily-XX-cyY">
                             <allowedToolbarItems>
                                 <toolbarItem implicitItemIdentifier="NSToolbarSpaceItem" id="dhL-7h-rsW"/>
                                 <toolbarItem implicitItemIdentifier="NSToolbarFlexibleSpaceItem" id="HEc-Hj-BmQ"/>
-                                <toolbarItem implicitItemIdentifier="69F09187-E24E-4FF5-A13A-00EAB5244870" label="Load" paletteLabel="Load" toolTip="Load" tag="-1" image="Open" id="Tzm-Kd-JnW">
+                                <toolbarItem implicitItemIdentifier="69F09187-E24E-4FF5-A13A-00EAB5244870" label="Load" paletteLabel="Load" toolTip="Load script" tag="-1" image="Open" id="Tzm-Kd-JnW">
                                     <connections>
                                         <action selector="doLoad:" target="Sf7-lD-tsG" id="wyt-C0-PJc"/>
                                     </connections>
                                 </toolbarItem>
-                                <toolbarItem implicitItemIdentifier="2E48C104-7DC0-42CF-8EE1-558C77FAACBD" label="Save" paletteLabel="Save" toolTip="Save" tag="-1" image="Save" id="Bz7-Hs-q8n">
+                                <toolbarItem implicitItemIdentifier="2E48C104-7DC0-42CF-8EE1-558C77FAACBD" label="Save" paletteLabel="Save" toolTip="Save script" tag="-1" image="Save" id="Bz7-Hs-q8n">
                                     <connections>
                                         <action selector="doSave:" target="Sf7-lD-tsG" id="AM7-xA-BJO"/>
                                     </connections>
@@ -41,10 +41,16 @@
                                     </connections>
                                 </toolbarItem>
                                 <toolbarItem implicitItemIdentifier="BA56A9E9-9F2D-4449-8C85-1AAC72C0A59C" label="Help" paletteLabel="Help" tag="-1" image="NSInfo" id="Fkt-SP-TKq"/>
+                                <toolbarItem implicitItemIdentifier="B2BDA47B-18EB-42D5-88BD-5DC1AE185B32" label="Clear" paletteLabel="Clear" toolTip="Clear text" tag="-1" image="Clear" id="YmW-wr-IkE">
+                                    <connections>
+                                        <action selector="doClear:" target="Sf7-lD-tsG" id="SAl-2C-gdt"/>
+                                    </connections>
+                                </toolbarItem>
                             </allowedToolbarItems>
                             <defaultToolbarItems>
                                 <toolbarItem reference="Tzm-Kd-JnW"/>
                                 <toolbarItem reference="Bz7-Hs-q8n"/>
+                                <toolbarItem reference="YmW-wr-IkE"/>
                                 <toolbarItem reference="Fkt-SP-TKq"/>
                                 <toolbarItem reference="HEc-Hj-BmQ"/>
                                 <toolbarItem reference="mAe-XY-Gs9"/>
@@ -478,6 +484,7 @@ Gw
     </scenes>
     <resources>
         <image name="Cancel" width="256" height="256"/>
+        <image name="Clear" width="256" height="256"/>
         <image name="History" width="128" height="128"/>
         <image name="NSAddTemplate" width="11" height="11"/>
         <image name="NSInfo" width="32" height="32"/>

@@ -28,32 +28,49 @@ typedef NS_ENUM(NSInteger, TypefaceVariationFlavor) {
 @interface TypefaceListFilter : NSObject
 
 @property LuaScript * luaScript;
-@property NSString * scriptText;
+@property NSString * luaScriptBuffer;
+@property NSString * luaScriptFile;
 
-- (instancetype)initWithLuaScript:(NSString*)script;
+- (instancetype)initWithBuffer:(NSString*)script;
+- (instancetype)initWithFile:(NSString*)filePath;
 - (BOOL)filter:(TMTypeface*)face;
 @end
 
 @implementation TypefaceListFilter
 
-- (instancetype)initWithLuaScript:(NSString*)script{
+- (instancetype)initWithBuffer:(NSString*)script{
     if (self = [super init]) {
-        [self reloadWithLuaScript:script];
+        [self reloadWithBuffer:script];
     }
     return self;
 }
 
-- (BOOL)reloadWithLuaScript:(NSString*) script {
+- (instancetype)initWithFile:(NSString*)filePath {
+    if (self = [super init]) {
+        [self reloadWithFile:filePath];
+    }
+    return self;
+}
+
+- (BOOL)reloadWithBuffer:(NSString*) script {
     NSString *trimmedText = [script stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
     if (trimmedText.length == 0) {
-        self.scriptText = trimmedText;
+        self.luaScriptBuffer = trimmedText;
         self.luaScript = nil;
     }
     else {
-        self.scriptText = script;
-        self.luaScript = [[LuaScript alloc] initWithString:script];
+        self.luaScriptBuffer = script;
+        self.luaScript = [[LuaScript alloc] initWithBuffer:script];
     }
+    self.luaScriptFile = nil;
 
+    return true;
+}
+
+- (BOOL)reloadWithFile:(NSString*)filePath {
+    self.luaScriptBuffer = nil;
+    self.luaScriptFile = filePath;
+    self.luaScript =  [[LuaScript alloc] initWithFile:filePath];
     return true;
 }
 
@@ -64,7 +81,7 @@ typedef NS_ENUM(NSInteger, TypefaceVariationFlavor) {
 }
 
 - (BOOL)isEmpty {
-    return !self.scriptText;
+    return !self.luaScript ;
 }
 @end
 
@@ -129,6 +146,7 @@ typedef NS_ENUM(NSInteger, TypefaceVariationFlavor) {
 
 @interface TypefaceSelectorFilterWindowController()
 @property (strong) TypefaceListFilter * filter;
+@property (nonatomic) NSString * filePath;
 @end
 
 @interface TypefaceSelectorFilterViewController ()
@@ -146,12 +164,7 @@ typedef NS_ENUM(NSInteger, TypefaceVariationFlavor) {
     
     // Implement this method to handle any initialization after your window controller's window has been loaded from its nib file.
     self.window.delegate = self;
-    
-    NSString * script = [NSString stringWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"SampleScripts/kern" ofType:@"lua"]
-                                                  encoding:NSUTF8StringEncoding
-                                                     error:NULL];
-    
-    self.filter = [[TypefaceListFilter alloc] initWithLuaScript:script];
+    self.filter = [[TypefaceListFilter alloc] initWithBuffer:nil];
     
     self.moreButton.wantsLayer = YES;
     self.window.titleVisibility = NSWindowTitleHidden;
@@ -472,40 +485,71 @@ typedef NS_ENUM(NSInteger, TypefaceVariationFlavor) {
     [NSApp stopModal];
 }
 
+- (NSString*)applicationLibraryDirectory {
+    NSString *libraryPath = [NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES) objectAtIndex:0];
+    NSString *appName = [NSBundle mainBundle].infoDictionary[@"CFBundleDisplayName"];
+    NSString *path = [NSString pathWithComponents:@[libraryPath, appName]];
+    
+    [[NSFileManager defaultManager] createDirectoryAtPath:path
+                              withIntermediateDirectories:YES
+                                               attributes:nil
+                                                    error:nil];
+    return path;
+}
+
 - (IBAction)doLoad:(id)sender {
     NSOpenPanel* panel = [NSOpenPanel openPanel];
     [panel setAllowsMultipleSelection:NO];
     [panel setAllowedFileTypes:@[@"lua"]];
+    [panel setDirectoryURL:[NSURL fileURLWithPath:[self applicationLibraryDirectory] isDirectory:YES]];
     
     [panel beginSheetModalForWindow:self.window completionHandler:^(NSModalResponse result) {
         if (result == NSFileHandlingPanelOKButton) {
             NSURL*  theDoc = [[panel URLs] objectAtIndex:0];
             [self.vc.luaScriptEditor setSource:[NSString stringWithContentsOfURL:theDoc
-                                                                        encoding:NSUTF8StringEncoding error:NULL]];
+                                                                        encoding:NSUTF8StringEncoding
+                                                                           error:NULL]];
             
-            [self.window setRepresentedFilename:theDoc.path];
-            [self.window setTitle:theDoc.path];
+            self.filePath = theDoc.path;
         }
     }];
 }
 
-
 - (IBAction)doSave:(id)sender {
     NSSavePanel*  panel = [NSSavePanel savePanel];
     [panel setAllowedFileTypes:@[@"lua"]];
-    
+    [panel setDirectoryURL:[NSURL fileURLWithPath:[self applicationLibraryDirectory] isDirectory:YES]];
+
     [panel beginSheetModalForWindow:self.window completionHandler:^(NSModalResponse result) {
         if (result == NSFileHandlingPanelOKButton) {
             [self.vc.luaScriptEditor.source writeToURL:panel.URL
                                             atomically:YES
                                               encoding:NSUTF8StringEncoding
                                                  error:NULL];
+            self.filePath = panel.URL.path;
         }
     }];
 }
 
+- (IBAction)doClear:(id)sender {
+    self.vc.luaScriptEditor.source = @"";
+}
+
 - (IBAction)doOK:(id)sender {
-    [self.filter reloadWithLuaScript:self.vc.luaScriptEditor.source];
+    BOOL loadFromFile = NO;
+    if (self.filePath) {
+        NSString * fileContent =
+        [NSString stringWithContentsOfURL:[NSURL fileURLWithPath:self.filePath isDirectory:NO]
+                                 encoding:NSUTF8StringEncoding
+                                    error:NULL];
+        if ([self.vc.luaScriptEditor.source isEqualToString:fileContent])
+            loadFromFile = YES;
+    }
+    if (loadFromFile)
+        [self.filter reloadWithFile:self.filePath];
+    else
+        [self.filter reloadWithBuffer:self.vc.luaScriptEditor.source];
+    
     [NSApp stopModalWithCode:NSModalResponseOK];
 }
 
@@ -513,6 +557,11 @@ typedef NS_ENUM(NSInteger, TypefaceVariationFlavor) {
     [NSApp stopModalWithCode:NSModalResponseCancel];
 }
 
+- (void)setFilePath:(NSString *)filePath {
+    _filePath = filePath;
+    [self.window setRepresentedFilename:filePath];
+    [self.window setTitle:filePath];
+}
 
 - (TypefaceSelectorFilterViewController*)vc {
     return (TypefaceSelectorFilterViewController*)self.contentViewController;
@@ -534,8 +583,19 @@ typedef NS_ENUM(NSInteger, TypefaceVariationFlavor) {
     [keywords setObject:[NSColor redColor] forKey:@"lua"];
     [self.luaScriptEditor setKeywordColors:keywords];
     
-    if (self.filter.scriptText)
-        [self.luaScriptEditor setSource:self.filter.scriptText];
+    if (self.filter.luaScriptBuffer)
+        [self.luaScriptEditor setSource:self.filter.luaScriptBuffer];
+    else if (self.filter.luaScriptFile) {
+        self.luaScriptEditor.source = [NSString stringWithContentsOfFile:self.filter.luaScriptFile
+                                                                encoding:NSUTF8StringEncoding
+                                                                   error:NULL];
+        
+        self.wc.filePath = self.filter.luaScriptFile;
+    }
+}
+
+- (TypefaceSelectorFilterWindowController*)wc {
+    return (TypefaceSelectorFilterWindowController*)self.view.window.windowController;
 }
 
 - (void)showAlertWithMessage:(NSString*)message {

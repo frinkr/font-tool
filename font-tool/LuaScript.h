@@ -5,7 +5,7 @@
 
 @interface LuaScript : NSObject
 -(instancetype)initWithFile:(NSString*)scriptFile;
--(instancetype)initWithString:(NSString*)script;
+-(instancetype)initWithBuffer:(NSString*)script;
 
 -(BOOL)runWithFont:(TMTypeface*)font;
 @end
