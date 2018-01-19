@@ -76,6 +76,7 @@ set(SOURCE_FILES
   TypefaceVariationViewController.m
   ToolBox.m
   LuaScript.mm
+  SourceTextView.m
   )
 
 if(BUILD_FREETYPE_HARFBUZZ)
@@ -108,7 +109,9 @@ set(RESOURCE_FILES
   Resources/Assets.xcassets
   Resources/AppIcon.icns
   Resources/DevLinks.plist
-  Resources/UNIDATA)
+  Resources/UNIDATA
+  Resources/Keyword-Colors
+  Resources/SampleScripts)
 
 
 add_executable(

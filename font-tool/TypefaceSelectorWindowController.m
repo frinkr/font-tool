@@ -10,6 +10,7 @@
 #import "TypefaceDocumentController.h"
 #import "TypefaceManager.h"
 #import "LuaScript.h"
+#import "SourceTextView.h"
 
 static TypefaceSelectorWindowController * sharedTypefaceListWC;
 
@@ -43,8 +44,16 @@ typedef NS_ENUM(NSInteger, TypefaceVariationFlavor) {
 }
 
 - (BOOL)reloadWithLuaScript:(NSString*) script {
-    self.scriptText = script;
-    self.luaScript = [[LuaScript alloc] initWithString:script];
+    NSString *trimmedText = [script stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+    if (trimmedText.length == 0) {
+        self.scriptText = trimmedText;
+        self.luaScript = nil;
+    }
+    else {
+        self.scriptText = script;
+        self.luaScript = [[LuaScript alloc] initWithString:script];
+    }
+
     return true;
 }
 
@@ -120,7 +129,7 @@ typedef NS_ENUM(NSInteger, TypefaceVariationFlavor) {
 
 
 @interface TypefaceSelectorFilterViewController ()
-@property (weak) IBOutlet NSTextField *luaScriptEditor;
+@property (unsafe_unretained) IBOutlet SourceTextView *luaScriptEditor;
 @property (strong) TypefaceListFilter * filter;
 @end
 
@@ -135,16 +144,14 @@ typedef NS_ENUM(NSInteger, TypefaceVariationFlavor) {
     // Implement this method to handle any initialization after your window controller's window has been loaded from its nib file.
     self.window.delegate = self;
     
-    NSString * script = @" \
-        function filterFont(font) \n \
-            return string.find(string.lower(font.familyName), 'myriad') \n \
-        end \n \
-    ";
+    NSString * script = [NSString stringWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"SampleScripts/kern" ofType:@"lua"]
+                                                  encoding:NSUTF8StringEncoding
+                                                     error:NULL];
     
     self.filter = [[TypefaceListFilter alloc] initWithLuaScript:script];
     
     self.moreButton.wantsLayer = YES;
-    //self.window.titleVisibility = NSWindowTitleHidden;
+    self.window.titleVisibility = NSWindowTitleHidden;
 }
 
 - (void)windowWillClose:(NSNotification *)notification {
@@ -463,8 +470,15 @@ typedef NS_ENUM(NSInteger, TypefaceVariationFlavor) {
 - (void)viewWillAppear {
     [super viewWillAppear];
     
+    // setup Lua editor
+    [self.luaScriptEditor setLanguage:kSourceTextViewLanguage_Lua];
+    NSMutableDictionary* keywords = [SourceTextView keywordColorsFromKeywordsPropertyList:[[NSBundle mainBundle] pathForResource:@"Keyword-Colors/Lua" ofType:@"plist"]];
+    [keywords setObject:[NSColor redColor] forKey:@"lua"];
+    [self.luaScriptEditor setKeywordColors:keywords];
+    
     if (self.filter.scriptText)
-        self.luaScriptEditor.stringValue = self.filter.scriptText;
+        [self.luaScriptEditor setSource:self.filter.scriptText];
+    
 }
 
 - (IBAction)cancelOperation:(id)sender {
@@ -472,7 +486,7 @@ typedef NS_ENUM(NSInteger, TypefaceVariationFlavor) {
 }
 
 - (IBAction)doConfirmOperation:(id)sender {
-    [self.filter reloadWithLuaScript:self.luaScriptEditor.stringValue];
+    [self.filter reloadWithLuaScript:self.luaScriptEditor.source];
     [self.view.window.sheetParent endSheet:self.view.window returnCode:NSModalResponseOK];
 }
 
