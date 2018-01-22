@@ -9,7 +9,7 @@
         <scene sceneID="NCM-uv-Eut">
             <objects>
                 <windowController storyboardIdentifier="luaScriptConsoleWindowController" id="gXO-9v-LYb" customClass="LuaScriptConsoleWindowController" sceneMemberID="viewController">
-                    <window key="window" title="Window" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" oneShot="NO" releasedWhenClosed="NO" showsToolbarButton="NO" visibleAtLaunch="NO" frameAutosaveName="" animationBehavior="default" id="eSg-uQ-mEM">
+                    <window key="window" title="Lua Console" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" oneShot="NO" releasedWhenClosed="NO" showsToolbarButton="NO" visibleAtLaunch="NO" frameAutosaveName="" animationBehavior="default" id="eSg-uQ-mEM" customClass="NSPanel">
                         <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
                         <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
                         <rect key="contentRect" x="1734" y="106" width="480" height="270"/>
@@ -19,6 +19,7 @@
                         </connections>
                     </window>
                     <connections>
+                        <outlet property="panel" destination="eSg-uQ-mEM" id="TiT-qB-8ha"/>
                         <segue destination="w1j-qm-NTw" kind="relationship" relationship="window.shadowedContentViewController" id="0f6-ce-UQX"/>
                     </connections>
                 </windowController>

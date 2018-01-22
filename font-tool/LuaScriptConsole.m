@@ -10,6 +10,7 @@
 static LuaScriptConsoleWindowController * sSharedInstance;
 
 @interface LuaScriptConsoleWindowController ()
+@property (weak) IBOutlet NSPanel *panel;
 
 @end
 
@@ -17,6 +18,7 @@ static LuaScriptConsoleWindowController * sSharedInstance;
 
 - (void)windowDidLoad {
     [super windowDidLoad];
+    self.panel.worksWhenModal = YES;
 }
 
 +(LuaScriptConsoleWindowController*)sharedWindowController {
