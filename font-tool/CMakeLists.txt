@@ -76,6 +76,7 @@ set(SOURCE_FILES
   TypefaceVariationViewController.m
   ToolBox.m
   LuaScript.mm
+  LuaScriptConsole.m
   SourceTextView.m
   )
 
@@ -103,6 +104,7 @@ set(NIB_FILES
   GlyphCollectionViewHeader.xib
   TBColorConstantsViewItem.xib
   StandardCollectionViewItem.xib
+  LuaScriptConsole.storyboard
 )
 
 set(RESOURCE_FILES

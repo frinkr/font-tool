@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="13196" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
+        <deployment identifier="macosx"/>
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="13196"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -138,6 +139,12 @@
                                         <menuItem title="Search" keyEquivalent="f" id="3bB-Sb-Rhk">
                                             <connections>
                                                 <action selector="doSearch:" target="I8j-Ym-xVt" id="ZMV-4f-7QP"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Lua Console" id="c7s-64-UWq">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="showLuaConsole:" target="Voe-Tx-rLC" id="LX5-pM-KFO"/>
                                             </connections>
                                         </menuItem>
                                         <menuItem isSeparatorItem="YES" id="c2c-2i-8lx"/>
@@ -406,7 +413,7 @@
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <segmentedControl verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="gO4-aN-dir">
-                                <rect key="frame" x="15" y="71" width="249" height="24"/>
+                                <rect key="frame" x="16" y="71" width="248" height="24"/>
                                 <segmentedCell key="cell" borderStyle="border" alignment="left" style="rounded" trackingMode="selectOne" id="0f7-rY-Sv9">
                                     <font key="font" metaFont="smallSystem"/>
                                     <segments>

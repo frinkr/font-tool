@@ -121,8 +121,10 @@ extern "C" {
 @end
 
 @implementation LuaScript
--(instancetype)initWithFile:(NSString*)scriptFile {
+-(instancetype)initWithFile:(NSString*)scriptFile messageHandler:(LuaScriptMessageHandler)messageHandler{
     if ((self = [super init]) && [self createState]) {
+        self.messageHandler = messageHandler;
+        
         const char* utf8 = [scriptFile UTF8String];
         
         if (luaL_loadfile(L, utf8) || lua_pcall (L, 0, LUA_MULTRET, 0)) {
@@ -132,8 +134,10 @@ extern "C" {
     return self;
 }
 
--(instancetype)initWithBuffer:(NSString*)script {
+-(instancetype)initWithBuffer:(NSString*)script  messageHandler:(LuaScriptMessageHandler)messageHandler {
     if ((self = [super init]) && [self createState]) {
+        self.messageHandler = messageHandler;
+        
         const char* utf8 = [script UTF8String];
         int lua_error = LUA_OK;
         if ((lua_error = luaL_loadbufferx(L, utf8, strlen(utf8), "BUFFER-SCRIPT.LUA", NULL))

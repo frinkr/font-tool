@@ -6,6 +6,8 @@
 #import "GlyphLookupWindowController.h"
 #import "TypefaceWindowController.h"
 #import "ToolBox.h"
+#import "LuaScriptConsole.h"
+
 @interface TMProgressViewController ()
 @property (weak) IBOutlet NSProgressIndicator *progressIndicator;
 @property (weak) IBOutlet NSTextField *fileLabel;
@@ -98,6 +100,10 @@
     else {
         [[NSWorkspace sharedWorkspace] openURL:url];
     }
+}
+
+- (IBAction)showLuaConsole:(id)sender {
+    [[[LuaScriptConsoleWindowController sharedWindowController] window] makeKeyAndOrderFront:sender];
 }
 
 - (IBAction)lookupGlyph:(id)sender {

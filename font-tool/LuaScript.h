@@ -3,10 +3,12 @@
 @class TMTypeface;
 @class LuaScript;
 
+typedef void (^LuaScriptMessageHandler)(NSString * message);
+
 @interface LuaScript : NSObject
 @property (nonatomic) void (^messageHandler)(NSString * message);
 
--(instancetype)initWithFile:(NSString*)scriptFile;
--(instancetype)initWithBuffer:(NSString*)script;
+-(instancetype)initWithFile:(NSString*)scriptFile messageHandler:(LuaScriptMessageHandler)messageHandler;
+-(instancetype)initWithBuffer:(NSString*)script messageHandler:(LuaScriptMessageHandler)messageHandler;
 -(BOOL)runWithFont:(TMTypeface*)font;
 @end

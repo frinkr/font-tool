@@ -11,7 +11,7 @@
 #import "TypefaceManager.h"
 #import "LuaScript.h"
 #import "SourceTextView.h"
-
+#import "LuaScriptConsole.h"
 static TypefaceSelectorWindowController * sharedTypefaceListWC;
 
 #define TypefaceSerifStyleAny (TypefaceSerifStyleUndefined)
@@ -30,6 +30,7 @@ typedef NS_ENUM(NSInteger, TypefaceVariationFlavor) {
 @property LuaScript * luaScript;
 @property NSString * luaScriptBuffer;
 @property NSString * luaScriptFile;
+@property (nonatomic) void (^messageHandler)(NSString * message);
 
 - (instancetype)initWithBuffer:(NSString*)script;
 - (instancetype)initWithFile:(NSString*)filePath;
@@ -60,7 +61,8 @@ typedef NS_ENUM(NSInteger, TypefaceVariationFlavor) {
     }
     else {
         self.luaScriptBuffer = script;
-        self.luaScript = [[LuaScript alloc] initWithBuffer:script];
+        self.luaScript = [[LuaScript alloc] initWithBuffer:script
+                                            messageHandler:self.messageHandler];
     }
     self.luaScriptFile = nil;
 
@@ -70,7 +72,8 @@ typedef NS_ENUM(NSInteger, TypefaceVariationFlavor) {
 - (BOOL)reloadWithFile:(NSString*)filePath {
     self.luaScriptBuffer = nil;
     self.luaScriptFile = filePath;
-    self.luaScript =  [[LuaScript alloc] initWithFile:filePath];
+    self.luaScript =  [[LuaScript alloc] initWithFile:filePath messageHandler:self.messageHandler];
+    self.luaScript.messageHandler = self.messageHandler;
     return true;
 }
 
@@ -169,6 +172,9 @@ typedef NS_ENUM(NSInteger, TypefaceVariationFlavor) {
                                                            error:nil];
     
     self.filter = [[TypefaceListFilter alloc] initWithBuffer:scriptBuffer];
+    self.filter.messageHandler = ^(NSString * message) {
+        [[LuaScriptConsoleWindowController sharedWindowController] appendMessage:message];
+    };
     
     self.moreButton.wantsLayer = YES;
     self.window.titleVisibility = NSWindowTitleHidden;
