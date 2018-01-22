@@ -456,12 +456,16 @@ typedef struct {
 
 @implementation TypefaceAttributes
 - (void)encodeWithCoder:(NSCoder *)coder {
+    [coder encodeObject:_postscriptName forKey:@"postscriptName"];
+    [coder encodeInt:_numGlyphs forKey:@"numGlyphs"];
+    [coder encodeInt:_UPEM forKey:@"UPEM"];
+    [coder encodeObject:_createdDate forKey:@"createDate"];
+    [coder encodeObject:_modifiedDate forKey:@"modifiedDate"];
     [coder encodeBool:_isOpenTypeVariation forKey:@"isOpenTypeVariation"];
     [coder encodeBool:_isAdobeMultiMaster forKey:@"isAdobeMM"];
     [coder encodeObject:_openTypeScripts forKey:@"openTypeScripts"];
     [coder encodeObject:_openTypeLanguages forKey:@"openTypeLanguages"];
     [coder encodeObject:_openTypeFeatures forKey:@"openTypeFeatures"];
-    [coder encodeInteger:_serifStyle forKey:@"serifStyle"];
     [coder encodeObject:_familyName forKey:@"familyName"];
     [coder encodeObject:_styleName forKey:@"styleName"];
     [coder encodeObject:_fullName forKey:@"fullName"];
@@ -472,17 +476,26 @@ typedef struct {
     [coder encodeObject:_localizedStyleNames forKey:@"localizedStyleNames"];
     [coder encodeObject:_localizedFullNames forKey:@"localizedFullNames"];
     [coder encodeObject:_designLanguages forKey:@"designLanguages"];
+    [coder encodeObject:_format forKey:@"format"];
+    [coder encodeBool:_isCID forKey:@"isCID"];
     [coder encodeObject:_vender forKey:@"vender"];
+    [coder encodeObject:_version forKey:@"version"];
+    [coder encodeInteger:_serifStyle forKey:@"serifStyle"];
+
 }
 
 - (id)initWithCoder:(NSCoder *)decoder {
     if (self = [super init]) {
+        _postscriptName = [decoder decodeObjectForKey:@"postscriptName"];
+        _numGlyphs = [decoder decodeIntForKey:@"numGlyphs"];
+        _UPEM = [decoder decodeIntForKey:@"UPEM"];
+        _createdDate = [decoder decodeObjectForKey:@"createDate"];
+        _modifiedDate = [decoder decodeObjectForKey:@"modifiedDate"];
         _isOpenTypeVariation = [decoder decodeBoolForKey:@"isOpenTypeVariation"];
         _isAdobeMultiMaster = [decoder decodeBoolForKey:@"isAdobeMM"];
         _openTypeScripts = [decoder decodeObjectForKey:@"openTypeScripts"];
         _openTypeLanguages = [decoder decodeObjectForKey:@"openTypeLanguages"];
         _openTypeFeatures = [decoder decodeObjectForKey:@"openTypeFeatures"];
-        _serifStyle = (TypefaceSerifStyle)[decoder decodeIntegerForKey:@"serifStyle"];
         _familyName = [decoder decodeObjectForKey:@"familyName"];
         _styleName = [decoder decodeObjectForKey:@"styleName"];
         _fullName = [decoder decodeObjectForKey:@"fullName"];
@@ -493,7 +506,12 @@ typedef struct {
         _localizedStyleNames = [decoder decodeObjectForKey:@"localizedStyleNames"];
         _localizedFullNames = [decoder decodeObjectForKey:@"localizedFullNames"];
         _designLanguages = [decoder decodeObjectForKey:@"designLanguages"];
+        _format = [decoder decodeObjectForKey:@"format"];
+        _isCID = [decoder decodeBoolForKey:@"isCID"];
         _vender = [decoder decodeObjectForKey:@"vender"];
+        _version = [decoder decodeObjectForKey:@"version"];
+        _serifStyle = (TypefaceSerifStyle)[decoder decodeIntegerForKey:@"serifStyle"];
+
     }
     return self;
 }
@@ -1142,30 +1160,57 @@ typedef struct {
     if (!_attributes) {
         _attributes = [[TypefaceAttributes alloc] init];
         
-        // MM
+        TT_OS2 * os2 = (TT_OS2*)FT_Get_Sfnt_Table(face,  FT_SFNT_OS2);
+        TT_Header * head = (TT_Header*)FT_Get_Sfnt_Table(face, FT_SFNT_HEAD);
+        
+        // PS name
+        const char * psName = FT_Get_Postscript_Name(face);
+        if (psName)
+            _attributes.postscriptName = [NSString stringWithUTF8String:psName];
+        
+        if (head) {
+            NSInteger created = ((head->Created[0] & 0xFFFFFFFF) << 32) + (head->Created[1] & 0xFFFFFFFF);
+            NSInteger modified = ((head->Modified[0] & 0xFFFFFFFF) << 32) + (head->Modified[1] & 0xFFFFFFFF);
+            _attributes.createdDate = FTDateTimeToString(created);
+            _attributes.modifiedDate = FTDateTimeToString(modified);
+        }
+        
+        _attributes.numGlyphs = face->num_glyphs;
+        _attributes.UPEM = face->units_per_EM;
+        
+        // OT - MM
         _attributes.isAdobeMultiMaster = _isAdobeMM;
         _attributes.isOpenTypeVariation = _isOpenTypeVariation;
         
-        // OT features
+        // OT - features
         Shapper * shapper = [[Shapper alloc] initWithTypeface:self];
         _attributes.openTypeScripts = [shapper allScripts];
         _attributes.openTypeLanguages = [shapper allLanguages];
         _attributes.openTypeFeatures = [shapper allFeatures];
         
         // format
-        const char * format = FT_Get_Font_Format(face);
-        if (!strcmp(format, "TrueType"))
-            _attributes.format = TypefaceFormatTrueType;
-        else if (!strcmp(format, "CFF"))
-            _attributes.format = TypefaceFormatCFF;
-        else
-            _attributes.format = TypefaceFormatOther;
+        _attributes.format = [NSString stringWithUTF8StringNilFallback:FT_Get_Font_Format(face)];
+
         
-        // Names
-        [self loadNamesForAttributes:_attributes];
+        // Vendor
+        if (os2) {
+            _attributes.vender = [[NSString alloc] initWithBytes:os2->achVendID
+                                                          length:4
+                                                        encoding:NSASCIIStringEncoding];
+        }
+        
+        // Version
+        _attributes.version = SFNTNameGetValueFromId(face, TT_NAME_ID_VERSION_STRING);
+        
+        // CID
+        FT_Bool isCID = false;
+        if (!FT_Get_CID_Is_Internally_CID_Keyed(face, &isCID))
+            _attributes.isCID = isCID;
+        
+        // Font Names
+        [self loadFontNames:_attributes];
         
         // Serif
-        TT_OS2 * os2 = (TT_OS2*)FT_Get_Sfnt_Table(face,  FT_SFNT_OS2);
         if (os2) {
             unsigned char familyClass = ((os2->sFamilyClass & 0xFF00) >> 8);
             //unsigned char subFamilyClass = (os2->sFamilyClass & 0x00FF);
@@ -1198,7 +1243,7 @@ typedef struct {
     return self.attributes.preferedLocalizedFullName;
 }
 
-- (void)loadNamesForAttributes:(TypefaceAttributes*)attributes {
+- (void)loadFontNames:(TypefaceAttributes*)attributes {
     FT_Error error = 0;
     FT_UInt count = FT_Get_Sfnt_Name_Count(face);
     

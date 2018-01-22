@@ -23,7 +23,7 @@ NSString * TMProgressNotificationFileKey = @"TMProgressNotificationFileKey";
 NSString * TMProgressNotificationTotalKey = @"TMProgressNotificationTotalKey";
 NSString * TMProgressNotificationCurrentKey = @"TMProgressNotificationCurrentKey";
 
-NSInteger TypefaceFontListVersion = 3;
+NSInteger TypefaceFontListVersion = 4;
 
 @interface TMTypeface()
 - (instancetype)initWithFamilyName:(NSString*)familyName styleName:(NSString*)styleName;

@@ -144,15 +144,20 @@ typedef NS_ENUM(NSInteger, TypefaceFormat) {
 
 @interface TypefaceAttributes : NSObject
 
+// meta
+@property NSString * postscriptName;
+@property int numGlyphs;
+@property int UPEM;
+@property NSString * createdDate;
+@property NSString * modifiedDate;
+
+// OT
 @property BOOL isOpenTypeVariation;
 @property BOOL isAdobeMultiMaster;
-
-
-@property TypefaceSerifStyle serifStyle;
 @property (strong) NSSet<TypefaceTag*> * openTypeScripts;
 @property (strong) NSSet<TypefaceTag*> * openTypeLanguages;
 @property (strong) NSSet<OpenTypeFeatureTag*> * openTypeFeatures;
-@property TypefaceFormat format;
+
 
 // names
 @property (strong) NSString * familyName;
@@ -171,7 +176,15 @@ typedef NS_ENUM(NSInteger, TypefaceFormat) {
 // lanuages
 @property (strong) NSArray<NSString*> * designLanguages;
 
+// format and version
+@property NSString * format;
+@property BOOL isCID;
 @property (strong) NSString * vender;
+@property (strong) NSString * version;
+
+// style
+@property TypefaceSerifStyle serifStyle;
+
 @end
 
 

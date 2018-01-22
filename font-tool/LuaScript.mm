@@ -39,14 +39,23 @@ namespace elua {
         
     public:
         std::string postscriptName;
-        std::string version;
-        std::string familyName;
-        std::string styleName;
-        std::string vender;
+        int numGlyphs;
+        int upem;
+        std::string createDate;
+        std::string modifiedDate;
         
-        std::string format;
         bool isOpenTypeVariation;
         bool isAdobeMultiMaster;
+        
+        std::string familyName;
+        std::string styleName;
+        std::string fullName;
+        
+        std::string format;
+        bool isCID;
+        std::string vender;
+        std::string version;
+
        
     private:
         std::set<std::string>  openTypeFeatures_;
@@ -63,16 +72,24 @@ namespace elua {
     
     Font toLuaFont(TMTypeface * face) {
         Font f;
-        f.familyName = toStdString(face.familyName);
-        f.styleName = toStdString(face.styleName);
-        f.vender = toStdString(face.attributes.vender);
+        f.postscriptName = toStdString(face.attributes.postscriptName);
+        f.numGlyphs = face.attributes.numGlyphs;
+        f.upem = face.attributes.UPEM;
+        f.createDate = toStdString(face.attributes.createdDate);
+        f.modifiedDate = toStdString(face.attributes.modifiedDate);
+        
         f.isOpenTypeVariation = face.attributes.isOpenTypeVariation;
         f.isAdobeMultiMaster = face.attributes.isAdobeMultiMaster;
-        switch (face.attributes.format) {
-            case TypefaceFormatTrueType: f.format = "TrueType"; break;
-            case TypefaceFormatCFF: f.format = "CFF"; break;
-            default: f.format = "Other";
-        }
+        
+        f.familyName = toStdString(face.familyName);
+        f.styleName = toStdString(face.styleName);
+        f.fullName = toStdString(face.attributes.fullName);
+        
+        f.format = toStdString(face.attributes.format);
+        f.isCID = face.attributes.isCID;
+        f.vender = toStdString(face.attributes.vender);
+        f.version = toStdString(face.attributes.version);
+        
         return f;
     }
     
@@ -83,13 +100,22 @@ namespace elua {
         .beginClass<Font>("Font")
         .addConstructor<void(*)(void)>()
         .addData("postscriptName", &Font::postscriptName, false)
-        .addData("version", &Font::version, false)
-        .addData("familyName", &Font::familyName, false)
-        .addData("styleName", &Font::styleName, false)
-        .addData("vender", &Font::vender, false)
-        .addData("format", &Font::format, false)
+        .addData("numGlyphs", &Font::numGlyphs, false)
+        .addData("UPEM", &Font::upem, false)
+        .addData("createdDate", &Font::createDate)
+        .addData("modifiedDate", &Font::modifiedDate)
+        
         .addData("isOpenTypeVariation", &Font::isOpenTypeVariation, false)
         .addData("isAdobeMultiMaster", &Font::isAdobeMultiMaster, false)
+        
+        .addData("familyName", &Font::familyName, false)
+        .addData("styleName", &Font::styleName, false)
+        .addData("fullName", &Font::fullName, false)
+        
+        .addData("format", &Font::format, false)
+        .addData("isCID", &Font::isCID, false)
+        .addData("vender", &Font::vender, false)
+        .addData("version", &Font::version, false)
         .addProperty("openTypeFeatures", &Font::openTypeFeatures)
         //.addProperty("name", &Font::familyName, &Font::setFamilyName)
         
@@ -172,15 +198,31 @@ extern "C" {
             return ret;
         }
         catch(const std::exception & ex) {
-            NSLog(@"%@ %@", @"| exception", [NSString stringWithUTF8String:ex.what()]);
+            [self logMessage:@"%@ %@", @"| exception", [NSString stringWithUTF8String:ex.what()] ];
             return NO;
         }
     }
     else {
-        NSLog(@"| failed to find function filterFont in script");
+        [self logMessage:@"| failed to find function filterFont in script"];
         return NO;
     }
     return YES;
 }
 
+- (void)logMessage:(NSString *)format, ... {
+    if (self.messageHandler) {
+        va_list args;
+        va_start(args, format);
+        NSString * s = [[NSString alloc] initWithFormat:format arguments:args];
+        va_end(args);
+        self.messageHandler(s);
+        
+    }
+    else {
+        va_list args;
+        va_start(args, format);
+        NSLogv(format, args);
+        va_end(args);
+    }
+}
 @end
