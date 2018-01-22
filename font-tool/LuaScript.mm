@@ -98,6 +98,22 @@ namespace elua {
     }
 }
 
+extern "C" {
+    int luaScriptPrintMessage(lua_State *L) {
+        const char * message = lua_tostring(L, -1);
+        lua_getglobal(L, "__LuaScriptHost__");
+        void * ptr  = lua_touserdata(L, -1);
+        LuaScript * script = (__bridge LuaScript*)ptr;
+        if (script.messageHandler) {
+            script.messageHandler([NSString stringWithUTF8String:message]);
+        }
+        else {
+            NSLog(@"<Lua> %@", [NSString stringWithUTF8String:message]);
+        }
+        return 0;
+    }
+}
+
 @interface LuaScript() {
     lua_State *L;
 }
@@ -132,6 +148,12 @@ namespace elua {
     L = luaL_newstate();
     luaL_openlibs(L); // load Lua standard libraries.
     elua::registerClasses(L);
+    
+    lua_pushlightuserdata(L, (void*)CFBridgingRetain(self));
+    lua_setglobal(L, "__LuaScriptHost__");
+    lua_pushcfunction(L, luaScriptPrintMessage);
+    lua_setglobal(L, "print");
+    
     return YES;
 }
 

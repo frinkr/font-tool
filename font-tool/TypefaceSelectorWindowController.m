@@ -164,7 +164,11 @@ typedef NS_ENUM(NSInteger, TypefaceVariationFlavor) {
     
     // Implement this method to handle any initialization after your window controller's window has been loaded from its nib file.
     self.window.delegate = self;
-    self.filter = [[TypefaceListFilter alloc] initWithBuffer:nil];
+    NSString * scriptBuffer = [NSString stringWithContentsOfFile: [[NSBundle mainBundle] pathForResource:@"SampleScripts/template" ofType:@"lua"]
+                                                        encoding:NSUTF8StringEncoding
+                                                           error:nil];
+    
+    self.filter = [[TypefaceListFilter alloc] initWithBuffer:scriptBuffer];
     
     self.moreButton.wantsLayer = YES;
     self.window.titleVisibility = NSWindowTitleHidden;
