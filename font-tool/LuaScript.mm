@@ -13,38 +13,14 @@
 
 #import "TypefaceManager.h"
 
+@interface LuaScript() {
+    lua_State *L;
+}
+-(BOOL)createState;
+-(void)logMessage:(NSString *)format, ...;
+@end
+
 namespace elua {
-    struct Font {
-    
-        std::string postscriptName;
-        int numGlyphs;
-        int upem;
-        std::string createDate;
-        std::string modifiedDate;
-        
-        bool isOpenTypeVariation;
-        bool isAdobeMultiMaster;
-        std::set<std::string> openTypeScripts;
-        std::set<std::string> openTypeLanguages;
-        std::map<std::string, bool> openTypeFeatures;
-        
-        std::string familyName;
-        std::string styleName;
-        std::string fullName;
-        std::map<std::string, std::string> localizedFamilyNames;
-        std::map<std::string, std::string> localizedStyleNames;
-        std::map<std::string, std::string> localizedFullNames;
-        std::vector<std::string> designLanguages;
-        
-        std::string format;
-        bool isCID;
-        std::string vender;
-        std::string version;
-    };
-    
-    void printMessage(const std::string & message) {
-        NSLog(@"<Lua> %@", [NSString stringWithUTF8String:message.c_str()]);
-    }
     
     std::string toStdString(NSString * str) {
         if (!str) return std::string();
@@ -84,7 +60,123 @@ namespace elua {
         return ret;
     }
     
-    Font toLuaFont(TMTypeface * face) {
+    NSString * toNSString(const std::string & str) {
+        return [NSString stringWithUTF8String:str.c_str()];
+    }
+    
+    NSString * toNSString(bool b) {
+        return b? @"true": @"false";
+    }
+    
+    template < template <typename K, typename Alloc> class C, typename K, typename Alloc>
+    NSString * toNSString(const C<K, Alloc> & c) {
+        NSMutableString * ret = [[NSMutableString alloc] init];
+        for (const K & v : c) {
+            if (ret.length != 0)
+                [ret appendString:@", "];
+            [ret appendString:toNSString(v)];
+        }
+        return [NSString stringWithFormat:@"{%@}", ret];
+    }
+    
+    template < template <typename K, typename Compare, typename Alloc> class C, typename K, typename Compare, typename Alloc>
+    NSString * toNSString(const C<K, Compare, Alloc> & c) {
+        NSMutableString * ret = [[NSMutableString alloc] init];
+        for (const K & v : c) {
+            if (ret.length != 0)
+                [ret appendString:@", "];
+            [ret appendString:toNSString(v)];
+        }
+        return [NSString stringWithFormat:@"{%@}", ret];
+    }
+    
+    NSString * toNSString(const std::map<std::string, bool> & features) {
+        NSMutableString * ret = [[NSMutableString alloc] init];
+        for (const auto  & key : features) {
+            if (ret.length != 0)
+                [ret appendString:@", "];
+            if (key.second)
+                [ret appendFormat:@"%@*", toNSString(key.first)];
+            else
+                [ret appendFormat:@"%@", toNSString(key.first)];
+        }
+        return [NSString stringWithFormat:@"{%@}", ret];
+    }
+    
+    NSString * toNSString(const std::map<std::string, std::string> & map) {
+        NSMutableString * ret = [[NSMutableString alloc] init];
+        for (const auto  & key : map) {
+            if (ret.length != 0)
+                [ret appendString:@", "];
+            [ret appendFormat:@"%@=%@", toNSString(key.first), toNSString(key.second)];
+        }
+        return [NSString stringWithFormat:@"{%@}", ret];
+    }
+    
+    struct Font {
+        ~Font() {
+            if (userData)
+                CFBridgingRelease(userData);
+        }
+        void Dump() {
+            LuaScript * script = (__bridge LuaScript*)userData;
+            [script logMessage:toNSString(postscriptName)];
+            [script logMessage:@"   Num Glyphs = %d", numGlyphs];
+            [script logMessage:@"   UPEM = %d", upem];
+            [script logMessage:@"   CreatedDate = %@", toNSString(createDate)];
+            [script logMessage:@"   ModifiedDate = %@", toNSString(modifiedDate)];
+            [script logMessage:@"   IsOpenTypeVariation = %@", toNSString(isOpenTypeVariation)];
+            [script logMessage:@"   IsAdobeMultiMaster = %@", toNSString(isAdobeMultiMaster)];
+            [script logMessage:@"   OpenType Scripts = %@", toNSString(openTypeScripts)];
+            [script logMessage:@"   OpenType Languages = %@", toNSString(openTypeLanguages)];
+            [script logMessage:@"   OpenType Features = %@", toNSString(openTypeFeatures)];
+            [script logMessage:@"   Family Name = %@", toNSString(familyName)];
+            [script logMessage:@"   Style Name = %@", toNSString(styleName)];
+            [script logMessage:@"   Full Name = %@", toNSString(fullName)];
+            [script logMessage:@"   Localized Family Names = %@", toNSString(localizedFamilyNames)];
+            [script logMessage:@"   Localized Style Names = %@", toNSString(localizedStyleNames)];
+            [script logMessage:@"   Localized Full Names = %@", toNSString(localizedFullNames)];
+            [script logMessage:@"   Design Languages = %@", toNSString(designLanguages)];
+            [script logMessage:@"   Format = %@", toNSString(format)];
+            [script logMessage:@"   IsCID = %@", toNSString(isCID)];
+            [script logMessage:@"   Vender = %@", toNSString(vender)];
+            [script logMessage:@"   Version = %@", toNSString(version)];
+        }
+        
+    public:
+        std::string postscriptName;
+        int numGlyphs;
+        int upem;
+        std::string createDate;
+        std::string modifiedDate;
+        
+        bool isOpenTypeVariation;
+        bool isAdobeMultiMaster;
+        std::set<std::string> openTypeScripts;
+        std::set<std::string> openTypeLanguages;
+        std::map<std::string, bool> openTypeFeatures;
+        
+        std::string familyName;
+        std::string styleName;
+        std::string fullName;
+        std::map<std::string, std::string> localizedFamilyNames;
+        std::map<std::string, std::string> localizedStyleNames;
+        std::map<std::string, std::string> localizedFullNames;
+        std::vector<std::string> designLanguages;
+        
+        std::string format;
+        bool isCID;
+        std::string vender;
+        std::string version;
+        
+        void * userData;
+    };
+    
+    void printMessage(const std::string & message) {
+        NSLog(@"<Lua> %@", [NSString stringWithUTF8String:message.c_str()]);
+    }
+    
+    Font toLuaFont(TMTypeface * face, LuaScript * script) {
         Font f;
         f.postscriptName = toStdString(face.attributes.postscriptName);
         f.numGlyphs = face.attributes.numGlyphs;
@@ -111,6 +203,8 @@ namespace elua {
         f.vender = toStdString(face.attributes.vender);
         f.version = toStdString(face.attributes.version);
         
+        f.userData = (void*)CFBridgingRetain(script);
+
         return f;
     }
     
@@ -145,6 +239,7 @@ namespace elua {
         .addData("vender", &Font::vender, false)
         .addData("version", &Font::version, false)
         
+        .addFunction("dump", &Font::Dump)
         .endClass()
         .endNamespace();
     }
@@ -153,24 +248,21 @@ namespace elua {
 extern "C" {
     int luaScriptPrintMessage(lua_State *L) {
         const char * message = lua_tostring(L, -1);
-        lua_getglobal(L, "__LuaScriptHost__");
-        void * ptr  = lua_touserdata(L, -1);
-        LuaScript * script = (__bridge LuaScript*)ptr;
-        if (script.messageHandler) {
-            script.messageHandler([NSString stringWithUTF8String:message]);
-        }
-        else {
-            NSLog(@"<Lua> %@", [NSString stringWithUTF8String:message]);
+        if (message) {
+            lua_getglobal(L, "__LuaScriptHost__");
+            void * ptr  = lua_touserdata(L, -1);
+            LuaScript * script = (__bridge LuaScript*)ptr;
+            if (script.messageHandler) {
+                script.messageHandler([NSString stringWithUTF8String:message]);
+            }
+            else {
+                NSLog(@"<Lua> %@", [NSString stringWithUTF8String:message]);
+            }
         }
         return 0;
     }
 }
 
-@interface LuaScript() {
-    lua_State *L;
-}
--(BOOL)createState;
-@end
 
 @implementation LuaScript
 -(instancetype)initWithFile:(NSString*)scriptFile messageHandler:(LuaScriptMessageHandler)messageHandler{
@@ -237,7 +329,7 @@ extern "C" {
     luabridge::LuaRef fFilterFont = luabridge::getGlobal(L, "filterFont");
     if (fFilterFont.isFunction()) {
         try {
-            elua::Font f = elua::toLuaFont(font);
+            elua::Font f = elua::toLuaFont(font, self);
             luabridge::LuaRef ref = fFilterFont(&f);
             bool ret = ref;
             return ret;
