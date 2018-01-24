@@ -24,6 +24,8 @@ static NSString * currentDateTimeString() {
 
 @interface LuaScriptConsoleViewController ()
 @property (unsafe_unretained) IBOutlet NSTextView *messagesTextView;
+@property (strong) NSMutableString * cachedMessages;
+- (void)flushMessages:(id)sender;
 @end
 
 
@@ -86,19 +88,33 @@ static NSString * currentDateTimeString() {
         [self.window makeKeyAndOrderFront:nil];
     [(LuaScriptConsoleViewController*)self.contentViewController appendMessage:message];
 }
+
+- (void)flushMessages:(id)sender {
+    if (!self.window.isVisible)
+        [self.window makeKeyAndOrderFront:nil];
+    [(LuaScriptConsoleViewController*)self.contentViewController flushMessages:sender];
+}
 @end
 
 
 @implementation LuaScriptConsoleViewController
 
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    self.cachedMessages = [[NSMutableString alloc] init];
+}
+
+- (void)flushMessages:(id)sender {
+    if ([self.cachedMessages length] == 0)
+        return;
+    NSAttributedString* attr = [[NSAttributedString alloc] initWithString:self.cachedMessages attributes:@{NSForegroundColorAttributeName : [NSColor greenColor]}];
+    [[self.messagesTextView textStorage] appendAttributedString:attr];
+    [self.messagesTextView scrollRangeToVisible:NSMakeRange([[self.messagesTextView string] length], 0)];
+    [self.cachedMessages setString:@""];
+}
+
 - (void)appendMessage:(NSString *)message {
-    dispatch_async(dispatch_get_main_queue(), ^{
-        NSString * text = [NSString stringWithFormat:@"%@ : %@\n", currentDateTimeString(), message];
-        NSAttributedString* attr = [[NSAttributedString alloc] initWithString:text attributes:@{NSForegroundColorAttributeName : [NSColor greenColor]}];
-        
-        [[self.messagesTextView textStorage] appendAttributedString:attr];
-        [self.messagesTextView scrollRangeToVisible:NSMakeRange([[self.messagesTextView string] length], 0)];
-    });
+    [self.cachedMessages appendFormat:@"%@ : %@\n", currentDateTimeString(), message];
 }
 
 @end

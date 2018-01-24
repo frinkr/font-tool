@@ -334,10 +334,13 @@ typedef NS_ENUM(NSInteger, TypefaceVariationFlavor) {
     }
     else {
         NSPredicate * predicate = [NSPredicate predicateWithBlock:^BOOL(id  evaluatedObject, NSDictionary<NSString *,id> *  bindings) {
+            //[[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.01]];
             TMTypefaceFamily * family = (TMTypefaceFamily*)evaluatedObject;
             return [family filter:filter];
         }];
         [self.familiesArrayController setFilterPredicate:predicate];
+        
+        [[LuaScriptConsoleWindowController sharedWindowController] flushMessages:self];
     }
     
     [self.familyCombobox reloadData];

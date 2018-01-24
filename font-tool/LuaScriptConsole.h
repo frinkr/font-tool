@@ -12,6 +12,7 @@
 +(LuaScriptConsoleWindowController*)sharedWindowController;
 
 -(void)appendMessage:(NSString*)message;
+-(void)flushMessages:(id)sender;
 @end
 
 @interface LuaScriptConsoleViewController : NSViewController
