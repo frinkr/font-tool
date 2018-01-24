@@ -14,30 +14,8 @@
 #import "TypefaceManager.h"
 
 namespace elua {
-    class Font {
-    public:
-        void setOpenTypeFeatures(const std::set<std::string> & otFeatures) {
-            openTypeFeatures_ = otFeatures;
-        }
-        
-        std::set<std::string> openTypeFeatures() const {
-            return openTypeFeatures_;
-        }
-        
-        
-        Font & addOpenTypeFeature(const std::string & feature) {
-            openTypeFeatures_.insert(feature);
-            return *this;
-        }
-        
-        Font & addOpenTypeFeatures(const std::initializer_list<std::string> & features) {
-            for (const auto & f : features)
-                openTypeFeatures_.insert(f);
-            return * this;
-        }
-        
-        
-    public:
+    struct Font {
+    
         std::string postscriptName;
         int numGlyphs;
         int upem;
@@ -46,23 +24,22 @@ namespace elua {
         
         bool isOpenTypeVariation;
         bool isAdobeMultiMaster;
+        std::set<std::string> openTypeScripts;
+        std::set<std::string> openTypeLanguages;
+        std::map<std::string, bool> openTypeFeatures;
         
         std::string familyName;
         std::string styleName;
         std::string fullName;
-        
         std::map<std::string, std::string> localizedFamilyNames;
         std::map<std::string, std::string> localizedStyleNames;
         std::map<std::string, std::string> localizedFullNames;
+        std::vector<std::string> designLanguages;
         
         std::string format;
         bool isCID;
         std::string vender;
         std::string version;
-
-       
-    private:
-        std::set<std::string>  openTypeFeatures_;
     };
     
     void printMessage(const std::string & message) {
@@ -74,11 +51,18 @@ namespace elua {
         return std::string([str UTF8String]);
     }
     
-    std::set<std::string> toStdSet(NSDictionary<NSString*, NSString*> * names) {
+    std::vector<std::string> toStdVector(NSArray<NSString*> * names) {
+        std::vector<std::string> ret;
+        for (NSString * str in names) {
+            ret.push_back(toStdString(str));
+        }
+        return ret;
+    }
+    
+    std::set<std::string> toStdSet(NSSet<TypefaceTag*> * tags) {
         std::set<std::string> ret;
-        for (NSString * lang in names) {
-            NSString * name = [names objectForKey:lang];
-            ret.insert(toStdString(name));
+        for (TypefaceTag * t in tags) {
+            ret.insert(toStdString(t.text));
         }
         return ret;
     }
@@ -88,6 +72,14 @@ namespace elua {
         for (NSString * lang in names) {
             NSString * name = [names objectForKey:lang];
             ret[toStdString(lang)] = toStdString(name);
+        }
+        return ret;
+    }
+    
+    std::map<std::string, bool> toStdMap(NSSet<OpenTypeFeatureTag*> * features) {
+        std::map<std::string, bool> ret;
+        for (OpenTypeFeatureTag * tag in features) {
+            ret[toStdString(tag.text)] = tag.isRequired;
         }
         return ret;
     }
@@ -102,6 +94,9 @@ namespace elua {
         
         f.isOpenTypeVariation = face.attributes.isOpenTypeVariation;
         f.isAdobeMultiMaster = face.attributes.isAdobeMultiMaster;
+        f.openTypeScripts = toStdSet(face.attributes.openTypeScripts);
+        f.openTypeLanguages = toStdSet(face.attributes.openTypeLanguages);
+        f.openTypeFeatures = toStdMap(face.attributes.openTypeFeatures);
         
         f.familyName = toStdString(face.familyName);
         f.styleName = toStdString(face.styleName);
@@ -109,6 +104,7 @@ namespace elua {
         f.localizedFamilyNames = toStdMap(face.attributes.localizedFamilyNames);
         f.localizedStyleNames = toStdMap(face.attributes.localizedStyleNames);
         f.localizedFullNames = toStdMap(face.attributes.localizedFullNames);
+        f.designLanguages = toStdVector(face.attributes.designLanguages);
         
         f.format = toStdString(face.attributes.format);
         f.isCID = face.attributes.isCID;
@@ -132,6 +128,9 @@ namespace elua {
         
         .addData("isOpenTypeVariation", &Font::isOpenTypeVariation, false)
         .addData("isAdobeMultiMaster", &Font::isAdobeMultiMaster, false)
+        .addData("otScripts", &Font::openTypeScripts, false)
+        .addData("otLanguages", &Font::openTypeLanguages, false)
+        .addData("otFeatures", &Font::openTypeFeatures, false)
         
         .addData("familyName", &Font::familyName, false)
         .addData("styleName", &Font::styleName, false)
@@ -139,13 +138,12 @@ namespace elua {
         .addData("localizedFamilyNames", &Font::localizedFamilyNames, false)
         .addData("localizedStyleNames", &Font::localizedStyleNames, false)
         .addData("localizedFullNames", &Font::localizedFullNames, false)
+        .addData("designLanguages", &Font::designLanguages, false)
         
         .addData("format", &Font::format, false)
         .addData("isCID", &Font::isCID, false)
         .addData("vender", &Font::vender, false)
         .addData("version", &Font::version, false)
-        .addProperty("openTypeFeatures", &Font::openTypeFeatures)
-        //.addProperty("name", &Font::familyName, &Font::setFamilyName)
         
         .endClass()
         .endNamespace();
