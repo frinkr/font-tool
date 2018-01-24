@@ -154,8 +154,14 @@ extern "C" {
         const char* utf8 = [scriptFile UTF8String];
         
         if (luaL_loadfile(L, utf8) || lua_pcall (L, 0, LUA_MULTRET, 0)) {
+            const char * message = lua_tostring(L, -1);
+            [self logMessage:[NSString stringWithUTF8String:message]];
             lua_pop(L, 1); // failed to load script
+            self = nil;
         }
+        
+        if (![self checkScript])
+            self = nil;
     }
     return self;
 }
@@ -168,8 +174,14 @@ extern "C" {
         int lua_error = LUA_OK;
         if ((lua_error = luaL_loadbufferx(L, utf8, strlen(utf8), "BUFFER-SCRIPT.LUA", NULL))
             || (lua_error = lua_pcall (L, 0, LUA_MULTRET, 0))) {
+            const char * message = lua_tostring(L, -1);
+            [self logMessage:[NSString stringWithUTF8String:message]];
             lua_pop(L, 1); // failed to load script
+            self = nil;
         }
+        
+        if (![self checkScript])
+            self = nil;
     }
     return self;
 }
@@ -187,8 +199,15 @@ extern "C" {
     return YES;
 }
 
+-(BOOL)checkScript {
+    luabridge::LuaRef fFilterFont = luabridge::getGlobal(L, "filterFont");
+    BOOL hasFunction = fFilterFont.isFunction();
+    if (!hasFunction)
+        [self logMessage:@"Failed to find function filterFont in script"];
+    return hasFunction;
+}
+
 -(BOOL)runWithFont:(TMTypeface *)font {
-    
     luabridge::LuaRef fFilterFont = luabridge::getGlobal(L, "filterFont");
     if (fFilterFont.isFunction()) {
         try {
@@ -198,12 +217,12 @@ extern "C" {
             return ret;
         }
         catch(const std::exception & ex) {
-            [self logMessage:@"%@ %@", @"| exception", [NSString stringWithUTF8String:ex.what()] ];
+            [self logMessage:@"%@ %@", @"Exception", [NSString stringWithUTF8String:ex.what()] ];
             return NO;
         }
     }
     else {
-        [self logMessage:@"| failed to find function filterFont in script"];
+        [self logMessage:@"Failed to find function filterFont in script"];
         return NO;
     }
     return YES;
@@ -216,7 +235,6 @@ extern "C" {
         NSString * s = [[NSString alloc] initWithFormat:format arguments:args];
         va_end(args);
         self.messageHandler(s);
-        
     }
     else {
         va_list args;
