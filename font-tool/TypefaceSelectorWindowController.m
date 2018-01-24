@@ -108,11 +108,12 @@ typedef NS_ENUM(NSInteger, TypefaceVariationFlavor) {
 @implementation TMTypefaceFamily(Filter)
 
 - (BOOL)filter:(TypefaceListFilter*)filter {
+    BOOL ok = NO;
     for (TMTypeface * face in self.faces) {
         if ([face filter:filter])
-            return YES;
+            ok = YES;
     }
-    return NO;
+    return ok;
 }
 
 @end

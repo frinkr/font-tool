@@ -56,9 +56,9 @@ function filterFont(font)
    -- font.designLanguages is an array, which key is the index, value is the language
    print('   Design Lanuages = ' .. arraytostring(font.designLanguages))
    
-   print('   format = ' .. font.format)
-   print('   isCID = ' .. tostring(font.isCID))
-   print('   vender = ' .. font.vender)
-   print('   version = ' .. font.version)
+   print('   Format = ' .. font.format)
+   print('   SsCID = ' .. tostring(font.isCID))
+   print('   Vender = ' .. font.vender)
+   print('   Version = ' .. font.version)
    return true
 end
