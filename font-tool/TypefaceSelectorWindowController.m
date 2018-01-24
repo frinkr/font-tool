@@ -223,6 +223,8 @@ typedef NS_ENUM(NSInteger, TypefaceVariationFlavor) {
     
     NSModalResponse response = [NSApp runModalForWindow:wc.window];
     if (response == NSModalResponseOK) {
+         [[LuaScriptConsoleWindowController sharedWindowController] flushMessages:self];
+        
         TypefaceSelectorViewController * cc = (TypefaceSelectorViewController*)self.contentViewController;
         [cc filterTypefaces:self.filter];
     }

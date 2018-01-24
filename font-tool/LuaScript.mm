@@ -51,6 +51,10 @@ namespace elua {
         std::string styleName;
         std::string fullName;
         
+        std::map<std::string, std::string> localizedFamilyNames;
+        std::map<std::string, std::string> localizedStyleNames;
+        std::map<std::string, std::string> localizedFullNames;
+        
         std::string format;
         bool isCID;
         std::string vender;
@@ -70,6 +74,24 @@ namespace elua {
         return std::string([str UTF8String]);
     }
     
+    std::set<std::string> toStdSet(NSDictionary<NSString*, NSString*> * names) {
+        std::set<std::string> ret;
+        for (NSString * lang in names) {
+            NSString * name = [names objectForKey:lang];
+            ret.insert(toStdString(name));
+        }
+        return ret;
+    }
+    
+    std::map<std::string, std::string> toStdMap(NSDictionary<NSString*, NSString*> * names) {
+        std::map<std::string, std::string> ret;
+        for (NSString * lang in names) {
+            NSString * name = [names objectForKey:lang];
+            ret[toStdString(lang)] = toStdString(name);
+        }
+        return ret;
+    }
+    
     Font toLuaFont(TMTypeface * face) {
         Font f;
         f.postscriptName = toStdString(face.attributes.postscriptName);
@@ -84,6 +106,9 @@ namespace elua {
         f.familyName = toStdString(face.familyName);
         f.styleName = toStdString(face.styleName);
         f.fullName = toStdString(face.attributes.fullName);
+        f.localizedFamilyNames = toStdMap(face.attributes.localizedFamilyNames);
+        f.localizedStyleNames = toStdMap(face.attributes.localizedStyleNames);
+        f.localizedFullNames = toStdMap(face.attributes.localizedFullNames);
         
         f.format = toStdString(face.attributes.format);
         f.isCID = face.attributes.isCID;
@@ -111,6 +136,9 @@ namespace elua {
         .addData("familyName", &Font::familyName, false)
         .addData("styleName", &Font::styleName, false)
         .addData("fullName", &Font::fullName, false)
+        .addData("localizedFamilyNames", &Font::localizedFamilyNames, false)
+        .addData("localizedStyleNames", &Font::localizedStyleNames, false)
+        .addData("localizedFullNames", &Font::localizedFullNames, false)
         
         .addData("format", &Font::format, false)
         .addData("isCID", &Font::isCID, false)

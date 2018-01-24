@@ -52,12 +52,13 @@ namespace LuaBind {
     template <class T>
     T tableToSet(const luabridge::LuaRef& table)
     {
+        typedef typename T::value_type U;
         T set;
         if (table.isTable())
         {
             for (size_t i = 1, n = (size_t)table.length(); (i <= n && !table[i].isNil()); i++)
             {
-                set.insert(table[i]); // implicit conversion from luabridge::Proxy should be called here
+                set.insert(table[i].cast<U>()); // don't why implicit conversion from luabridge::Proxy is not called here
             }
         }
         return set;
@@ -81,12 +82,14 @@ namespace LuaBind {
     template <class T>
     T tableToMap(const luabridge::LuaRef& table)
     {
+        typedef typename T::mapped_type V;
+        
         T map;
         if (table.isTable())
         {
             for (luabridge::Iterator iter(table); !iter.isNil(); ++iter)
             {
-                map[iter.key()] = iter.value(); // implicit conversion from LuaRefs should be called here
+                map[iter.key()] = iter.value().cast<V>(); // implicit conversion from LuaRefs should be called here
             }
         }
         return map;
