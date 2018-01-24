@@ -13,7 +13,7 @@
                     <window key="window" title="Lua Console" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" oneShot="NO" releasedWhenClosed="NO" showsToolbarButton="NO" visibleAtLaunch="NO" frameAutosaveName="" animationBehavior="default" id="eSg-uQ-mEM" customClass="NSPanel">
                         <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
                         <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
-                        <rect key="contentRect" x="1734" y="106" width="480" height="270"/>
+                        <rect key="contentRect" x="1734" y="106" width="786" height="270"/>
                         <rect key="screenRect" x="1440" y="-256" width="1920" height="1177"/>
                         <connections>
                             <outlet property="delegate" destination="gXO-9v-LYb" id="7AN-4V-Lyu"/>
@@ -26,29 +26,29 @@
                 </windowController>
                 <customObject id="5R8-EW-Wg5" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-275" y="266"/>
+            <point key="canvasLocation" x="-122" y="266"/>
         </scene>
         <!--Lua Script Console View Controller-->
         <scene sceneID="rJl-Rk-ERq">
             <objects>
                 <viewController id="w1j-qm-NTw" customClass="LuaScriptConsoleViewController" sceneMemberID="viewController">
                     <view key="view" id="pRc-H4-hiD">
-                        <rect key="frame" x="0.0" y="0.0" width="480" height="270"/>
+                        <rect key="frame" x="0.0" y="0.0" width="948" height="337"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <scrollView horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ewn-xH-sDV">
-                                <rect key="frame" x="0.0" y="0.0" width="480" height="270"/>
+                                <rect key="frame" x="0.0" y="0.0" width="948" height="337"/>
                                 <clipView key="contentView" id="gfH-Jy-CVw">
-                                    <rect key="frame" x="1" y="1" width="463" height="268"/>
+                                    <rect key="frame" x="1" y="1" width="946" height="335"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <textView importsGraphics="NO" verticallyResizable="YES" usesFontPanel="YES" findStyle="panel" continuousSpellChecking="YES" allowsUndo="YES" usesRuler="YES" allowsNonContiguousLayout="YES" quoteSubstitution="YES" dashSubstitution="YES" spellingCorrection="YES" smartInsertDelete="YES" id="SW6-NS-KW2">
-                                            <rect key="frame" x="0.0" y="0.0" width="463" height="268"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="946" height="335"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <color key="textColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                             <color key="backgroundColor" name="textColor" catalog="System" colorSpace="catalog"/>
-                                            <size key="minSize" width="463" height="268"/>
-                                            <size key="maxSize" width="480" height="10000000"/>
+                                            <size key="minSize" width="946" height="335"/>
+                                            <size key="maxSize" width="946" height="10000000"/>
                                             <color key="insertionPointColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
                                         </textView>
                                     </subviews>
@@ -59,7 +59,7 @@
                                     <autoresizingMask key="autoresizingMask"/>
                                 </scroller>
                                 <scroller key="verticalScroller" verticalHuggingPriority="750" doubleValue="1" horizontal="NO" id="LK3-2y-Grk">
-                                    <rect key="frame" x="464" y="1" width="15" height="268"/>
+                                    <rect key="frame" x="931" y="1" width="16" height="335"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                 </scroller>
                             </scrollView>
@@ -77,7 +77,7 @@
                 </viewController>
                 <customObject id="QCv-eV-PKU" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="647" y="63"/>
+            <point key="canvasLocation" x="881" y="96.5"/>
         </scene>
         <!--Titlebar Accessory View Controller-->
         <scene sceneID="Sxh-BE-f9T">

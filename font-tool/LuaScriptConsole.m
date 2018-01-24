@@ -111,6 +111,8 @@ static NSString * currentDateTimeString() {
     [[self.messagesTextView textStorage] appendAttributedString:attr];
     [self.messagesTextView scrollRangeToVisible:NSMakeRange([[self.messagesTextView string] length], 0)];
     [self.cachedMessages setString:@""];
+    [[self.messagesTextView textStorage] setFont:[NSFont fontWithName:@"Courier New" size:12]];
+
 }
 
 - (void)appendMessage:(NSString *)message {
