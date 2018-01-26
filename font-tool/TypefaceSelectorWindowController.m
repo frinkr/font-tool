@@ -300,18 +300,18 @@ typedef NS_ENUM(NSInteger, TypefaceVariationFlavor) {
 }
 
 - (IBAction)showRecentTypeMenu:(id)sender {
-#if 0
+
     TypefaceDocumentController * docController = (TypefaceDocumentController*)[TypefaceDocumentController sharedDocumentController];
     NSMenu * theMenu = [docController buildRecentMenuWithAction:@selector(openRecentType:)
                                                     clearAction:@selector(clearAllRecents:)];
-    [theMenu setFont:self.styleCombobox.font];
+    [theMenu setFont:self.typefaceCombobox.font];
     
     NSView * view = (NSView*)sender;
     
     [theMenu popUpMenuPositioningItem:nil
                            atLocation:NSMakePoint(view.bounds.size.width-8, view.bounds.size.height-1)
                                inView:view];
-#endif
+
     
 }
 
@@ -321,6 +321,10 @@ typedef NS_ENUM(NSInteger, TypefaceVariationFlavor) {
         TypefaceRecentDocumentInfo * recent = (TypefaceRecentDocumentInfo*)item.representedObject;
         [self selectRecentTypeface:recent autoConfirmIfNotFound:YES];
     }
+}
+
+- (IBAction)clearAllRecents:(id)sender {
+    [[TypefaceDocumentController sharedDocumentController] clearRecentDocuments:sender];
 }
 
 - (IBAction)doIncreasePreviewFontSize:(id)sender {
@@ -335,9 +339,6 @@ typedef NS_ENUM(NSInteger, TypefaceVariationFlavor) {
     [self.sampleTextField setFont:[self selectedFont]];
 }
 
-- (IBAction)clearAllRecents:(id)sender {
-    [[TypefaceDocumentController sharedDocumentController] clearRecentDocuments:sender];
-}
 
 #pragma mark **** Filter ***
 
@@ -397,21 +398,12 @@ typedef NS_ENUM(NSInteger, TypefaceVariationFlavor) {
         return NO;
     
     BOOL matchFound = NO;
-#if 0
-    NSArray<TMTypefaceFamily*>* families = self.familiesArrayController.arrangedObjects;
-    for (NSUInteger familyIndex = 0; familyIndex < [families count]; ++ familyIndex) {
-        TMTypefaceFamily * family = [families objectAtIndex:familyIndex];
-        if ([family.familyName isEqualToString:recent.family]) {
-            [self selectFamilyAtIndex:familyIndex];
-            
-            NSArray<TMTypeface *> * members = self.membersArrayController.arrangedObjects;
-            for (NSUInteger memberIndex = 0; memberIndex < members.count; ++ memberIndex) {
-                TMTypeface * member = [members objectAtIndex:memberIndex];
-                if ([member.styleName isEqualToString:recent.style]) {
-                    [self selectStyleAtIndex:memberIndex];
-                    matchFound = YES;
-                }
-            }
+    NSArray<TMTypeface*> * faces = self.typefacesArrayController.arrangedObjects;
+    for (NSUInteger index = 0; index < faces.count; ++ index) {
+        TMTypeface * face = [faces objectAtIndex:index];
+        if ([face.familyName isEqualToString:recent.family] && [face.styleName isEqualToString:recent.style]) {
+            [self selectFaceAtIndex:index];
+            matchFound = YES;
         }
     }
     
@@ -419,7 +411,7 @@ typedef NS_ENUM(NSInteger, TypefaceVariationFlavor) {
         self.selectedTypeface = [TypefaceDescriptor descriptorWithFilePath:recent.file faceIndex:recent.index];
         [NSApp stopModalWithCode:NSModalResponseOK];
     }
-#endif
+
     return matchFound;
 }
 
