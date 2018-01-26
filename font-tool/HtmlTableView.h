@@ -17,6 +17,7 @@
 extern HtmlTableRow * MakeHtmlTableRow(NSString *key, NSString * value);
 
 @interface NSMutableArray  (HtmlTableRow)
+- (void)addSection:(NSString*)sectionName;
 - (void)addRowWithKey:(NSString*)key stringValue:(NSString*)value;
 - (void)addRowWithKey:(NSString*)key boolValue:(BOOL)value;
 - (void)addRowWithKey:(NSString*)key integerValue:(NSInteger)value;

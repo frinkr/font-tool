@@ -499,7 +499,7 @@ Gw
                             </textField>
                             <comboBox verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="MWG-jJ-hwb">
                                 <rect key="frame" x="100" y="275" width="350" height="26"/>
-                                <comboBoxCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" drawsBackground="YES" completes="NO" numberOfVisibleItems="15" id="GVk-vX-zun">
+                                <comboBoxCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" drawsBackground="YES" numberOfVisibleItems="15" id="GVk-vX-zun">
                                     <font key="font" metaFont="system"/>
                                     <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -510,8 +510,8 @@ Gw
                                     </objectValues>
                                 </comboBoxCell>
                                 <connections>
-                                    <binding destination="pi0-Wv-LcR" name="content" keyPath="arrangedObjects.UIFullName" id="TKe-W7-ieM"/>
                                     <binding destination="pi0-Wv-LcR" name="contentValues" keyPath="arrangedObjects.UIFullName" previousBinding="TKe-W7-ieM" id="O7L-Cf-xmB"/>
+                                    <binding destination="pi0-Wv-LcR" name="content" keyPath="arrangedObjects.UIFullName" id="TKe-W7-ieM"/>
                                     <outlet property="delegate" destination="H06-Us-nPa" id="bGn-SP-GBi"/>
                                 </connections>
                             </comboBox>

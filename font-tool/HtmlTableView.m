@@ -21,12 +21,24 @@
 }
 @end
 
+HtmlTableRow * MakeHtmlTableSection(NSString *section) {
+    return [[HtmlTableRow alloc] initWithKey:section value:nil];
+}
+
+
 HtmlTableRow * MakeHtmlTableRow(NSString *key, NSString * value) {
     return [[HtmlTableRow alloc] initWithKey:key value:value];
 }
 
+BOOL IsHtmlTableSection(NSString * key, NSString * value) {
+    return !value;
+}
 
 @implementation NSMutableArray  (HtmlTableRow)
+
+- (void)addSection:(NSString *)sectionName {
+    [self addObject:MakeHtmlTableSection(sectionName)];
+}
 
 - (void)addRowWithKey:(NSString*)key stringValue:(NSString*)value {
     if (!value)
@@ -165,6 +177,12 @@ static HtmlTableViewAppearance * defaultHtmlTableViewApperance;
 }
 
 + (NSString*)htmlTableRowWithKey:(NSString*)key keyStyle:(NSString*)keyStyle value:(NSString*)value valueStyle:(NSString*)valueStyle {
+    if (IsHtmlTableSection(key, value)) {
+        NSString * padding = [@"" stringByPaddingToLength:15 withString:@"\u2592" startingAtIndex:0];
+        
+        return [NSString stringWithFormat:@"<tr><td colspan=2 align='center' valign='bottom' >%@ %@ %@</td></tr>", padding, [key uppercaseString], padding];
+    }
+    
     return [NSString stringWithFormat:@"<tr><td %@>%@:</td> <td %@>%@</td></tr>", keyStyle, key, valueStyle, value];
 }
 

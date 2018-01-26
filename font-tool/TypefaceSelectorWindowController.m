@@ -438,6 +438,7 @@ typedef NS_ENUM(NSInteger, TypefaceVariationFlavor) {
     [self.tableRows addRowWithKey:@"OpenType Languages" setValue:face.attributes.openTypeLanguages delemiter:@", "];
     [self.tableRows addRowWithKey:@"OpenType Features" setValue:face.attributes.openTypeFeatures delemiter:@", "];
     
+    [self.tableRows addSection:@"Names"];
     [self.tableRows addRowWithKey:@"Family Name" stringValue:face.familyName];
     [self.tableRows addRowWithKey:@"Style Name" stringValue:face.styleName];
     [self.tableRows addRowWithKey:@"Full Name" stringValue:face.attributes.fullName];
@@ -446,6 +447,7 @@ typedef NS_ENUM(NSInteger, TypefaceVariationFlavor) {
     [self.tableRows addRowWithKey:@"Localized Full Names" dictionaryValue:face.attributes.localizedFullNames delemiter:@"</br>"];
     [self.tableRows addRowWithKey:@"Design Languages" arrayValue:face.attributes.designLanguages delemiter:@", "];
     
+    [self.tableRows addSection:@"Meta Data"];
     [self.tableRows addRowWithKey:@"Format" stringValue:face.attributes.format];
     [self.tableRows addRowWithKey:@"IsCID" boolValue:face.attributes.isCID];
     [self.tableRows addRowWithKey:@"Vender" stringValue:face.attributes.vender];
