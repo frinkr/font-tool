@@ -224,22 +224,12 @@ typedef NS_ENUM(NSInteger, TypefaceVariationFlavor) {
 
 - (void)awakeFromNib {
     [super awakeFromNib];
-    
-    self.typefaceDetailsTableView = [[HtmlTableView alloc] initWithFrame:CGRectMake(0, 0, 600, 150)];
-    self.typefaceDetailsTableView.translatesAutoresizingMaskIntoConstraints = NO;
-    self.typefaceDetailsTableView.dataSource = self;
-    self.typefaceDetailsTableView.delegate = self;
-    [self.typefaceDetailsPlaceholder addSubview:self.typefaceDetailsTableView];
-    
-    NSDictionary<NSString*, id> * views = @{@"tableView": self.typefaceDetailsTableView};
-    
-    [self.typefaceDetailsPlaceholder addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[tableView]|" options:0 metrics:nil views:views]];
-    [self.typefaceDetailsPlaceholder addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[tableView]|" options:0 metrics:nil views:views]];
 }
 
 - (void)viewDidLoad {
     [super viewDidLoad];
     
+    [self loadTableView];
     self.previewFontSize = 16;
 
     NSMutableArray<TMTypeface*> * allFaces = [[NSMutableArray alloc] init];
@@ -250,14 +240,22 @@ typedef NS_ENUM(NSInteger, TypefaceVariationFlavor) {
     [self.typefacesArrayController addObjects:allFaces];
     [self.typefaceCombobox reloadData];
     
-    // this fix the WKWebView redrawing issue
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        [self selectFaceAtIndex:0];
-        
-        [self selectRecentTypeface:[((TypefaceDocumentController*)[TypefaceDocumentController sharedDocumentController]) mostRecentDocument]
-             autoConfirmIfNotFound:NO];
-    });
+    [self selectFaceAtIndex:0];
     
+    [self selectRecentTypeface:[((TypefaceDocumentController*)[TypefaceDocumentController sharedDocumentController]) mostRecentDocument]
+         autoConfirmIfNotFound:NO];
+}
+
+- (void)loadTableView {
+    self.typefaceDetailsTableView = [[HtmlTableView alloc] initWithFrame:CGRectMake(0, 0, 600, 150)];
+    self.typefaceDetailsTableView.translatesAutoresizingMaskIntoConstraints = NO;
+    self.typefaceDetailsTableView.dataSource = self;
+    self.typefaceDetailsTableView.delegate = self;
+    [self.typefaceDetailsPlaceholder addSubview:self.typefaceDetailsTableView];
+    
+    NSDictionary<NSString*, id> * views = @{@"tableView": self.typefaceDetailsTableView};
+    [self.typefaceDetailsPlaceholder addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[tableView]|" options:0 metrics:nil views:views]];
+    [self.typefaceDetailsPlaceholder addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[tableView]|" options:0 metrics:nil views:views]];
 }
 
 -(void)viewWillAppear{
@@ -365,6 +363,8 @@ typedef NS_ENUM(NSInteger, TypefaceVariationFlavor) {
 #pragma mark **** Selection ***
 
 - (TMTypeface*)selectedTypefaceEntry {
+    if (self.typefaceCombobox.indexOfSelectedItem == -1)
+        return nil;
     NSString * faceUIName = [self.typefaceCombobox itemObjectValueAtIndex:self.typefaceCombobox.indexOfSelectedItem];
     NSArray<TMTypeface*> * faces = self.typefacesArrayController.arrangedObjects;
     NSUInteger faceIndex = [faces indexOfObjectPassingTest:^BOOL(TMTypeface * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
