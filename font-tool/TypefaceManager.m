@@ -38,6 +38,10 @@ NSInteger TypefaceFontListVersion = 4;
     return self;
 }
 
+- (NSString*) UIFullName {
+    return [NSString stringWithFormat:@"%@ - %@", _UIFamilyName, _UIStyleName];
+}
+
 - (NSComparisonResult)compare:(TMTypeface*)other {
     NSComparisonResult result = [self.familyName compare:other.familyName];
     if (result == NSOrderedSame) {
@@ -228,8 +232,8 @@ static TypefaceManager * defaultTypefaceManager;
             }
             
             TMTypeface * face = [[TMTypeface alloc] initWithFamilyName:attributes.familyName styleName:attributes.styleName];
-            face.localizedFamilyName = attributes.preferedLocalizedFamilyName;
-            face.localizedStyleName = attributes.preferedLocalizedStyleName;
+            face.UIFamilyName = attributes.preferedLocalizedFamilyName;
+            face.UIStyleName = attributes.preferedLocalizedStyleName;
             face.attributes = attributes;
             
             [faces addObject:face];

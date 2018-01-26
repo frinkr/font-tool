@@ -12,6 +12,8 @@
 #import "LuaScript.h"
 #import "SourceTextView.h"
 #import "LuaScriptConsole.h"
+#import "HtmlTableView.h"
+
 static TypefaceSelectorWindowController * sharedTypefaceListWC;
 
 #define TypefaceSerifStyleAny (TypefaceSerifStyleUndefined)
@@ -89,36 +91,7 @@ typedef NS_ENUM(NSInteger, TypefaceVariationFlavor) {
 @end
 
 
-@interface TMTypeface(Filter)
-- (BOOL)filter:(TypefaceListFilter*)filter;
-@end
-
-@implementation TMTypeface(Filter)
-- (BOOL)filter:(TypefaceListFilter*)filter {
-    return [filter filter:self];
-}
-
-@end
-
-
-@interface TMTypefaceFamily(Filter)
-- (BOOL)filter:(TypefaceListFilter*)filter;
-@end
-
-@implementation TMTypefaceFamily(Filter)
-
-- (BOOL)filter:(TypefaceListFilter*)filter {
-    BOOL ok = NO;
-    for (TMTypeface * face in self.faces) {
-        if ([face filter:filter])
-            ok = YES;
-    }
-    return ok;
-}
-
-@end
-
-#pragma mark #### TypefaceListWindowController ####
+#pragma mark #### TypefaceSelectorWindowController ####
 
 @interface TypefaceSelectorWindowController ()
 @property (weak) IBOutlet NSButton *moreButton;
@@ -128,21 +101,19 @@ typedef NS_ENUM(NSInteger, TypefaceVariationFlavor) {
 
 @end
 
+#pragma mark #### TypefaceSelectorViewController ####
 @interface TypefaceSelectorViewController ()
-@property (assign) IBOutlet NSComboBox *familyCombobox;
-@property (assign) IBOutlet NSComboBox *styleCombobox;
-@property (weak) IBOutlet NSTextField *designLanguagesTextField;
-@property (weak) IBOutlet NSTextField *featuresTextField;
-@property (weak) IBOutlet NSTextField *familiesTextField;
-@property (weak) IBOutlet NSTextField *styleTextField;
+@property (weak) IBOutlet NSComboBox *typefaceCombobox;
+@property (unsafe_unretained) IBOutlet NSTextView *typefaceInfoEdit;
 @property (assign) IBOutlet NSTextField *sampleTextField;
-@property (assign) IBOutlet NSButton *recentsButton;
 @property (strong) TypefaceDescriptor * selectedTypeface;
-
-@property (assign) IBOutlet NSArrayController *familiesArrayController;
-@property (assign) IBOutlet NSArrayController *membersArrayController;
+@property (assign) IBOutlet NSArrayController *typefacesArrayController;
+@property (nonatomic) HtmlTableView * typefaceDetailsTableView;
+@property (weak) IBOutlet NSView *typefaceDetailsPlaceholder;
 
 @property (nonatomic) CGFloat previewFontSize;
+
+@property (strong) HtmlTableRows * tableRows;
 
 - (void)filterTypefaces:(TypefaceListFilter*)filter;
 - (IBAction)showRecentTypeMenu:(id)sender;
@@ -159,7 +130,7 @@ typedef NS_ENUM(NSInteger, TypefaceVariationFlavor) {
 @end
 
 
-#pragma mark ##### TypefaceListViewController #####
+#pragma mark ##### TypefaceSelectorWindowController #####
 
 @implementation TypefaceSelectorWindowController
 
@@ -226,8 +197,8 @@ typedef NS_ENUM(NSInteger, TypefaceVariationFlavor) {
     if (response == NSModalResponseOK) {
          [[LuaScriptConsoleWindowController sharedWindowController] flushMessages:self];
         
-        TypefaceSelectorViewController * cc = (TypefaceSelectorViewController*)self.contentViewController;
-        [cc filterTypefaces:self.filter];
+        TypefaceSelectorViewController * sc = (TypefaceSelectorViewController*)self.contentViewController;
+        [sc filterTypefaces:self.filter];
     }
     [wc.window orderOut:nil];
 }
@@ -253,6 +224,17 @@ typedef NS_ENUM(NSInteger, TypefaceVariationFlavor) {
 
 - (void)awakeFromNib {
     [super awakeFromNib];
+    
+    self.typefaceDetailsTableView = [[HtmlTableView alloc] initWithFrame:CGRectMake(0, 0, 600, 150)];
+    self.typefaceDetailsTableView.translatesAutoresizingMaskIntoConstraints = NO;
+    self.typefaceDetailsTableView.dataSource = self;
+    self.typefaceDetailsTableView.delegate = self;
+    [self.typefaceDetailsPlaceholder addSubview:self.typefaceDetailsTableView];
+    
+    NSDictionary<NSString*, id> * views = @{@"tableView": self.typefaceDetailsTableView};
+    
+    [self.typefaceDetailsPlaceholder addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[tableView]|" options:0 metrics:nil views:views]];
+    [self.typefaceDetailsPlaceholder addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[tableView]|" options:0 metrics:nil views:views]];
 }
 
 - (void)viewDidLoad {
@@ -260,20 +242,47 @@ typedef NS_ENUM(NSInteger, TypefaceVariationFlavor) {
     
     self.previewFontSize = 16;
 
+    NSMutableArray<TMTypeface*> * allFaces = [[NSMutableArray alloc] init];
+    for (TMTypefaceFamily * family in [[TypefaceManager defaultManager] availableTypefaceFamilies]) {
+        [allFaces addObjectsFromArray:family.faces];
+    }
     
-    [self.familiesArrayController addObjects:[[TypefaceManager defaultManager] availableTypefaceFamilies]];
-    [self.familyCombobox reloadData];
-    [self selectFamilyAtIndex:0];
+    [self.typefacesArrayController addObjects:allFaces];
+    [self.typefaceCombobox reloadData];
     
-    [self selectRecentTypeface:[((TypefaceDocumentController*)[TypefaceDocumentController sharedDocumentController]) mostRecentDocument]
-         autoConfirmIfNotFound:NO];
+    // this fix the WKWebView redrawing issue
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        [self selectFaceAtIndex:0];
+        
+        [self selectRecentTypeface:[((TypefaceDocumentController*)[TypefaceDocumentController sharedDocumentController]) mostRecentDocument]
+             autoConfirmIfNotFound:NO];
+    });
+    
 }
 
 -(void)viewWillAppear{
     [super viewWillAppear];
     
-    [self.familyCombobox becomeFirstResponder];
+    [self.typefaceCombobox becomeFirstResponder];
 }
+
+#pragma mark *** HtmlTableViewDataSource ****
+- (NSUInteger)numberOfRowsInHtmlTableView:(HtmlTableView *)view {
+    return self.tableRows.count;
+}
+
+-(HtmlTableRow*)htmlTableView:(HtmlTableView*)view rowAtIndex:(NSUInteger)index {
+    return [self.tableRows objectAtIndex:index];
+}
+
+-(HtmlTableViewAppearance*)appearanceOfHtmlTableView:(HtmlTableView *)view {
+    HtmlTableViewAppearance * appearance = [[HtmlTableViewAppearance alloc] init];
+    appearance.keyColumnSize = 150;
+    appearance.absoluteKeyColumnSize = YES;
+    appearance.dark = YES;
+    return appearance;
+}
+
 
 #pragma mark *** Actions ****
 
@@ -291,6 +300,7 @@ typedef NS_ENUM(NSInteger, TypefaceVariationFlavor) {
 }
 
 - (IBAction)showRecentTypeMenu:(id)sender {
+#if 0
     TypefaceDocumentController * docController = (TypefaceDocumentController*)[TypefaceDocumentController sharedDocumentController];
     NSMenu * theMenu = [docController buildRecentMenuWithAction:@selector(openRecentType:)
                                                     clearAction:@selector(clearAllRecents:)];
@@ -301,6 +311,7 @@ typedef NS_ENUM(NSInteger, TypefaceVariationFlavor) {
     [theMenu popUpMenuPositioningItem:nil
                            atLocation:NSMakePoint(view.bounds.size.width-8, view.bounds.size.height-1)
                                inView:view];
+#endif
     
 }
 
@@ -333,56 +344,38 @@ typedef NS_ENUM(NSInteger, TypefaceVariationFlavor) {
 - (void)filterTypefaces:(TypefaceListFilter*)filter {
     
     if (filter.isEmpty) {
-        [self.familiesArrayController setFilterPredicate:nil];
+        [self.typefacesArrayController setFilterPredicate:nil];
     }
     else {
         NSPredicate * predicate = [NSPredicate predicateWithBlock:^BOOL(id  evaluatedObject, NSDictionary<NSString *,id> *  bindings) {
             //[[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.01]];
-            TMTypefaceFamily * family = (TMTypefaceFamily*)evaluatedObject;
-            return [family filter:filter];
+            TMTypeface * face = (TMTypeface*)evaluatedObject;
+            return [filter filter:face];
         }];
-        [self.familiesArrayController setFilterPredicate:predicate];
+        [self.typefacesArrayController setFilterPredicate:predicate];
         
         [[LuaScriptConsoleWindowController sharedWindowController] flushMessages:self];
     }
     
-    [self.familyCombobox reloadData];
-    [self selectFamilyAtIndex:0];
+    [self.typefaceCombobox reloadData];
+    [self selectFaceAtIndex:0];
 }
 
 #pragma mark **** Selection ***
 
 - (TMTypeface*)selectedTypefaceEntry {
-    
-    NSString * familyName = self.familyCombobox.stringValue;
-    NSString * styleName = self.styleCombobox.stringValue;
-    
-    NSArray<TMTypefaceFamily*> * families = self.familiesArrayController.arrangedObjects;
-    
-    NSUInteger familyIndex = [families indexOfObjectPassingTest:^BOOL(TMTypefaceFamily * obj, NSUInteger idx, BOOL * stop) {
-        if ([obj.localizedFamilyName isEqualToString:familyName]) {
-            *stop = YES;
-            return YES;
-        }
+    NSString * faceUIName = [self.typefaceCombobox itemObjectValueAtIndex:self.typefaceCombobox.indexOfSelectedItem];
+    NSArray<TMTypeface*> * faces = self.typefacesArrayController.arrangedObjects;
+    NSUInteger faceIndex = [faces indexOfObjectPassingTest:^BOOL(TMTypeface * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+       if ([obj.UIFullName isEqualToString:faceUIName]) {
+           *stop = YES;
+           return YES;
+       }
         return NO;
     }];
-    
-    if (familyIndex == NSNotFound)
+    if (faceIndex == NSNotFound)
         return nil;
-    
-    TMTypefaceFamily * family = [families objectAtIndex:familyIndex];
-    
-    NSUInteger styleIndex = [family.faces indexOfObjectPassingTest:^BOOL(TMTypeface *  obj, NSUInteger idx, BOOL *  stop) {
-        if ([obj.localizedStyleName isEqualToString:styleName]) {
-            *stop = YES;
-            return YES;
-        }
-        return NO;
-    }];
-    
-    if (styleIndex == NSNotFound)
-        return nil;
-    return [family.faces objectAtIndex:styleIndex];
+    return [faces objectAtIndex:faceIndex];
 }
 
 - (NSFont*)selectedFont {
@@ -393,45 +386,18 @@ typedef NS_ENUM(NSInteger, TypefaceVariationFlavor) {
     self.selectedTypeface = [self.selectedTypefaceEntry createTypefaceDescriptor];
 }
 
-- (void)selectFamilyAtIndex:(NSUInteger)index {
-    if (index >= [self.familiesArrayController.arrangedObjects count]) {
-        [self.membersArrayController removeAllObjects];
-        [self.styleCombobox reloadData];
-    }
-    else {
-        [self.familyCombobox selectItemAtIndex:index];
-        
-        TMTypefaceFamily * family = [self.familiesArrayController.arrangedObjects objectAtIndex:index];
-        
-        [self.membersArrayController removeAllObjects];
-        [self.membersArrayController addObjects:family.faces];
-        
-        [self.styleCombobox reloadData];
-        
-        // Select Regular automatically
-        NSUInteger index = [self.styleCombobox indexOfItemWithObjectValue:@"Regular"];
-        if (index == NSNotFound)
-            index = 0;
-        [self selectStyleAtIndex:index];
-    }
-}
-
-- (void)selectStyleAtIndex:(NSUInteger)index {
-    if (index == -1) // nothing selected
-        return;
-    
-    [self.membersArrayController setSelectionIndex:index];
-    [self.styleCombobox selectItemAtIndex:index];
-    
+- (void)selectFaceAtIndex:(NSUInteger)index {
+    [self.typefaceCombobox selectItemAtIndex:index];
     [self updateTypefaceInformation];
 }
+
 
 - (BOOL)selectRecentTypeface:(TypefaceRecentDocumentInfo*)recent autoConfirmIfNotFound:(BOOL)autoConfirmIfNotFound{
     if (!recent)
         return NO;
     
     BOOL matchFound = NO;
-    
+#if 0
     NSArray<TMTypefaceFamily*>* families = self.familiesArrayController.arrangedObjects;
     for (NSUInteger familyIndex = 0; familyIndex < [families count]; ++ familyIndex) {
         TMTypefaceFamily * family = [families objectAtIndex:familyIndex];
@@ -453,47 +419,37 @@ typedef NS_ENUM(NSInteger, TypefaceVariationFlavor) {
         self.selectedTypeface = [TypefaceDescriptor descriptorWithFilePath:recent.file faceIndex:recent.index];
         [NSApp stopModalWithCode:NSModalResponseOK];
     }
+#endif
     return matchFound;
 }
 
 - (void)updateTypefaceInformation {
     TMTypeface * face = [self selectedTypefaceEntry];
-    self.designLanguagesTextField.stringValue = [face.attributes.designLanguages componentsJoinedByString:@", "];
-    self.featuresTextField.stringValue = [face.attributes.openTypeFeatures.allObjects componentsJoinedByString:@", "];
-    
-    NSString * (^generateNameString)(NSDictionary<NSString*, NSString*>*) = ^(NSDictionary<NSString*, NSString*>* names) {
-        NSMutableArray<NSString*> * array = [[NSMutableArray<NSString*> alloc] init];
-        for (NSString * lang in names)
-            [array addObject:[NSString stringWithFormat:@"%@(%@)", [names objectForKey:lang], lang]];
-        return [array componentsJoinedByString:@", "];
-    };
-    
-    self.familiesTextField.stringValue = generateNameString(face.attributes.localizedFamilyNames);
-    self.styleTextField.stringValue = generateNameString(face.attributes.localizedStyleNames);
-    
-    [self.sampleTextField setFont:[face createFontWithSize:self.previewFontSize]];
+    self.tableRows = [[HtmlTableRows alloc] init];
+    [self.tableRows addRowWithKey:@"UI Name" stringValue:face.UIFullName];
+    [self.tableRows addRowWithKey:@"Family Name" stringValue:face.familyName];
+    [self.tableRows addRowWithKey:@"Style Name" stringValue:face.styleName];
+    [self.tableRows addRowWithKey:@"Postscript Name" stringValue:face.attributes.postscriptName];
+    [self.tableRows addRowWithKey:@"Num Glyphs" integerValue:face.attributes.numGlyphs];
+    [self.tableRows addRowWithKey:@"UPEM" integerValue:face.attributes.UPEM];
+    [self.tableRows addRowWithKey:@"Created Date" stringValue:face.attributes.createdDate];
+    [self.tableRows addRowWithKey:@"Modified Date" stringValue:face.attributes.modifiedDate];
+    [self.tableRows addRowWithKey:@"OpenType Variation" boolValue:face.attributes.isOpenTypeVariation];
+    [self.tableRows addRowWithKey:@"Multiple Master" boolValue:face.attributes.isAdobeMultiMaster];
+    [self.typefaceDetailsTableView reloadData];
+    [self.sampleTextField setFont:[self selectedFont]];
 }
 
 #pragma mark *** NSComboboxDataSource ****
 - (void)comboBoxSelectionDidChange:(NSNotification *)notification {
-    if (notification.object == self.familyCombobox) {
-        [self selectFamilyAtIndex:self.familyCombobox.indexOfSelectedItem];
-    }
-    else if (notification.object == self.styleCombobox) {
-        [self selectStyleAtIndex:self.styleCombobox.indexOfSelectedItem];
-    }
-}
-
-- (void)controlTextDidEndEditing:(NSNotification *)notification {
-    if (notification.object == self.familyCombobox) {
-        NSString * text = self.familyCombobox.stringValue;
-        NSInteger index = [self.familyCombobox indexOfItemWithObjectValue:text];
-        if (index != -1)
-            [self selectFamilyAtIndex:index];
+    if (notification.object == self.typefaceCombobox) {
+        [self updateTypefaceInformation];
     }
 }
 
 @end 
+
+#pragma mark ##### TypefaceSelectorFilterWindowController #####
 
 @implementation TypefaceSelectorFilterWindowController
 

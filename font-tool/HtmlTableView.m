@@ -175,8 +175,14 @@ static HtmlTableViewAppearance * defaultHtmlTableViewApperance;
     
     [htmlText appendFormat:@"<colgroup>"]; {
         if (appearance.keyColumnSize) {
-            [htmlText appendFormat:@"<col style='width: %ld%%'/>", appearance.keyColumnSize];
-            [htmlText appendFormat:@"<col style='width: %ld%%'/>", (100 - appearance.keyColumnSize)];
+            if (appearance.absoluteKeyColumnSize) {
+                [htmlText appendFormat:@"<col style='width: %ld'/>", appearance.keyColumnSize];
+                [htmlText appendFormat:@"<col/>"];
+            }
+            else {
+                [htmlText appendFormat:@"<col style='width: %ld%%'/>", appearance.keyColumnSize];
+                [htmlText appendFormat:@"<col style='width: %ld%%'/>", (100 - appearance.keyColumnSize)];
+            }
         }
         else {
             [htmlText appendFormat:@"<col/>"];

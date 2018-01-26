@@ -8,6 +8,7 @@
 
 #import <Cocoa/Cocoa.h>
 #import "Typeface.h"
+#import "HtmlTableView.h"
 
 @interface TypefaceSelectorWindowController : NSWindowController <NSWindowDelegate>
 +(TypefaceSelectorWindowController*) sharedTypefaceListWindowController;
@@ -17,7 +18,7 @@
 
 @end
 
-@interface TypefaceSelectorViewController : NSViewController<NSComboBoxDataSource, NSComboBoxDelegate>
+@interface TypefaceSelectorViewController : NSViewController<NSComboBoxDataSource, NSComboBoxDelegate, HtmlTableViewDataSource, HtmlTableViewDelegate>
 - (IBAction)cancelTypefaceSelection:(id)sender;
 - (IBAction)confirmTypeFaceSelection:(id)sender;
 @end

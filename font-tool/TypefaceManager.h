@@ -27,9 +27,11 @@ extern NSString * TMProgressNotificationCurrentKey;
 @interface TMTypeface : NSObject
 @property NSString           * familyName;
 @property NSString           * styleName;
-@property NSString           * localizedFamilyName;
-@property NSString           * localizedStyleName;
+@property NSString           * UIFamilyName;
+@property NSString           * UIStyleName;
 @property TypefaceAttributes * attributes;
+
+- (NSString*) UIFullName;
 
 - (NSComparisonResult)compare:(TMTypeface*)other;
 - (Typeface*)createTypeface;

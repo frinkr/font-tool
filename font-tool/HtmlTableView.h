@@ -42,6 +42,7 @@ typedef NSMutableArray<HtmlTableRow*> HtmlTableRows;
 @interface HtmlTableViewAppearance : NSObject
 @property CGFloat fontSize;
 @property NSUInteger keyColumnSize; // 0-100, zero means free size
+@property BOOL absoluteKeyColumnSize; // keyColumnSize in pt when YES
 @property BOOL dark;
 
 -(instancetype)init;
