@@ -62,6 +62,21 @@ HtmlTableRow * MakeHtmlTableRow(NSString *key, NSString * value) {
     return [self addRowWithKey:key stringValue:[CharEncoding bitsStringOfNumber:value count:count]];
 }
 
+- (void)addRowWithKey:(NSString*)key arrayValue:(NSArray*) objects  delemiter:(NSString*)delemiter{
+    return [self addRowWithKey:key stringValue:[objects componentsJoinedByString:delemiter]];
+}
+
+- (void)addRowWithKey:(NSString*)key setValue:(NSSet*) objects  delemiter:(NSString*)delemiter{
+    return [self addRowWithKey:key arrayValue:objects.allObjects delemiter:delemiter];
+}
+
+- (void)addRowWithKey:(NSString *)key dictionaryValue:(NSDictionary *)objects  delemiter:(NSString*)delemiter{
+    NSMutableArray<NSString*> * array = [[NSMutableArray alloc] init];
+    for (id k in objects)
+        [array addObject:[NSString stringWithFormat:@"%@ = %@", k, [objects objectForKey:k]]];
+    return [self addRowWithKey:key arrayValue:array delemiter:delemiter];
+}
+
 @end
 
 static HtmlTableViewAppearance * defaultHtmlTableViewApperance;

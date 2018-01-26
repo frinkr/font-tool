@@ -25,7 +25,9 @@ extern HtmlTableRow * MakeHtmlTableRow(NSString *key, NSString * value);
 - (void)addRowWithKey:(NSString*)key uint32HexValue:(NSUInteger)value withPrefix:(NSString*)prefix;
 - (void)addRowWithKey:(NSString*)key uint16HexValue:(NSUInteger)value withPrefix:(NSString*)prefix;
 - (void)addRowWithKey:(NSString*)key bitsValue:(NSUInteger)value count:(NSUInteger)count;
-
+- (void)addRowWithKey:(NSString*)key arrayValue:(NSArray*) objects delemiter:(NSString*)delemiter;
+- (void)addRowWithKey:(NSString*)key setValue:(NSSet*) objects delemiter:(NSString*)delemiter;
+- (void)addRowWithKey:(NSString *)key dictionaryValue:(NSDictionary *)objects delemiter:(NSString*)delemiter;
 @end
 
 typedef NSMutableArray<HtmlTableRow*> HtmlTableRows;

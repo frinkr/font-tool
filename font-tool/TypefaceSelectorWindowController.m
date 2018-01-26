@@ -427,8 +427,6 @@ typedef NS_ENUM(NSInteger, TypefaceVariationFlavor) {
     TMTypeface * face = [self selectedTypefaceEntry];
     self.tableRows = [[HtmlTableRows alloc] init];
     [self.tableRows addRowWithKey:@"UI Name" stringValue:face.UIFullName];
-    [self.tableRows addRowWithKey:@"Family Name" stringValue:face.familyName];
-    [self.tableRows addRowWithKey:@"Style Name" stringValue:face.styleName];
     [self.tableRows addRowWithKey:@"Postscript Name" stringValue:face.attributes.postscriptName];
     [self.tableRows addRowWithKey:@"Num Glyphs" integerValue:face.attributes.numGlyphs];
     [self.tableRows addRowWithKey:@"UPEM" integerValue:face.attributes.UPEM];
@@ -436,6 +434,23 @@ typedef NS_ENUM(NSInteger, TypefaceVariationFlavor) {
     [self.tableRows addRowWithKey:@"Modified Date" stringValue:face.attributes.modifiedDate];
     [self.tableRows addRowWithKey:@"OpenType Variation" boolValue:face.attributes.isOpenTypeVariation];
     [self.tableRows addRowWithKey:@"Multiple Master" boolValue:face.attributes.isAdobeMultiMaster];
+    [self.tableRows addRowWithKey:@"OpenType Scripts" setValue:face.attributes.openTypeScripts delemiter:@", "];
+    [self.tableRows addRowWithKey:@"OpenType Languages" setValue:face.attributes.openTypeLanguages delemiter:@", "];
+    [self.tableRows addRowWithKey:@"OpenType Features" setValue:face.attributes.openTypeFeatures delemiter:@", "];
+    
+    [self.tableRows addRowWithKey:@"Family Name" stringValue:face.familyName];
+    [self.tableRows addRowWithKey:@"Style Name" stringValue:face.styleName];
+    [self.tableRows addRowWithKey:@"Full Name" stringValue:face.attributes.fullName];
+    [self.tableRows addRowWithKey:@"Localized Family Names" dictionaryValue:face.attributes.localizedFamilyNames delemiter:@"</br>"];
+    [self.tableRows addRowWithKey:@"Localized Style Names" dictionaryValue:face.attributes.localizedStyleNames delemiter:@"</br>"];
+    [self.tableRows addRowWithKey:@"Localized Full Names" dictionaryValue:face.attributes.localizedFullNames delemiter:@"</br>"];
+    [self.tableRows addRowWithKey:@"Design Languages" arrayValue:face.attributes.designLanguages delemiter:@", "];
+    
+    [self.tableRows addRowWithKey:@"Format" stringValue:face.attributes.format];
+    [self.tableRows addRowWithKey:@"IsCID" boolValue:face.attributes.isCID];
+    [self.tableRows addRowWithKey:@"Vender" stringValue:face.attributes.vender];
+    [self.tableRows addRowWithKey:@"Version" stringValue:face.attributes.version];
+    
     [self.typefaceDetailsTableView reloadData];
     [self.sampleTextField setFont:[self selectedFont]];
 }
