@@ -202,7 +202,7 @@
                             </textField>
                             <comboBox verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="MWG-jJ-hwb">
                                 <rect key="frame" x="100" y="275" width="381" height="26"/>
-                                <comboBoxCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" drawsBackground="YES" numberOfVisibleItems="15" id="GVk-vX-zun">
+                                <comboBoxCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" drawsBackground="YES" numberOfVisibleItems="15" id="GVk-vX-zun" customClass="TypefaceComboBoxCell">
                                     <font key="font" metaFont="system"/>
                                     <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -329,6 +329,7 @@ DQ
                     <connections>
                         <outlet property="sampleTextField" destination="NUE-wf-jok" id="fWm-JN-LJY"/>
                         <outlet property="typefaceCombobox" destination="MWG-jJ-hwb" id="nc0-jX-zEx"/>
+                        <outlet property="typefaceComboboxCell" destination="GVk-vX-zun" id="wEF-5d-rYn"/>
                         <outlet property="typefaceDetailsPlaceholder" destination="5HE-2w-0Ui" id="TOa-5a-1mt"/>
                         <outlet property="typefacesArrayController" destination="pi0-Wv-LcR" id="oFN-3M-QQ3"/>
                     </connections>

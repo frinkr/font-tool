@@ -101,9 +101,19 @@ typedef NS_ENUM(NSInteger, TypefaceVariationFlavor) {
 
 @end
 
+
+@interface TypefaceComboBoxCell : NSComboBoxCell
+{
+}
+- (void)popUpList;
+- (void)closePopUpWindow;
+- (BOOL)isPopUpWindowVisible;
+@end
+
 #pragma mark #### TypefaceSelectorViewController ####
 @interface TypefaceSelectorViewController ()
 @property (weak) IBOutlet NSComboBox *typefaceCombobox;
+@property (weak) IBOutlet TypefaceComboBoxCell *typefaceComboboxCell;
 @property (unsafe_unretained) IBOutlet NSTextView *typefaceInfoEdit;
 @property (assign) IBOutlet NSTextField *sampleTextField;
 @property (strong) TypefaceDescriptor * selectedTypeface;
@@ -456,7 +466,49 @@ typedef NS_ENUM(NSInteger, TypefaceVariationFlavor) {
     }
 }
 
+- (void)controlTextDidChange:(NSNotification *)notification {
+    NSComboBox * object = notification.object;
+    [object setCompletes:YES];
+    [self.typefaceComboboxCell popUpList];
+}
+
+- (NSString *)comboBox:(NSComboBox *)comboBox completedString:(NSString *)string {
+    for (TMTypeface * face in self.typefacesArrayController.arrangedObjects) {
+        NSRange range = [face.UIFullName rangeOfString:string options:NSAnchoredSearch|NSCaseInsensitiveSearch];
+        if (range.location == 0)
+            return face.UIFullName;
+    }
+    return nil;
+}
 @end 
+
+
+@implementation TypefaceComboBoxCell
+- (void)popUpList {
+    if ([self isPopUpWindowVisible])
+        return;
+    else
+        [_buttonCell performClick:nil];
+}
+
+- (void)closePopUpWindow {
+    if ([self isPopUpWindowVisible])
+        [_popUp close];
+}
+
+- (BOOL)isPopUpWindowVisible {
+    return [_popUp isVisible];
+}
+
+- (NSString *)completedString:(NSString *)string {
+    if ([_delegate isKindOfClass:[NSComboBox class]]) {
+        NSComboBox * cb = (NSComboBox*)_delegate;
+        if ([cb.delegate respondsToSelector:@selector(comboBox:completedString:)])
+            return [cb.delegate performSelector:@selector(comboBox:completedString:) withObject:cb withObject:string];
+    }
+    return nil;
+}
+@end
 
 #pragma mark ##### TypefaceSelectorFilterWindowController #####
 
