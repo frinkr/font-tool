@@ -106,7 +106,6 @@ typedef NS_ENUM(NSInteger, TypefaceVariationFlavor) {
 {
 }
 - (void)popUpList;
-- (void)closePopUpWindow;
 - (BOOL)isPopUpWindowVisible;
 @end
 
@@ -116,7 +115,7 @@ typedef NS_ENUM(NSInteger, TypefaceVariationFlavor) {
 @property (weak) IBOutlet TypefaceComboBoxCell *typefaceComboboxCell;
 @property (unsafe_unretained) IBOutlet NSTextView *typefaceInfoEdit;
 @property (assign) IBOutlet NSTextField *sampleTextField;
-@property (strong) TypefaceDescriptor * selectedTypeface;
+@property (strong) TypefaceDescriptor * selectedTypefaceDescriptor;
 @property (assign) IBOutlet NSArrayController *typefacesArrayController;
 @property (nonatomic) HtmlTableView * typefaceDetailsTableView;
 @property (weak) IBOutlet NSView *typefaceDetailsPlaceholder;
@@ -182,7 +181,7 @@ typedef NS_ENUM(NSInteger, TypefaceVariationFlavor) {
     
     if (NSModalResponseOK == [NSApp runModalForWindow:wc.window]) {
         TypefaceSelectorViewController * vc = (TypefaceSelectorViewController*)wc.contentViewController;
-        faceDesc = vc.selectedTypeface;
+        faceDesc = vc.selectedTypefaceDescriptor;
     };
     
     [wc.window orderOut:nil];
@@ -242,13 +241,9 @@ typedef NS_ENUM(NSInteger, TypefaceVariationFlavor) {
     [self loadTableView];
     self.previewFontSize = 16;
 
-    NSMutableArray<TMTypeface*> * allFaces = [[NSMutableArray alloc] init];
-    for (TMTypefaceFamily * family in [[TypefaceManager defaultManager] availableTypefaceFamilies]) {
-        [allFaces addObjectsFromArray:family.faces];
-    }
-    
-    [self.typefacesArrayController addObjects:allFaces];
+    [self.typefacesArrayController addObjects:[[TypefaceManager defaultManager] availableFaces]];
     [self.typefaceCombobox reloadData];
+    self.typefaceCombobox.completes = NO;
     
     [self selectFaceAtIndex:0];
     
@@ -296,11 +291,14 @@ typedef NS_ENUM(NSInteger, TypefaceVariationFlavor) {
 
 - (IBAction)cancelTypefaceSelection:(id)sender {
     [NSApp stopModalWithCode:NSModalResponseCancel];
+    self.typefacesArrayController.filterPredicate = nil;
 }
 
 - (IBAction)confirmTypeFaceSelection:(id)sender {
     [self readSelectedFont];
-    [NSApp stopModalWithCode:NSModalResponseOK];
+    if (self.selectedTypefaceDescriptor)
+        [NSApp stopModalWithCode:NSModalResponseOK];
+    self.typefacesArrayController.filterPredicate = nil;
 }
 
 - (IBAction)doQuit:(id)sender {
@@ -353,16 +351,19 @@ typedef NS_ENUM(NSInteger, TypefaceVariationFlavor) {
 - (void)filterTypefaces:(TypefaceListFilter*)filter {
     
     if (filter.isEmpty) {
+        [self.typefacesArrayController removeAllObjects];
+        [self.typefacesArrayController addObjects:[[TypefaceManager defaultManager] availableFaces]];
         [self.typefacesArrayController setFilterPredicate:nil];
     }
     else {
         NSPredicate * predicate = [NSPredicate predicateWithBlock:^BOOL(id  evaluatedObject, NSDictionary<NSString *,id> *  bindings) {
-            //[[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.01]];
             TMTypeface * face = (TMTypeface*)evaluatedObject;
             return [filter filter:face];
         }];
-        [self.typefacesArrayController setFilterPredicate:predicate];
         
+        NSArray<TMTypeface*> * faces = [[[TypefaceManager defaultManager] availableFaces] filteredArrayUsingPredicate:predicate];
+        [self.typefacesArrayController removeAllObjects];
+        [self.typefacesArrayController addObjects:faces];
         [[LuaScriptConsoleWindowController sharedWindowController] flushMessages:self];
     }
     
@@ -372,10 +373,15 @@ typedef NS_ENUM(NSInteger, TypefaceVariationFlavor) {
 
 #pragma mark **** Selection ***
 
-- (TMTypeface*)selectedTypefaceEntry {
+- (TMTypeface*)selectedTypeface {
+    NSString * faceUIName = nil;
     if (self.typefaceCombobox.indexOfSelectedItem == -1)
+        faceUIName = self.typefaceCombobox.stringValue;
+    else
+        faceUIName = [self.typefaceCombobox itemObjectValueAtIndex:self.typefaceCombobox.indexOfSelectedItem];
+    if (!faceUIName)
         return nil;
-    NSString * faceUIName = [self.typefaceCombobox itemObjectValueAtIndex:self.typefaceCombobox.indexOfSelectedItem];
+    
     NSArray<TMTypeface*> * faces = self.typefacesArrayController.arrangedObjects;
     NSUInteger faceIndex = [faces indexOfObjectPassingTest:^BOOL(TMTypeface * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
        if ([obj.UIFullName isEqualToString:faceUIName]) {
@@ -390,11 +396,11 @@ typedef NS_ENUM(NSInteger, TypefaceVariationFlavor) {
 }
 
 - (NSFont*)selectedFont {
-    return [self.selectedTypefaceEntry createFontWithSize:self.previewFontSize];
+    return [self.selectedTypeface createFontWithSize:self.previewFontSize];
 }
 
 - (void)readSelectedFont {
-    self.selectedTypeface = [self.selectedTypefaceEntry createTypefaceDescriptor];
+    self.selectedTypefaceDescriptor = [self.selectedTypeface createTypefaceDescriptor];
 }
 
 - (void)selectFaceAtIndex:(NSUInteger)index {
@@ -418,7 +424,7 @@ typedef NS_ENUM(NSInteger, TypefaceVariationFlavor) {
     }
     
     if (!matchFound && autoConfirmIfNotFound) {
-        self.selectedTypeface = [TypefaceDescriptor descriptorWithFilePath:recent.file faceIndex:recent.index];
+        self.selectedTypefaceDescriptor = [TypefaceDescriptor descriptorWithFilePath:recent.file faceIndex:recent.index];
         [NSApp stopModalWithCode:NSModalResponseOK];
     }
 
@@ -426,7 +432,7 @@ typedef NS_ENUM(NSInteger, TypefaceVariationFlavor) {
 }
 
 - (void)updateTypefaceInformation {
-    TMTypeface * face = [self selectedTypefaceEntry];
+    TMTypeface * face = [self selectedTypeface];
     self.tableRows = [[HtmlTableRows alloc] init];
     [self.tableRows addRowWithKey:@"UI Name" stringValue:face.UIFullName];
     [self.tableRows addRowWithKey:@"Postscript Name" stringValue:face.attributes.postscriptName];
@@ -464,11 +470,41 @@ typedef NS_ENUM(NSInteger, TypefaceVariationFlavor) {
     if (notification.object == self.typefaceCombobox) {
         [self updateTypefaceInformation];
     }
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        if (!self.typefaceComboboxCell.isPopUpWindowVisible)
+            [self.typefacesArrayController setFilterPredicate:nil];
+    });
+}
+
+- (void)controlTextDidEndEditing:(NSNotification *)notification {
+    // Select first if no selected
+    if (!self.selectedTypeface)
+        [self selectFaceAtIndex:0];
+    [self.typefacesArrayController setFilterPredicate:nil];
 }
 
 - (void)controlTextDidChange:(NSNotification *)notification {
     NSComboBox * object = notification.object;
-    [object setCompletes:YES];
+    [object setCompletes:NO];
+    
+    NSPredicate * predicate = [NSPredicate predicateWithBlock:^BOOL(id  evaluatedObject, NSDictionary<NSString *,id> *  bindings) {
+        TMTypeface * face = (TMTypeface*)evaluatedObject;
+        NSMutableArray<NSString*> * names = [[NSMutableArray alloc] init];
+        [names addObjectsFromArray:face.attributes.localizedFamilyNames.allValues];
+        [names addObject:face.UIFamilyName];
+        for (NSString * name in names ) {
+            NSRange range = [name rangeOfString:object.stringValue options:NSCaseInsensitiveSearch];
+            if (range.location != NSNotFound)
+                return YES;
+        }
+        return NO;
+    }];
+    
+    if (object.stringValue.length)
+        [self.typefacesArrayController setFilterPredicate:predicate];
+    else
+        [self.typefacesArrayController setFilterPredicate:nil];
+    
     [self.typefaceComboboxCell popUpList];
 }
 
@@ -485,15 +521,14 @@ typedef NS_ENUM(NSInteger, TypefaceVariationFlavor) {
 
 @implementation TypefaceComboBoxCell
 - (void)popUpList {
+    id ax = NSAccessibilityUnignoredDescendant(self);
+    [ax accessibilitySetValue: [NSNumber numberWithBool:YES]
+                 forAttribute: NSAccessibilityExpandedAttribute];
+    return;
     if ([self isPopUpWindowVisible])
         return;
     else
         [_buttonCell performClick:nil];
-}
-
-- (void)closePopUpWindow {
-    if ([self isPopUpWindowVisible])
-        [_popUp close];
 }
 
 - (BOOL)isPopUpWindowVisible {

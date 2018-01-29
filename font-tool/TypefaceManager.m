@@ -254,6 +254,14 @@ static TypefaceManager * defaultTypefaceManager;
     return _typefaceFimilies;
 }
 
+-(NSArray<TMTypeface*>*)availableFaces {
+    NSMutableArray<TMTypeface*> * allFaces = [[NSMutableArray alloc] init];
+    for (TMTypefaceFamily * family in [self availableTypefaceFamilies]) 
+        [allFaces addObjectsFromArray:family.faces];
+    
+    return allFaces;
+}
+
 -(void)initFTLib {
     if (!ftLib)
         FT_Init_FreeType(&ftLib);

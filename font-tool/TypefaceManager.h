@@ -60,7 +60,7 @@ extern NSString * TMProgressNotificationCurrentKey;
 -(OpaqueFTLibrary)ftLib;
 
 -(NSArray<TMTypefaceFamily*>*)availableTypefaceFamilies;
-
+-(NSArray<TMTypeface*>*)availableFaces;
 
 -(NSArray<NSString*> *)listFacesOfURL:(NSURL*)url;
 -(NSString*)faceNameAtIndex:(NSUInteger)index ofURL:(NSURL*)url;
