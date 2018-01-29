@@ -1,3 +1,4 @@
+
 //
 //  TypefaceListWindowController.m
 //  tx-research
@@ -123,9 +124,10 @@ typedef NS_ENUM(NSInteger, TypefaceVariationFlavor) {
 @property (nonatomic) CGFloat previewFontSize;
 
 @property (strong) HtmlTableRows * tableRows;
+@property (strong) TypefaceListFilter * filter;
 
 - (void)filterTypefaces:(TypefaceListFilter*)filter;
-- (IBAction)showRecentTypeMenu:(id)sender;
+- (IBAction)doShowRecentTypeMenu:(id)sender;
 @end
 
 @interface TypefaceSelectorFilterWindowController()
@@ -148,7 +150,7 @@ typedef NS_ENUM(NSInteger, TypefaceVariationFlavor) {
     
     // Implement this method to handle any initialization after your window controller's window has been loaded from its nib file.
     self.window.delegate = self;
-    NSString * scriptBuffer = [NSString stringWithContentsOfFile: [[NSBundle mainBundle] pathForResource:@"SampleScripts/template" ofType:@"lua"]
+    NSString * scriptBuffer = [NSString stringWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"SampleScripts/template" ofType:@"lua"]
                                                         encoding:NSUTF8StringEncoding
                                                            error:nil];
     
@@ -157,15 +159,18 @@ typedef NS_ENUM(NSInteger, TypefaceVariationFlavor) {
         [[LuaScriptConsoleWindowController sharedWindowController] appendMessage:message];
     };
     
+    TypefaceSelectorViewController * vc = (TypefaceSelectorViewController*)self.contentViewController;
+    vc.filter = self.filter;
+    
     self.moreButton.wantsLayer = YES;
-    self.window.titleVisibility = NSWindowTitleHidden;
+    self.window.titleVisibility = NSWindowTitleVisible;
 }
 
 - (void)windowWillClose:(NSNotification *)notification {
     [[NSApplication sharedApplication] stopModalWithCode: NSModalResponseCancel];
 }
 
-+(TypefaceSelectorWindowController*) sharedTypefaceListWindowController {
++(TypefaceSelectorWindowController*) sharedInstance {
     if (sharedTypefaceListWC)
         return sharedTypefaceListWC;
     
@@ -175,7 +180,7 @@ typedef NS_ENUM(NSInteger, TypefaceVariationFlavor) {
 }
 
 +(TypefaceDescriptor*)selectTypeface {
-    NSWindowController * wc  = [TypefaceSelectorWindowController sharedTypefaceListWindowController];
+    NSWindowController * wc  = [TypefaceSelectorWindowController sharedInstance];
     
     TypefaceDescriptor * faceDesc = nil;
     
@@ -188,29 +193,6 @@ typedef NS_ENUM(NSInteger, TypefaceVariationFlavor) {
     return faceDesc;
 }
 
-- (IBAction)doToggleFeature:(id)sender {
-}
-
-- (IBAction)doShowRecents:(id)sender {
-    TypefaceSelectorViewController * vc = (TypefaceSelectorViewController*)self.contentViewController;
-    [vc showRecentTypeMenu:sender];
-}
-
-- (IBAction)doShowMoreOpenTypeFeatures:(id)sender {
-    TypefaceSelectorFilterWindowController * wc = (TypefaceSelectorFilterWindowController*)[[NSStoryboard storyboardWithName:@"TypefaceSelectorWindow" bundle:nil] instantiateControllerWithIdentifier:@"typefaceFilterWindowController"];
-    TypefaceSelectorFilterViewController * vc = (TypefaceSelectorFilterViewController*)wc.contentViewController;
-    wc.filter = self.filter;
-    vc.filter = self.filter;
-    
-    NSModalResponse response = [NSApp runModalForWindow:wc.window];
-    if (response == NSModalResponseOK) {
-         [[LuaScriptConsoleWindowController sharedWindowController] flushMessages:self];
-        
-        TypefaceSelectorViewController * sc = (TypefaceSelectorViewController*)self.contentViewController;
-        [sc filterTypefaces:self.filter];
-    }
-    [wc.window orderOut:nil];
-}
 
 @end
 
@@ -305,10 +287,24 @@ typedef NS_ENUM(NSInteger, TypefaceVariationFlavor) {
     [NSApp terminate:self];
 }
 
-- (IBAction)showRecentTypeMenu:(id)sender {
+- (IBAction)doFilter:(id)sender {
+    TypefaceSelectorFilterWindowController * wc = (TypefaceSelectorFilterWindowController*)[[NSStoryboard storyboardWithName:@"TypefaceSelectorWindow" bundle:nil] instantiateControllerWithIdentifier:@"typefaceFilterWindowController"];
+    TypefaceSelectorFilterViewController * vc = (TypefaceSelectorFilterViewController*)wc.contentViewController;
+    wc.filter = self.filter;
+    vc.filter = self.filter;
+    
+    NSModalResponse response = [NSApp runModalForWindow:wc.window];
+    if (response == NSModalResponseOK) {
+        [[LuaScriptConsoleWindowController sharedWindowController] flushMessages:self];
+        [self filterTypefaces:self.filter];
+    }
+    [wc.window orderOut:nil];
+}
+
+- (IBAction)doShowRecentTypeMenu:(id)sender {
 
     TypefaceDocumentController * docController = (TypefaceDocumentController*)[TypefaceDocumentController sharedDocumentController];
-    NSMenu * theMenu = [docController buildRecentMenuWithAction:@selector(openRecentType:)
+    NSMenu * theMenu = [docController buildRecentMenuWithAction:@selector(doOpenRecentType:)
                                                     clearAction:@selector(clearAllRecents:)];
     [theMenu setFont:self.typefaceCombobox.font];
     
@@ -321,7 +317,7 @@ typedef NS_ENUM(NSInteger, TypefaceVariationFlavor) {
     
 }
 
-- (IBAction)openRecentType:(id)sender {
+- (IBAction)doOpenRecentType:(id)sender {
     if ([sender isKindOfClass:[NSMenuItem class]]) {
         NSMenuItem * item = (NSMenuItem*)sender;
         TypefaceRecentDocumentInfo * recent = (TypefaceRecentDocumentInfo*)item.representedObject;

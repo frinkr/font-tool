@@ -11,10 +11,8 @@
 #import "HtmlTableView.h"
 
 @interface TypefaceSelectorWindowController : NSWindowController <NSWindowDelegate>
-+(TypefaceSelectorWindowController*) sharedTypefaceListWindowController;
++(TypefaceSelectorWindowController*) sharedInstance;
 +(TypefaceDescriptor*)selectTypeface;
-
-- (IBAction)doToggleFeature:(id)sender;
 
 @end
 
