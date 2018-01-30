@@ -80,14 +80,14 @@
                             <scrollView horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="KBg-9G-daH">
                                 <rect key="frame" x="0.0" y="0.0" width="610" height="257"/>
                                 <clipView key="contentView" id="hdj-nK-jzh">
-                                    <rect key="frame" x="1" y="1" width="608" height="255"/>
+                                    <rect key="frame" x="1" y="1" width="593" height="255"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <textView importsGraphics="NO" verticallyResizable="YES" usesFontPanel="YES" findStyle="panel" continuousSpellChecking="YES" allowsUndo="YES" usesRuler="YES" allowsNonContiguousLayout="YES" quoteSubstitution="YES" dashSubstitution="YES" spellingCorrection="YES" smartInsertDelete="YES" id="8zZ-Uh-Qpt" customClass="SourceTextView">
-                                            <rect key="frame" x="0.0" y="0.0" width="608" height="255"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="593" height="255"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                            <size key="minSize" width="608" height="255"/>
+                                            <size key="minSize" width="593" height="255"/>
                                             <size key="maxSize" width="610" height="10000000"/>
                                             <color key="insertionPointColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
                                         </textView>
@@ -99,7 +99,7 @@
                                     <autoresizingMask key="autoresizingMask"/>
                                 </scroller>
                                 <scroller key="verticalScroller" verticalHuggingPriority="750" doubleValue="1" horizontal="NO" id="iaZ-4t-pWw">
-                                    <rect key="frame" x="593" y="1" width="16" height="255"/>
+                                    <rect key="frame" x="594" y="1" width="15" height="255"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                 </scroller>
                             </scrollView>
@@ -156,7 +156,7 @@
                                 </textFieldCell>
                             </textField>
                             <comboBox verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="MWG-jJ-hwb">
-                                <rect key="frame" x="86" y="287" width="323" height="26"/>
+                                <rect key="frame" x="86" y="287" width="319" height="26"/>
                                 <comboBoxCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" drawsBackground="YES" numberOfVisibleItems="15" id="GVk-vX-zun" customClass="TypefaceComboBoxCell">
                                     <font key="font" metaFont="system"/>
                                     <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -194,12 +194,12 @@ DQ
                                 </connections>
                             </button>
                             <button toolTip="Filter" translatesAutoresizingMaskIntoConstraints="NO" id="3mN-70-v6u" userLabel="Filter">
-                                <rect key="frame" x="412" y="291" width="20" height="20"/>
+                                <rect key="frame" x="408" y="290" width="22" height="22"/>
                                 <constraints>
-                                    <constraint firstAttribute="height" constant="20" id="hrD-1G-3ri"/>
-                                    <constraint firstAttribute="width" constant="20" id="xTZ-6H-4NC"/>
+                                    <constraint firstAttribute="height" constant="22" id="hrD-1G-3ri"/>
+                                    <constraint firstAttribute="width" constant="22" id="xTZ-6H-4NC"/>
                                 </constraints>
-                                <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="Filter" imagePosition="only" alignment="center" imageScaling="proportionallyUpOrDown" inset="2" id="S0y-aJ-049">
+                                <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="Script" imagePosition="only" alignment="center" imageScaling="proportionallyUpOrDown" inset="2" id="S0y-aJ-049">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
                                 </buttonCell>
@@ -208,10 +208,10 @@ DQ
                                 </connections>
                             </button>
                             <button toolTip="Recents" translatesAutoresizingMaskIntoConstraints="NO" id="bXf-4W-VgH" userLabel="Recents">
-                                <rect key="frame" x="436" y="291" width="20" height="20"/>
+                                <rect key="frame" x="434" y="290" width="22" height="22"/>
                                 <constraints>
-                                    <constraint firstAttribute="width" constant="20" id="Fav-bb-PLm"/>
-                                    <constraint firstAttribute="height" constant="20" id="v0m-i2-3uw"/>
+                                    <constraint firstAttribute="width" constant="22" id="Fav-bb-PLm"/>
+                                    <constraint firstAttribute="height" constant="22" id="v0m-i2-3uw"/>
                                 </constraints>
                                 <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="History" imagePosition="only" alignment="center" imageScaling="proportionallyUpOrDown" inset="2" id="4vr-yU-Vww">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -256,12 +256,12 @@ DQ
     <resources>
         <image name="Cancel" width="256" height="256"/>
         <image name="Clear" width="256" height="256"/>
-        <image name="Filter" width="128" height="128"/>
         <image name="History" width="128" height="128"/>
         <image name="NSInfo" width="32" height="32"/>
         <image name="OK_Color" width="256" height="256"/>
         <image name="Open" width="256" height="256"/>
         <image name="Run" width="256" height="256"/>
         <image name="Save" width="256" height="256"/>
+        <image name="Script" width="256" height="256"/>
     </resources>
 </document>
