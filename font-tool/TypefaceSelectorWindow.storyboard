@@ -29,7 +29,7 @@
                                         <action selector="doSave:" target="Sf7-lD-tsG" id="AM7-xA-BJO"/>
                                     </connections>
                                 </toolbarItem>
-                                <toolbarItem implicitItemIdentifier="2EAAB940-D670-4376-BF86-9925075C5D75" label="OK" paletteLabel="OK" toolTip="OK" tag="-1" image="OK" id="i1e-ar-WvI">
+                                <toolbarItem implicitItemIdentifier="2EAAB940-D670-4376-BF86-9925075C5D75" label="Run" paletteLabel="Run" toolTip="OK" tag="-1" image="Run" id="i1e-ar-WvI">
                                     <connections>
                                         <action selector="doOK:" target="Sf7-lD-tsG" id="177-mv-vNg"/>
                                     </connections>
@@ -156,7 +156,7 @@
                                 </textFieldCell>
                             </textField>
                             <comboBox verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="MWG-jJ-hwb">
-                                <rect key="frame" x="92" y="287" width="329" height="26"/>
+                                <rect key="frame" x="86" y="287" width="323" height="26"/>
                                 <comboBoxCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" drawsBackground="YES" numberOfVisibleItems="15" id="GVk-vX-zun" customClass="TypefaceComboBoxCell">
                                     <font key="font" metaFont="system"/>
                                     <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -176,11 +176,11 @@
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="5HE-2w-0Ui" userLabel="Typeface Details Placeholder">
                                 <rect key="frame" x="0.0" y="0.0" width="498" height="283"/>
                             </customView>
-                            <button translatesAutoresizingMaskIntoConstraints="NO" id="yFP-Sa-6Y5">
-                                <rect key="frame" x="446" y="20" width="32" height="32"/>
+                            <button translatesAutoresizingMaskIntoConstraints="NO" id="yFP-Sa-6Y5" userLabel="OK">
+                                <rect key="frame" x="468" y="289" width="24" height="24"/>
                                 <constraints>
-                                    <constraint firstAttribute="width" constant="32" id="JJO-EW-8L3"/>
-                                    <constraint firstAttribute="height" constant="32" id="yAa-ME-3DY"/>
+                                    <constraint firstAttribute="width" constant="24" id="JJO-EW-8L3"/>
+                                    <constraint firstAttribute="height" constant="24" id="yAa-ME-3DY"/>
                                 </constraints>
                                 <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="OK_Color" imagePosition="only" alignment="center" imageScaling="proportionallyUpOrDown" inset="2" id="IFn-Rk-jl7">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -193,11 +193,11 @@ DQ
                                     <action selector="confirmTypeFaceSelection:" target="H06-Us-nPa" id="JUb-6R-gYd"/>
                                 </connections>
                             </button>
-                            <button toolTip="Filter" translatesAutoresizingMaskIntoConstraints="NO" id="3mN-70-v6u">
-                                <rect key="frame" x="426" y="290" width="22" height="22"/>
+                            <button toolTip="Filter" translatesAutoresizingMaskIntoConstraints="NO" id="3mN-70-v6u" userLabel="Filter">
+                                <rect key="frame" x="412" y="291" width="20" height="20"/>
                                 <constraints>
-                                    <constraint firstAttribute="height" constant="22" id="hrD-1G-3ri"/>
-                                    <constraint firstAttribute="width" constant="22" id="xTZ-6H-4NC"/>
+                                    <constraint firstAttribute="height" constant="20" id="hrD-1G-3ri"/>
+                                    <constraint firstAttribute="width" constant="20" id="xTZ-6H-4NC"/>
                                 </constraints>
                                 <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="Filter" imagePosition="only" alignment="center" imageScaling="proportionallyUpOrDown" inset="2" id="S0y-aJ-049">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -207,11 +207,11 @@ DQ
                                     <action selector="doFilter:" target="H06-Us-nPa" id="otf-nl-xDQ"/>
                                 </connections>
                             </button>
-                            <button toolTip="Recents" translatesAutoresizingMaskIntoConstraints="NO" id="bXf-4W-VgH">
-                                <rect key="frame" x="456" y="290" width="22" height="22"/>
+                            <button toolTip="Recents" translatesAutoresizingMaskIntoConstraints="NO" id="bXf-4W-VgH" userLabel="Recents">
+                                <rect key="frame" x="436" y="291" width="20" height="20"/>
                                 <constraints>
-                                    <constraint firstAttribute="width" constant="22" id="Fav-bb-PLm"/>
-                                    <constraint firstAttribute="height" constant="22" id="v0m-i2-3uw"/>
+                                    <constraint firstAttribute="width" constant="20" id="Fav-bb-PLm"/>
+                                    <constraint firstAttribute="height" constant="20" id="v0m-i2-3uw"/>
                                 </constraints>
                                 <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="History" imagePosition="only" alignment="center" imageScaling="proportionallyUpOrDown" inset="2" id="4vr-yU-Vww">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -223,20 +223,20 @@ DQ
                             </button>
                         </subviews>
                         <constraints>
+                            <constraint firstAttribute="trailing" secondItem="yFP-Sa-6Y5" secondAttribute="trailing" constant="6" id="1fb-G3-fzY"/>
                             <constraint firstItem="MWG-jJ-hwb" firstAttribute="top" secondItem="ufI-pY-Xtw" secondAttribute="top" constant="32" id="217-ep-Pgt"/>
                             <constraint firstAttribute="trailing" secondItem="5HE-2w-0Ui" secondAttribute="trailing" id="97M-ss-OMA"/>
                             <constraint firstItem="bXf-4W-VgH" firstAttribute="centerY" secondItem="MWG-jJ-hwb" secondAttribute="centerY" id="9kM-EZ-2Cp"/>
-                            <constraint firstAttribute="trailing" secondItem="bXf-4W-VgH" secondAttribute="trailing" constant="20" id="DJg-Fy-d3D"/>
-                            <constraint firstItem="bXf-4W-VgH" firstAttribute="leading" secondItem="3mN-70-v6u" secondAttribute="trailing" constant="8" id="JKN-bv-NEb"/>
-                            <constraint firstItem="MWG-jJ-hwb" firstAttribute="leading" secondItem="Eej-7z-bbF" secondAttribute="trailing" constant="12" id="TdV-YH-any"/>
+                            <constraint firstItem="yFP-Sa-6Y5" firstAttribute="leading" secondItem="bXf-4W-VgH" secondAttribute="trailing" constant="12" id="DJg-Fy-d3D"/>
+                            <constraint firstItem="bXf-4W-VgH" firstAttribute="leading" secondItem="3mN-70-v6u" secondAttribute="trailing" constant="4" id="JKN-bv-NEb"/>
+                            <constraint firstItem="MWG-jJ-hwb" firstAttribute="leading" secondItem="Eej-7z-bbF" secondAttribute="trailing" constant="6" id="TdV-YH-any"/>
                             <constraint firstItem="3mN-70-v6u" firstAttribute="centerY" secondItem="MWG-jJ-hwb" secondAttribute="centerY" id="VFS-wO-DTv"/>
-                            <constraint firstItem="3mN-70-v6u" firstAttribute="leading" secondItem="MWG-jJ-hwb" secondAttribute="trailing" constant="8" symbolic="YES" id="War-FD-iMA"/>
+                            <constraint firstItem="3mN-70-v6u" firstAttribute="leading" secondItem="MWG-jJ-hwb" secondAttribute="trailing" constant="6" id="War-FD-iMA"/>
                             <constraint firstItem="5HE-2w-0Ui" firstAttribute="top" secondItem="MWG-jJ-hwb" secondAttribute="bottom" constant="8" id="X0e-nC-Fig"/>
-                            <constraint firstAttribute="trailing" secondItem="yFP-Sa-6Y5" secondAttribute="trailing" constant="20" id="Za7-aF-2Kc"/>
                             <constraint firstItem="MWG-jJ-hwb" firstAttribute="centerY" secondItem="Eej-7z-bbF" secondAttribute="centerY" id="gTk-X2-rkg"/>
-                            <constraint firstItem="Eej-7z-bbF" firstAttribute="leading" secondItem="ufI-pY-Xtw" secondAttribute="leading" constant="20" id="oez-vn-Dn0"/>
+                            <constraint firstItem="Eej-7z-bbF" firstAttribute="leading" secondItem="ufI-pY-Xtw" secondAttribute="leading" constant="20" symbolic="YES" id="oez-vn-Dn0"/>
+                            <constraint firstItem="yFP-Sa-6Y5" firstAttribute="centerY" secondItem="MWG-jJ-hwb" secondAttribute="centerY" id="qWv-Ar-env"/>
                             <constraint firstAttribute="bottom" secondItem="5HE-2w-0Ui" secondAttribute="bottom" id="qpa-6G-f3r"/>
-                            <constraint firstAttribute="bottom" secondItem="yFP-Sa-6Y5" secondAttribute="bottom" constant="20" id="s1c-Wm-kcE"/>
                             <constraint firstItem="5HE-2w-0Ui" firstAttribute="leading" secondItem="ufI-pY-Xtw" secondAttribute="leading" id="voz-F3-5He"/>
                         </constraints>
                     </view>
@@ -259,9 +259,9 @@ DQ
         <image name="Filter" width="128" height="128"/>
         <image name="History" width="128" height="128"/>
         <image name="NSInfo" width="32" height="32"/>
-        <image name="OK" width="256" height="256"/>
         <image name="OK_Color" width="256" height="256"/>
         <image name="Open" width="256" height="256"/>
+        <image name="Run" width="256" height="256"/>
         <image name="Save" width="256" height="256"/>
     </resources>
 </document>

@@ -283,10 +283,6 @@ typedef NS_ENUM(NSInteger, TypefaceVariationFlavor) {
     self.typefacesArrayController.filterPredicate = nil;
 }
 
-- (IBAction)doQuit:(id)sender {
-    [NSApp terminate:self];
-}
-
 - (IBAction)doFilter:(id)sender {
     TypefaceSelectorFilterWindowController * wc = (TypefaceSelectorFilterWindowController*)[[NSStoryboard storyboardWithName:@"TypefaceSelectorWindow" bundle:nil] instantiateControllerWithIdentifier:@"typefaceFilterWindowController"];
     TypefaceSelectorFilterViewController * vc = (TypefaceSelectorFilterViewController*)wc.contentViewController;
@@ -512,6 +508,11 @@ typedef NS_ENUM(NSInteger, TypefaceVariationFlavor) {
     }
     return nil;
 }
+
+- (IBAction)terminate:(id)sender {
+    [NSApp terminate:sender];
+}
+
 @end 
 
 

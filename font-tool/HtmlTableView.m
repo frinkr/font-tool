@@ -176,6 +176,11 @@ static HtmlTableViewAppearance * defaultHtmlTableViewApperance;
 
 }
 
+- (void)webView:(WKWebView *)webView didFinishNavigation:(WKNavigation *)navigation
+{
+    [webView evaluateJavaScript:@"document.getElementsByTagName('body')[0].setAttribute('oncontextmenu', 'event.preventDefault();');" completionHandler:nil];
+}
+
 + (NSString*)htmlTableRowWithKey:(NSString*)key keyStyle:(NSString*)keyStyle value:(NSString*)value valueStyle:(NSString*)valueStyle {
     if (IsHtmlTableSection(key, value)) {
         NSString * padding = [@"" stringByPaddingToLength:15 withString:@"\u2592" startingAtIndex:0];
