@@ -208,7 +208,7 @@ DQ
                                 </connections>
                             </button>
                             <button toolTip="Recents" translatesAutoresizingMaskIntoConstraints="NO" id="bXf-4W-VgH" userLabel="Recents">
-                                <rect key="frame" x="434" y="290" width="22" height="22"/>
+                                <rect key="frame" x="434" y="291" width="22" height="22"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="22" id="Fav-bb-PLm"/>
                                     <constraint firstAttribute="height" constant="22" id="v0m-i2-3uw"/>
