@@ -325,7 +325,35 @@ extern "C" {
     return hasFunction;
 }
 
--(BOOL)runWithFont:(TMTypeface *)font {
+-(BOOL)beginFilter {
+    luabridge::LuaRef fInit = luabridge::getGlobal(L, "init");
+    if (fInit.isFunction()) {
+        try {
+            fInit();
+        }
+        catch(const std::exception & ex) {
+            [self logMessage:@"%@ %@", @"Exception", [NSString stringWithUTF8String:ex.what()] ];
+            return NO;
+        }
+    }
+    return YES;
+}
+
+-(BOOL)endFilter {
+    luabridge::LuaRef fFinalize = luabridge::getGlobal(L, "finalize");
+    if (fFinalize.isFunction()) {
+        try {
+            fFinalize();
+        }
+        catch(const std::exception & ex) {
+            [self logMessage:@"%@ %@", @"Exception", [NSString stringWithUTF8String:ex.what()] ];
+            return NO;
+        }
+    }
+    return YES;
+}
+
+-(BOOL)filterFont:(TMTypeface *)font {
     luabridge::LuaRef fFilterFont = luabridge::getGlobal(L, "filterFont");
     if (fFilterFont.isFunction()) {
         try {

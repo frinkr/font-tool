@@ -83,7 +83,7 @@ typedef NS_ENUM(NSInteger, TypefaceVariationFlavor) {
 - (BOOL)filter:(TMTypeface *)face {
     if (self.isEmpty)
         return YES;
-    return [self.luaScript runWithFont:face];
+    return [self.luaScript filterFont:face];
 }
 
 - (BOOL)isEmpty {
@@ -342,25 +342,34 @@ typedef NS_ENUM(NSInteger, TypefaceVariationFlavor) {
 
 - (void)filterTypefaces:(TypefaceListFilter*)filter {
     
+    NSString * selectedFace = self.selectedTypeface.UIFullName;
+    
     if (filter.isEmpty) {
         [self.typefacesArrayController removeAllObjects];
         [self.typefacesArrayController addObjects:[[TypefaceManager defaultManager] availableFaces]];
         [self.typefacesArrayController setFilterPredicate:nil];
     }
     else {
+        
         NSPredicate * predicate = [NSPredicate predicateWithBlock:^BOOL(id  evaluatedObject, NSDictionary<NSString *,id> *  bindings) {
             TMTypeface * face = (TMTypeface*)evaluatedObject;
             return [filter filter:face];
         }];
         
+        [filter.luaScript beginFilter];
         NSArray<TMTypeface*> * faces = [[[TypefaceManager defaultManager] availableFaces] filteredArrayUsingPredicate:predicate];
+        [filter.luaScript endFilter];
+        
         [self.typefacesArrayController removeAllObjects];
         [self.typefacesArrayController addObjects:faces];
         [[LuaScriptConsoleWindowController sharedWindowController] flushMessages:self];
     }
     
     [self.typefaceCombobox reloadData];
-    [self selectFaceAtIndex:0];
+    if (selectedFace)
+        [self selectFaceByUIFullName: selectedFace];
+    else
+        [self selectFaceAtIndex:0];
 }
 
 #pragma mark **** Selection ***
@@ -400,6 +409,13 @@ typedef NS_ENUM(NSInteger, TypefaceVariationFlavor) {
     [self updateTypefaceInformation];
 }
 
+- (void)selectFaceByUIFullName:(NSString*)uiFullName {
+    [self.typefaceCombobox selectItemWithObjectValue:uiFullName];
+    if (self.typefaceCombobox.indexOfSelectedItem == -1)
+        [self selectFaceAtIndex:0];
+    else
+        [self updateTypefaceInformation];
+}
 
 - (BOOL)selectRecentTypeface:(TypefaceRecentDocumentInfo*)recent autoConfirmIfNotFound:(BOOL)autoConfirmIfNotFound{
     if (!recent)

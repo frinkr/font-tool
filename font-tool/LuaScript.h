@@ -10,5 +10,8 @@ typedef void (^LuaScriptMessageHandler)(NSString * message);
 
 -(instancetype)initWithFile:(NSString*)scriptFile messageHandler:(LuaScriptMessageHandler)messageHandler;
 -(instancetype)initWithBuffer:(NSString*)script messageHandler:(LuaScriptMessageHandler)messageHandler;
--(BOOL)runWithFont:(TMTypeface*)font;
+
+-(BOOL)beginFilter;
+-(BOOL)filterFont:(TMTypeface*)font;
+-(BOOL)endFilter;
 @end
