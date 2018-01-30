@@ -8,12 +8,15 @@
 #import "LuaScriptConsole.h"
 
 static LuaScriptConsoleWindowController * sSharedInstance;
+static NSDateFormatter *sDateFormatter;
 
 static NSString * currentDateTimeString() {
     NSDate *currDate = [NSDate date];
-    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc]init];
-    [dateFormatter setDateFormat: @"yyyy-MM-dd HH:mm:ssZZZZZ"];
-    NSString *dateString = [dateFormatter stringFromDate:currDate];
+    if (!sDateFormatter) {
+        sDateFormatter = [[NSDateFormatter alloc]init];
+        [sDateFormatter setDateFormat: @"yyyy-MM-dd HH:mm:ssZZZZZ"];
+    }
+    NSString *dateString = [sDateFormatter stringFromDate:currDate];
     return dateString;
 }
 
@@ -102,17 +105,32 @@ static NSString * currentDateTimeString() {
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.cachedMessages = [[NSMutableString alloc] init];
+    
+    // disable word wrap to make text layout faster
+    NSSize bigSize = NSMakeSize(FLT_MAX, FLT_MAX);
+    [self.messagesTextView.enclosingScrollView setHasHorizontalScroller:YES];
+    [self.messagesTextView setHorizontallyResizable:YES];
+    [self.messagesTextView setAutoresizingMask:(NSViewWidthSizable | NSViewHeightSizable)];
+    [self.messagesTextView.textContainer setContainerSize:bigSize];
+    [self.messagesTextView.textContainer setWidthTracksTextView:NO];
+    
 }
 
 - (void)flushMessages:(id)sender {
     if ([self.cachedMessages length] == 0)
         return;
-    NSAttributedString* attr = [[NSAttributedString alloc] initWithString:self.cachedMessages attributes:@{NSForegroundColorAttributeName : [NSColor greenColor]}];
+    [self.messagesTextView.textStorage beginEditing];
+    
+    NSAttributedString* attr = [[NSAttributedString alloc] initWithString:self.cachedMessages
+                                                               attributes:@{NSForegroundColorAttributeName : [NSColor greenColor],
+                                                                            //NSFontAttributeName: @"Courier New 12"
+                                                                            }];
     [[self.messagesTextView textStorage] appendAttributedString:attr];
-    [self.messagesTextView scrollRangeToVisible:NSMakeRange([[self.messagesTextView string] length], 0)];
-    [self.cachedMessages setString:@""];
     [[self.messagesTextView textStorage] setFont:[NSFont fontWithName:@"Courier New" size:12]];
-
+    [self.messagesTextView.textStorage endEditing];
+    
+    [self.cachedMessages setString:@""];
+    //[self.messagesTextView scrollToEndOfDocument:self]; // scroll make it slow
 }
 
 - (void)appendMessage:(NSString *)message {
