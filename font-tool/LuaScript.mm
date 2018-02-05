@@ -117,6 +117,8 @@ namespace elua {
         ~Font() {
             if (userData)
                 CFBridgingRelease(userData);
+            if (tmFace)
+                CFBridgingRelease(tmFace);
         }
         void Dump() {
             LuaScript * script = (__bridge LuaScript*)userData;
@@ -143,6 +145,10 @@ namespace elua {
             [script logMessage:@"   Version = %@", toNSString(version)];
         }
         
+        bool containsChar(uint32_t unicodeChar) {
+            TMTypeface * face = (__bridge TMTypeface*)tmFace;
+            return [face containsChar:unicodeChar];
+        }
     public:
         std::string postscriptName;
         int numGlyphs;
@@ -169,6 +175,7 @@ namespace elua {
         std::string vender;
         std::string version;
         
+        void * tmFace;
         void * userData;
     };
     
@@ -204,7 +211,7 @@ namespace elua {
         f.version = toStdString(face.attributes.version);
         
         f.userData = (void*)CFBridgingRetain(script);
-
+        f.tmFace = (void*)CFBridgingRetain(face);
         return f;
     }
     
@@ -240,6 +247,8 @@ namespace elua {
         .addData("version", &Font::version, false)
         
         .addFunction("dump", &Font::Dump)
+        .addFunction("containsChar", &Font::containsChar)
+        
         .endClass()
         .endNamespace();
     }

@@ -25,17 +25,21 @@ extern NSString * TMProgressNotificationCurrentKey;
 @end
 
 @interface TMTypeface : NSObject
+@property NSUInteger           faceId;
 @property NSString           * familyName;
 @property NSString           * styleName;
 @property NSString           * UIFamilyName;
 @property NSString           * UIStyleName;
 @property TypefaceAttributes * attributes;
+@property TypefaceDescriptor * fileDescriptor;
 
 - (NSString*) UIFullName;
 
+- (BOOL)containsChar:(uint32_t) unicodeChar;
+
 - (NSComparisonResult)compare:(TMTypeface*)other;
 - (Typeface*)createTypeface;
-- (TypefaceDescriptor*)createTypefaceDescriptor;
+- (TypefaceDescriptor*)createNameDescriptor;
 @end
 
 @interface TMTypeface (NSFont)
@@ -67,6 +71,7 @@ extern NSString * TMProgressNotificationCurrentKey;
 -(NSString*)familyNameAtIndex:(NSUInteger)index ofURL:(NSURL*)url;
 -(NSString*)styleNameAtIndex:(NSUInteger)index ofURL:(NSURL*)url;
 
+- (NSUInteger)lookupGlyphOfChar:(NSUInteger) charcode withCMapIndex:(NSInteger) cmapIndex inFace:(NSUInteger)faceId;
 - (TypefaceDescriptor*)fileDescriptorFromNameDescriptor:(TypefaceDescriptor*)nameDescriptor;
 
 - (void)enumurateFacesOfURL:(NSURL*)url handler:(BOOL (^)(OpaqueFTFace opaqueFace, NSUInteger index))hander;

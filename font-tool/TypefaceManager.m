@@ -12,6 +12,7 @@
 #include FT_TRUETYPE_IDS_H
 #include FT_TRUETYPE_TABLES_H
 #include FT_SIZES_H
+#include FT_CACHE_H
 
 #import "TypefaceManager.h"
 #import "TypefaceNames.h"
@@ -24,6 +25,11 @@ NSString * TMProgressNotificationTotalKey = @"TMProgressNotificationTotalKey";
 NSString * TMProgressNotificationCurrentKey = @"TMProgressNotificationCurrentKey";
 
 NSInteger TypefaceFontListVersion = 4;
+
+static  FT_Error TMFaceRequester(FTC_FaceID  face_id,
+                                 FT_Library  library,
+                                 FT_Pointer  req_data,
+                                 FT_Face*    aface );
 
 @interface TMTypeface()
 - (instancetype)initWithFamilyName:(NSString*)familyName styleName:(NSString*)styleName;
@@ -42,6 +48,11 @@ NSInteger TypefaceFontListVersion = 4;
     return [NSString stringWithFormat:@"%@ - %@", _UIFamilyName, _UIStyleName];
 }
 
+- (BOOL)containsChar:(uint32_t) unicodeChar {
+    NSUInteger gid = [[TypefaceManager defaultManager] lookupGlyphOfChar:unicodeChar withCMapIndex:-1 inFace:self.faceId];
+    return gid != 0;
+}
+
 - (NSComparisonResult)compare:(TMTypeface*)other {
     NSComparisonResult result = [self.familyName compare:other.familyName];
     if (result == NSOrderedSame) {
@@ -53,12 +64,12 @@ NSInteger TypefaceFontListVersion = 4;
     
 }
 
-- (TypefaceDescriptor*)createTypefaceDescriptor {
+- (TypefaceDescriptor*)createNameDescriptor {
     return [TypefaceDescriptor descriptorWithFamily:self.familyName style:self.styleName];
 }
 
 - (Typeface*)createTypeface {
-    return [[Typeface alloc] initWithDescriptor:[self createTypefaceDescriptor]];
+    return [[Typeface alloc] initWithDescriptor:[self createNameDescriptor]];
 }
 
 @end
@@ -110,18 +121,21 @@ NSInteger TypefaceFontListVersion = 4;
 
 @interface TypefaceManager()
 {
-    FT_Library  ftLib;
+    FT_Library    ftLib;
+    FTC_Manager   ftcMgr;
+    FTC_CMapCache ftCMapCache;
 }
 @end
 
 static TypefaceManager * defaultTypefaceManager;
 
 @interface TypefaceManager() {
-    NSMutableDictionary<TypefaceDescriptor*, TypefaceAttributes*> * _fileDescriptorAttributesMapping;
-    
-    NSMutableDictionary<TypefaceDescriptor*, TypefaceDescriptor*> * _nameDescriptorFileMapping;
     NSMutableArray<TMTypefaceFamily*> * _typefaceFimilies;
 }
+
+@property NSMutableDictionary<TypefaceDescriptor*, TypefaceAttributes*> * fileDescriptorAttributesMapping;
+@property NSMutableDictionary<TypefaceDescriptor*, TypefaceDescriptor*> * nameDescriptorFileMapping; // name descriptor to file descriptor mapping
+@property NSMutableDictionary<NSNumber*, TMTypeface*> * idTypefaceMapping; // hash to TMTypeface mapping
 
 @end
 
@@ -187,7 +201,7 @@ static TypefaceManager * defaultTypefaceManager;
             TypefaceDescriptor * descriptor = [TypefaceDescriptor descriptorWithFilePath:fontFile faceIndex:index];
             
             [_fileDescriptorAttributesMapping setObject:attributes
-                                           forKey:descriptor];
+                                                 forKey:descriptor];
             
             return YES;
         }];
@@ -197,7 +211,7 @@ static TypefaceManager * defaultTypefaceManager;
     [[NSUserDefaults standardUserDefaults] setObject:serialized forKey:@"TypefaceFontList"];
     [[NSUserDefaults standardUserDefaults] setInteger:databaseHashNew forKey:@"TypefaceFontListHash"];
     [[NSUserDefaults standardUserDefaults] setInteger:TypefaceFontListVersion forKey:@"TypefaceFontListVersion"];
-
+    
 }
 
 - (void) buildAccelerations {
@@ -211,6 +225,7 @@ static TypefaceManager * defaultTypefaceManager;
     }
     
     _typefaceFimilies = [[NSMutableArray<TMTypefaceFamily*> alloc] init];
+    _idTypefaceMapping = [[NSMutableDictionary<NSNumber*, TMTypeface*> alloc] init];
     {
         NSMutableDictionary<NSString*, TMTypefaceFamily*> * familiesMap = [[NSMutableDictionary<NSString*, TMTypefaceFamily*> alloc] init];
         for (TypefaceDescriptor * fileDescriptor in _fileDescriptorAttributesMapping) {
@@ -235,8 +250,12 @@ static TypefaceManager * defaultTypefaceManager;
             face.UIFamilyName = attributes.preferedLocalizedFamilyName;
             face.UIStyleName = attributes.preferedLocalizedStyleName;
             face.attributes = attributes;
-            
+            face.fileDescriptor = fileDescriptor;
+            face.faceId = fileDescriptor.hash;
             [faces addObject:face];
+            
+            [_idTypefaceMapping setObject:face
+                                  forKey:[NSNumber numberWithUnsignedInteger:face.faceId]];
         }
         
         for (NSString * familyName in familiesMap) {
@@ -256,18 +275,22 @@ static TypefaceManager * defaultTypefaceManager;
 
 -(NSArray<TMTypeface*>*)availableFaces {
     NSMutableArray<TMTypeface*> * allFaces = [[NSMutableArray alloc] init];
-    for (TMTypefaceFamily * family in [self availableTypefaceFamilies]) 
+    for (TMTypefaceFamily * family in [self availableTypefaceFamilies])
         [allFaces addObjectsFromArray:family.faces];
     
     return allFaces;
 }
 
 -(void)initFTLib {
-    if (!ftLib)
+    if (!ftLib) {
         FT_Init_FreeType(&ftLib);
+        FTC_Manager_New(ftLib, 0, 0, 0, TMFaceRequester, 0, &ftcMgr);
+        FTC_CMapCache_New(ftcMgr, &ftCMapCache);
+    }
 }
 
 -(void)doneFTLib {
+    FTC_Manager_Done(ftcMgr);
     FT_Done_FreeType(ftLib);
 }
 
@@ -316,6 +339,9 @@ static TypefaceManager * defaultTypefaceManager;
     return style;
 }
 
+- (NSUInteger)lookupGlyphOfChar:(NSUInteger)charcode withCMapIndex:(NSInteger)cmapIndex inFace:(NSUInteger)faceId {
+    return FTC_CMapCache_Lookup(ftCMapCache, faceId, cmapIndex, charcode);
+}
 
 - (TypefaceDescriptor*)fileDescriptorFromNameDescriptor:(TypefaceDescriptor*)nameDescriptor {
     NSAssert(nameDescriptor.isNameDescriptor, @"Expect a name descriptor");
@@ -388,7 +414,17 @@ static TypefaceManager * defaultTypefaceManager;
         [defaultTypefaceManager loadFontDatabase];
         [defaultTypefaceManager buildAccelerations];
     }
-
+    
     return defaultTypefaceManager;
 }
 @end
+
+FT_Error TMFaceRequester(FTC_FaceID  face_id,
+                         FT_Library  library,
+                         FT_Pointer  req_data,
+                         FT_Face*    aface ) {
+    TypefaceManager * tm = [TypefaceManager defaultManager];
+    TMTypeface * face = [tm.idTypefaceMapping objectForKey:[NSNumber numberWithUnsignedInteger:(NSUInteger)face_id]];
+    TypefaceDescriptor * descriptor = face.fileDescriptor;
+    return FT_New_Face(tm.ftLib, [descriptor.fileURL.path UTF8String], descriptor.faceIndex, aface);
+}

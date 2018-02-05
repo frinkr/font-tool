@@ -401,7 +401,7 @@ typedef NS_ENUM(NSInteger, TypefaceVariationFlavor) {
 }
 
 - (void)readSelectedFont {
-    self.selectedTypefaceDescriptor = [self.selectedTypeface createTypefaceDescriptor];
+    self.selectedTypefaceDescriptor = [self.selectedTypeface createNameDescriptor];
 }
 
 - (void)selectFaceAtIndex:(NSUInteger)index {
