@@ -184,6 +184,25 @@
                                                 <action selector="toggleFullScreen:" target="Ady-hI-5gd" id="dU3-MA-1Rq"/>
                                             </connections>
                                         </menuItem>
+                                        <menuItem isSeparatorItem="YES" id="6v2-kR-88r"/>
+                                        <menuItem title="Glyph Name" id="XSX-cT-IDI">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="changeGlyphsLabel:" target="Ady-hI-5gd" id="tH0-rm-nue"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Glyph ID" tag="1" id="vVv-ww-iMs">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="changeGlyphsLabel:" target="Ady-hI-5gd" id="moT-Z6-y8t"/>
+                                            </connections>
+                                        </menuItem>
+                                        <menuItem title="Unicode (Char Code)" tag="2" id="JPO-nR-lbh">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="changeGlyphsLabel:" target="Ady-hI-5gd" id="16u-I3-DEl"/>
+                                            </connections>
+                                        </menuItem>
                                     </items>
                                 </menu>
                             </menuItem>
@@ -264,29 +283,6 @@
                                         <action selector="showFontInfo:" target="jGA-0Y-lOj" id="vfm-QK-pc9"/>
                                     </connections>
                                 </toolbarItem>
-                                <toolbarItem implicitItemIdentifier="747C8F8D-F8E7-439C-8879-0B35F371FA3B" label="Glyph Label" paletteLabel="Glyph Label" id="gYh-RD-ERN">
-                                    <nil key="toolTip"/>
-                                    <size key="minSize" width="100" height="28"/>
-                                    <size key="maxSize" width="202" height="28"/>
-                                    <segmentedControl key="view" verticalHuggingPriority="750" id="mvF-yP-bjQ">
-                                        <rect key="frame" x="0.0" y="14" width="166" height="28"/>
-                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                        <segmentedCell key="cell" borderStyle="border" alignment="left" style="texturedSquare" trackingMode="selectOne" id="eep-DD-uoV">
-                                            <font key="font" metaFont="smallSystem"/>
-                                            <segments>
-                                                <segment label="Name" toolTip="Glyph Name" selected="YES"/>
-                                                <segment label="GID" toolTip="Glyph ID" tag="1"/>
-                                                <segment label="Charcode" toolTip="Glyph Unicode"/>
-                                            </segments>
-                                        </segmentedCell>
-                                        <connections>
-                                            <action selector="changeGlyphsLabel:" target="jGA-0Y-lOj" id="HWQ-LC-QGR"/>
-                                        </connections>
-                                    </segmentedControl>
-                                    <connections>
-                                        <action selector="changeGlyphsLabel:" target="jGA-0Y-lOj" id="a3d-E1-hRw"/>
-                                    </connections>
-                                </toolbarItem>
                                 <toolbarItem implicitItemIdentifier="20EEC4D2-AA18-4971-8BF2-DAD37E068898" label="Character Block" paletteLabel="Character Block" id="ScC-02-6uu">
                                     <nil key="toolTip"/>
                                     <size key="minSize" width="99" height="26"/>
@@ -294,7 +290,7 @@
                                     <comboBox key="view" verticalHuggingPriority="750" id="hWE-Sq-d5u">
                                         <rect key="frame" x="0.0" y="14" width="180" height="26"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                        <comboBoxCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" drawsBackground="YES" usesSingleLineMode="YES" usesDataSource="YES" numberOfVisibleItems="10" id="XWQ-sk-7bE">
+                                        <comboBoxCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" drawsBackground="YES" usesSingleLineMode="YES" completes="NO" usesDataSource="YES" numberOfVisibleItems="10" id="XWQ-sk-7bE">
                                             <font key="font" metaFont="smallSystem"/>
                                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -304,26 +300,6 @@
                                             <outlet property="dataSource" destination="jGA-0Y-lOj" id="WuV-Gz-U0j"/>
                                         </connections>
                                     </comboBox>
-                                </toolbarItem>
-                                <toolbarItem implicitItemIdentifier="532A425D-8523-4DE8-A41D-543B9D54BBD8" label="Character Map" paletteLabel="Character Map" id="UbQ-WV-XE3">
-                                    <nil key="toolTip"/>
-                                    <size key="minSize" width="99" height="26"/>
-                                    <size key="maxSize" width="209" height="26"/>
-                                    <comboBox key="view" focusRingType="none" verticalHuggingPriority="750" id="ea4-di-TsU">
-                                        <rect key="frame" x="0.0" y="14" width="209" height="26"/>
-                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                        <comboBoxCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" focusRingType="none" drawsBackground="YES" usesSingleLineMode="YES" usesDataSource="YES" numberOfVisibleItems="10" id="G1j-o1-gYq">
-                                            <font key="font" metaFont="smallSystem"/>
-                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                        </comboBoxCell>
-                                        <connections>
-                                            <outlet property="dataSource" destination="jGA-0Y-lOj" id="mTz-PE-i2k"/>
-                                        </connections>
-                                    </comboBox>
-                                    <connections>
-                                        <action selector="changeCMap:" target="jGA-0Y-lOj" id="NY0-nE-M5Z"/>
-                                    </connections>
                                 </toolbarItem>
                                 <toolbarItem implicitItemIdentifier="BDDF7CA3-79DE-4834-9294-AF2230E2BCC4" label="Variants" paletteLabel="Variants" image="NSFontPanel" id="Yk9-xR-zhD">
                                     <nil key="toolTip"/>
@@ -356,10 +332,32 @@
                                         <action selector="showGlyphTable:" target="jGA-0Y-lOj" id="ib9-zJ-WSP"/>
                                     </connections>
                                 </toolbarItem>
+                                <toolbarItem implicitItemIdentifier="00057537-CDE9-4F97-8AF3-9A66A2A6EDE1" label="Character Map" paletteLabel="Character Map" id="eaY-fc-Hzc">
+                                    <nil key="toolTip"/>
+                                    <size key="minSize" width="100" height="28"/>
+                                    <size key="maxSize" width="220" height="28"/>
+                                    <popUpButton key="view" verticalHuggingPriority="750" id="L9A-JU-bgT">
+                                        <rect key="frame" x="0.0" y="14" width="128" height="28"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                        <popUpButtonCell key="cell" type="roundTextured" title="Item 1" bezelStyle="texturedRounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" arrowPosition="arrowAtCenter" autoenablesItems="NO" selectedItem="Li0-X6-Pxh" id="kMQ-jq-MlH">
+                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                            <font key="font" metaFont="menu"/>
+                                            <menu key="menu" autoenablesItems="NO" id="wpH-hH-23x">
+                                                <items>
+                                                    <menuItem title="Item 1" state="on" id="jo5-uH-D9I"/>
+                                                    <menuItem title="Item 2" id="DxT-aX-vKu"/>
+                                                    <menuItem title="Item 3" id="Li0-X6-Pxh"/>
+                                                </items>
+                                            </menu>
+                                        </popUpButtonCell>
+                                        <connections>
+                                            <action selector="changeCMap:" target="jGA-0Y-lOj" id="hVJ-bg-toB"/>
+                                        </connections>
+                                    </popUpButton>
+                                </toolbarItem>
                             </allowedToolbarItems>
                             <defaultToolbarItems>
-                                <toolbarItem reference="gYh-RD-ERN"/>
-                                <toolbarItem reference="UbQ-WV-XE3"/>
+                                <toolbarItem reference="eaY-fc-Hzc"/>
                                 <toolbarItem reference="ScC-02-6uu"/>
                                 <toolbarItem reference="Yk9-xR-zhD"/>
                                 <toolbarItem reference="6Ts-mD-YSf"/>
@@ -374,7 +372,7 @@
                         </connections>
                     </window>
                     <connections>
-                        <outlet property="cmapCombobox" destination="ea4-di-TsU" id="y8X-o8-CK3"/>
+                        <outlet property="cmapPopupButton" destination="L9A-JU-bgT" id="Tbk-ZG-3GJ"/>
                         <outlet property="glyphListCombobox" destination="hWE-Sq-d5u" id="8dA-Zh-7u3"/>
                         <segue destination="Sgs-dL-3FM" kind="relationship" relationship="window.shadowedContentViewController" id="Bzt-rc-UPn"/>
                     </connections>
@@ -382,6 +380,36 @@
                 <customObject id="6f7-a7-6o1" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="360.5" y="196"/>
+        </scene>
+        <!--View Controller-->
+        <scene sceneID="pbH-sB-mn4">
+            <objects>
+                <viewController id="bTJ-Qw-UeK" sceneMemberID="viewController">
+                    <view key="view" id="k0V-UR-79x">
+                        <rect key="frame" x="0.0" y="0.0" width="450" height="300"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                        <subviews>
+                            <popUpButton verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="gza-Dd-y9e">
+                                <rect key="frame" x="142" y="174" width="179" height="26"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <popUpButtonCell key="cell" type="push" title="Item 1" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="28A-Ll-MH1" id="qQc-ms-GL4">
+                                    <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="menu"/>
+                                    <menu key="menu" id="NDz-8u-jNN">
+                                        <items>
+                                            <menuItem title="Item 1" state="on" id="28A-Ll-MH1"/>
+                                            <menuItem title="Item 2" state="on" id="8G0-Zk-YM2"/>
+                                            <menuItem title="Item 3" id="S21-0m-tv3"/>
+                                        </items>
+                                    </menu>
+                                </popUpButtonCell>
+                            </popUpButton>
+                        </subviews>
+                    </view>
+                </viewController>
+                <customObject id="3RN-9V-TpC" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1034" y="8"/>
         </scene>
         <!--Window Controller-->
         <scene sceneID="tbZ-BF-JG0">

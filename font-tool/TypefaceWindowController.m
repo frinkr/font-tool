@@ -19,7 +19,7 @@
 
 @interface TypefaceWindowController () <GlyphTableDelegate>
 @property (assign) IBOutlet NSComboBox * glyphListCombobox;
-@property (assign) IBOutlet NSComboBox *cmapCombobox;
+@property (weak) IBOutlet NSPopUpButton *cmapPopupButton;
 
 @property (nonatomic, getter=glyphCollectionViewController) GlyphCollectionViewController * glyphCollectionViewController;
 @property (nonatomic, getter=typefaceDocument) TypefaceDocument * typefaceDocument;
@@ -41,7 +41,11 @@
                                options:NSKeyValueObservingOptionNew
                                context:nil];
     
-    [self.cmapCombobox reloadData];
+    [self.cmapPopupButton removeAllItems];
+    for (NSUInteger index = 0; index < self.typefaceDocument.cmaps.count; ++ index) {
+        TypefaceCMap * cm = [self.typefaceDocument.cmaps objectAtIndex:index];
+        [self.cmapPopupButton addItemWithTitle:cm.name];
+    }
     [self selectCMapAtIndex: 0];
 }
 
@@ -58,8 +62,15 @@
 }
 
 #pragma mark *** Actions ***
-- (IBAction)changeGlyphsLabel:(NSSegmentedControl*)sender {
-    self.glyphCollectionViewController.glyphLabelCategory = (GlyphLabelCategory)sender.selectedSegment;
+- (IBAction)changeGlyphsLabel:(id)sender {
+    NSUInteger cat = 0;
+    if ([sender isKindOfClass:[NSSegmentedControl class]])
+        cat = ((NSSegmentedControl*)sender).selectedSegment;
+    else if ([sender isKindOfClass:[NSMenuItem class]])
+        cat = ((NSMenuItem*)sender).tag;
+    else
+        return;
+    self.glyphCollectionViewController.glyphLabelCategory = (GlyphLabelCategory)cat;
 }
 
 - (IBAction)changeGlyphList:(id)sender {
@@ -90,7 +101,8 @@
 }
 
 - (IBAction)changeCMap:(id)sender {
-    [self selectCMapAtIndex:[self.cmapCombobox indexOfSelectedItem]];
+    [self selectCMapAtIndex:[self.cmapPopupButton indexOfSelectedItem]];
+    //[self selectCMapAtIndex:[self.cmapCombobox indexOfSelectedItem]];
 }
 
 - (IBAction)lookupCharacter:(id)sender {
@@ -117,7 +129,7 @@
 }
 
 - (void)selectCMapAtIndex:(NSUInteger)index {
-    [self.cmapCombobox selectItemAtIndex:index];
+    [self.cmapPopupButton selectItemAtIndex:index];
     
     [self.typefaceDocument selectCMapAtIndex:index];
     
@@ -141,8 +153,21 @@
     [self.window makeKeyAndOrderFront:self];
     [self lookupGlyphWithType:GlyphLookupByGlyphIndex
                         value:[NSString stringWithFormat:@"%ld", index]];
-    
-    
+}
+
+#pragma mark *** Menu updater ***
+- (BOOL)validateUserInterfaceItem:(id <NSValidatedUserInterfaceItem>)item {
+    if ([item action] == @selector(changeGlyphsLabel:)) {
+        // This method is also used for toolbar items, so it's a good idea to
+        // make sure you're validating a menu item here
+        if ([(id)item respondsToSelector:@selector(setState:)]) {
+            if (item.tag == self.glyphCollectionViewController.glyphLabelCategory)
+                [(id)item setState:NSOnState];
+            else
+                [(id)item setState:NSOffState];
+        }
+    }
+    return YES;
 }
 
 #pragma mark *** Lookup ***
@@ -221,17 +246,13 @@
 #pragma mark *** NSComboboxDataSource ***
 
 - (NSInteger)numberOfItemsInComboBox:(NSComboBox *)comboBox {
-    if (comboBox == self.cmapCombobox)
-        return [self.typefaceDocument cmaps].count;
-    else if (comboBox == self.glyphListCombobox)
+    if (comboBox == self.glyphListCombobox)
         return self.typefaceDocument.currentCMap.blocks.count;
     else
         return 0;
 }
 
 - (nullable id)comboBox:(NSComboBox *)comboBox objectValueForItemAtIndex:(NSInteger)index {
-    if (comboBox == self.cmapCombobox)
-        return [[self.typefaceDocument cmaps] objectAtIndex:index].name;
     if (comboBox == self.glyphListCombobox)
         return [self.typefaceDocument.currentCMap.blocks objectAtIndex:index].name;
     else

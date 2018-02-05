@@ -541,7 +541,7 @@ NSString * FTGetUnicodeString(FT_UShort platformId, FT_UShort encodingId, void *
 NSString * FTGetPlatformName(FT_UShort platformId) {
     switch (platformId) {
         case TT_PLATFORM_APPLE_UNICODE: return  @"Unicode";
-        case TT_PLATFORM_MACINTOSH: return @"(deprecated) Macintosh";
+        case TT_PLATFORM_MACINTOSH: return @"Macintosh";
         case TT_PLATFORM_ISO: return @"ISO";
         case TT_PLATFORM_MICROSOFT: return @"Microsoft";
         case TT_PLATFORM_ADOBE: return @"Adobe";
