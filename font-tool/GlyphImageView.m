@@ -224,7 +224,17 @@ static NSImage * UNASSIGNED_CODEPOINT_IMAGE = nil;
                 [unicodeString drawInRect:emBox withAttributes:attributes];
             }
             else {
-                [UNASSIGNED_CODEPOINT_IMAGE drawInRect:emBox];
+                if (!typeface.isBitmap && foreground && ![foreground isEqual:[NSColor blackColor]]) {
+                    NSImage * img = [UNASSIGNED_CODEPOINT_IMAGE copy];
+                    [img lockFocus];
+                    [foreground set];
+                    NSRect imageRect = {NSZeroPoint, [img size]};
+                    NSRectFillUsingOperation(imageRect, NSCompositeSourceAtop);
+                    [img unlockFocus];
+                    [img drawInRect:emBox];
+                }
+                else
+                    [UNASSIGNED_CODEPOINT_IMAGE drawInRect:emBox];
             }
         }
         
