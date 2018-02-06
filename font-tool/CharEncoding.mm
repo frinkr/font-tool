@@ -6,6 +6,7 @@
 //
 //
 
+#include <unicode/uchar.h>
 
 #import "CharEncoding.h"
 
@@ -512,6 +513,10 @@ static UnicodeDatabase *standardUnicodDatabase = nil;
     if (unicode >= 0x100000 && unicode <= 0x10FFFD)
         return YES;
     return NO;
+}
+
+- (BOOL)isAssigned:(codepoint_t)unicode {
+    return u_isdefined(unicode);
 }
 
 - (NSString*)propListOfChar:(codepoint_t)unicode {

@@ -284,7 +284,7 @@
                                     <comboBox key="view" verticalHuggingPriority="750" id="hWE-Sq-d5u">
                                         <rect key="frame" x="0.0" y="14" width="92" height="26"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                        <comboBoxCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" drawsBackground="YES" usesSingleLineMode="YES" completes="NO" usesDataSource="YES" numberOfVisibleItems="10" id="XWQ-sk-7bE">
+                                        <comboBoxCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" drawsBackground="YES" usesSingleLineMode="YES" usesDataSource="YES" numberOfVisibleItems="10" id="XWQ-sk-7bE">
                                             <font key="font" metaFont="smallSystem"/>
                                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -328,14 +328,14 @@
                                     <popUpButton key="view" verticalHuggingPriority="750" id="L9A-JU-bgT">
                                         <rect key="frame" x="6" y="14" width="73" height="28"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                        <popUpButtonCell key="cell" type="roundTextured" title="Item 1" bezelStyle="texturedRounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" arrowPosition="arrowAtCenter" autoenablesItems="NO" selectedItem="Li0-X6-Pxh" id="kMQ-jq-MlH">
+                                        <popUpButtonCell key="cell" type="roundTextured" title="Item 3" bezelStyle="texturedRounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" arrowPosition="arrowAtCenter" autoenablesItems="NO" selectedItem="Li0-X6-Pxh" id="kMQ-jq-MlH">
                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                             <font key="font" metaFont="menu"/>
                                             <menu key="menu" autoenablesItems="NO" id="wpH-hH-23x">
                                                 <items>
-                                                    <menuItem title="Item 1" state="on" id="jo5-uH-D9I"/>
+                                                    <menuItem title="Item 1" id="jo5-uH-D9I"/>
                                                     <menuItem title="Item 2" id="DxT-aX-vKu"/>
-                                                    <menuItem title="Item 3" id="Li0-X6-Pxh"/>
+                                                    <menuItem title="Item 3" state="on" id="Li0-X6-Pxh"/>
                                                 </items>
                                             </menu>
                                         </popUpButtonCell>

@@ -1723,11 +1723,11 @@ typedef struct {
 }
 
 - (BOOL)hasCanonicalGlyphNames {
-    return FT_HAS_GLYPH_NAMES(face);
+    return FT_HAS_GLYPH_NAMES(face) || FT_Has_PS_Glyph_Names(face);
 }
 
 - (NSString*)canonicalNameOfGlyph:(NSUInteger)gid {
-    if (!FT_HAS_GLYPH_NAMES(face))
+    if (!self.hasCanonicalGlyphNames)
         return nil;
     char glyphName[256] = {0};
     if (!FT_Get_Glyph_Name(face, gid, glyphName, 256))

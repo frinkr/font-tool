@@ -7,6 +7,9 @@
 //
 #import "Typeface.h"
 #import "GlyphImageView.h"
+#include "CharEncoding.h"
+
+static NSImage * UNASSIGNED_CODEPOINT_IMAGE = nil;
 
 @interface GlyphImageView()
 
@@ -17,6 +20,10 @@
 - (void)awakeFromNib {
     [super awakeFromNib];
     [self setUpView];
+    
+    if (!UNASSIGNED_CODEPOINT_IMAGE) {
+        UNASSIGNED_CODEPOINT_IMAGE = [NSImage imageNamed:@"UnAssigned"];
+    }
 }
 
 - (void)dealloc {
@@ -204,16 +211,21 @@
         // let's draw system font if gid is 0
         if (glyph.GID == 0) {
             UInt32 cp = glyph.codepoint;
-            NSString * unicodeString = [[NSString alloc] initWithBytes:&cp length:sizeof(cp) encoding:NSUTF32LittleEndianStringEncoding];
-            
-            NSMutableParagraphStyle *style = [[NSParagraphStyle defaultParagraphStyle] mutableCopy];
-            style.alignment = NSTextAlignmentCenter;
-            
-            CGFloat fontSize = MIN(imageRect.size.height, imageRect.size.width);
-            NSDictionary * attributes = [NSDictionary dictionaryWithObjects: @[[NSFont systemFontOfSize:fontSize], [NSColor redColor], style]
-                                                                    forKeys: @[NSFontAttributeName, NSForegroundColorAttributeName, NSParagraphStyleAttributeName]];
-            
-            [unicodeString drawInRect:emBox withAttributes:attributes];
+            if ([UnicodeDatabase.standardDatabase isAssigned:cp]) {
+                NSString * unicodeString = [[NSString alloc] initWithBytes:&cp length:sizeof(cp) encoding:NSUTF32LittleEndianStringEncoding];
+                
+                NSMutableParagraphStyle *style = [[NSParagraphStyle defaultParagraphStyle] mutableCopy];
+                style.alignment = NSTextAlignmentCenter;
+                
+                CGFloat fontSize = MIN(imageRect.size.height, imageRect.size.width);
+                NSDictionary * attributes = [NSDictionary dictionaryWithObjects: @[[NSFont systemFontOfSize:fontSize], [NSColor redColor], style]
+                                                                        forKeys: @[NSFontAttributeName, NSForegroundColorAttributeName, NSParagraphStyleAttributeName]];
+                
+                [unicodeString drawInRect:emBox withAttributes:attributes];
+            }
+            else {
+                [UNASSIGNED_CODEPOINT_IMAGE drawInRect:emBox];
+            }
         }
         
         if (glyphScale != 1) {

@@ -118,6 +118,7 @@ typedef UnicodeBlock UnicodePropListBlock;
 - (NSString*)derivedAgeOfChar:(codepoint_t)unicode;
 - (NSString*)propListOfChar:(codepoint_t)unicode;
 - (BOOL)isPUA:(codepoint_t)unicode;
+- (BOOL)isAssigned:(codepoint_t)unicode;
 
 - (uint32_t)codepointFromName:(NSString*)charName;
 
