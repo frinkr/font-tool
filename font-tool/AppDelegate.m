@@ -15,7 +15,13 @@
 @implementation TMProgressViewController
 - (void)updateProgress:(NSUInteger)progress ofTotal:(NSUInteger)total currentFile:(NSString*)file {
     self.fileLabel.stringValue = file;
+    self.progressIndicator.maxValue = total;
+    self.progressIndicator.minValue = 1;
+    self.progressIndicator.doubleValue = progress;
+    
     [self.view setNeedsDisplay:YES];
+    
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.01]];
 }
 @end
 
@@ -40,23 +46,24 @@
                                                  name:TMProgressNotification
                                                object:nil];
     
-    [[TypefaceManager defaultManager] initFTLib];
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.01 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        [[TypefaceManager defaultManager] initFTLib];
+        //
+    });
+    
     
     [self loadDevLinkSubMenu];
 }
 
 - (void)TMProgress:(NSNotification*)notification {
-#if 0
+
     if (!progressWindowController) {
-        progressWindowController = [[NSStoryboard storyboardWithName:@"TMProgress" bundle:nil] instantiateControllerWithIdentifier:@"progressWindowController"];
+        progressWindowController = [[NSStoryboard storyboardWithName:@"Main" bundle:nil] instantiateControllerWithIdentifier:@"progressWindowController"];
         
         progressViewController = (TMProgressViewController*)(progressWindowController.contentViewController);
         [progressWindowController.window makeKeyAndOrderFront:self];
-        //[NSApp runModalForWindow:progressWindowController.window];
     }
-#endif
-    // TODO: progress UI
-    
+
     NSString * file = [notification.userInfo objectForKey:TMProgressNotificationFileKey];
     NSNumber * total = [notification.userInfo objectForKey:TMProgressNotificationTotalKey];
     NSNumber * current = [notification.userInfo objectForKey:TMProgressNotificationCurrentKey];
@@ -64,7 +71,11 @@
     [progressViewController updateProgress:current.integerValue
                                    ofTotal:total.integerValue
                                currentFile:file];
-    NSLog(@"%@/%@ %@", current, total, file);
+    
+    if (total.unsignedIntegerValue == current.unsignedIntegerValue) {
+        [progressWindowController.window orderOut:nil];
+    }
+    
 }
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
@@ -76,7 +87,7 @@
 }
 
 - (BOOL)applicationShouldOpenUntitledFile:(NSApplication *)sender {
-    [(TypefaceDocumentController*)[NSDocumentController sharedDocumentController] openFontFromList:nil];
+     [(TypefaceDocumentController*)[NSDocumentController sharedDocumentController] openFontFromList:nil];
     return NO;
 }
 

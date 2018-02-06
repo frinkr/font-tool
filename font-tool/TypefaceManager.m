@@ -24,7 +24,7 @@ NSString * TMProgressNotificationFileKey = @"TMProgressNotificationFileKey";
 NSString * TMProgressNotificationTotalKey = @"TMProgressNotificationTotalKey";
 NSString * TMProgressNotificationCurrentKey = @"TMProgressNotificationCurrentKey";
 
-NSInteger TypefaceFontListVersion = 4;
+NSInteger TypefaceFontListVersion = 5;
 
 static  FT_Error TMFaceRequester(FTC_FaceID  face_id,
                                  FT_Library  library,
@@ -185,6 +185,9 @@ static TypefaceManager * defaultTypefaceManager;
     for (NSString * fontFile in allFontFiles) {
         
         // Progress
+        ++ currentIndex;
+        
+        if ((currentIndex == fontFilesTotal) || !(currentIndex % 10)) 
         [[NSNotificationCenter defaultCenter] postNotificationName:TMProgressNotification
                                                             object:self
                                                           userInfo:@{
@@ -192,7 +195,7 @@ static TypefaceManager * defaultTypefaceManager;
                                                                      TMProgressNotificationTotalKey: [NSNumber numberWithInteger:fontFilesTotal],
                                                                      TMProgressNotificationCurrentKey : [NSNumber numberWithInteger:currentIndex]
                                                                      }];
-        ++ currentIndex;
+        
         
         [self enumurateFacesOfURL:[NSURL fileURLWithPath:fontFile] handler:^BOOL(OpaqueFTFace opaqueFace, NSUInteger index) {
             Typeface * face = [[Typeface alloc] initWithOpaqueFace:opaqueFace];

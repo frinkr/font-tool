@@ -6,6 +6,65 @@
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
+        <!--Window Controller-->
+        <scene sceneID="h8V-8l-bxO">
+            <objects>
+                <windowController storyboardIdentifier="progressWindowController" id="QTQ-6K-XtU" sceneMemberID="viewController">
+                    <window key="window" title="Rebuilding Font Cache..." allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" restorable="NO" oneShot="NO" releasedWhenClosed="NO" showsToolbarButton="NO" visibleAtLaunch="NO" frameAutosaveName="" animationBehavior="default" titlebarAppearsTransparent="YES" id="hyl-lC-48X" customClass="NSPanel">
+                        <windowStyleMask key="styleMask" titled="YES" miniaturizable="YES" resizable="YES" utility="YES" HUD="YES" fullSizeContentView="YES"/>
+                        <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
+                        <rect key="contentRect" x="1734" y="106" width="480" height="270"/>
+                        <rect key="screenRect" x="1440" y="-256" width="1920" height="1177"/>
+                        <connections>
+                            <outlet property="delegate" destination="QTQ-6K-XtU" id="7VE-FY-B41"/>
+                        </connections>
+                    </window>
+                    <connections>
+                        <segue destination="KId-Lo-ZeO" kind="relationship" relationship="window.shadowedContentViewController" id="0Si-74-CZT"/>
+                    </connections>
+                </windowController>
+                <customObject id="Lcb-QI-5LE" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="167" y="-620"/>
+        </scene>
+        <!--Progress View Controller-->
+        <scene sceneID="aRz-Wu-vNI">
+            <objects>
+                <viewController id="KId-Lo-ZeO" customClass="TMProgressViewController" sceneMemberID="viewController">
+                    <view key="view" id="8QK-JN-J9I">
+                        <rect key="frame" x="0.0" y="0.0" width="480" height="119"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                        <subviews>
+                            <progressIndicator wantsLayer="YES" maxValue="100" style="bar" translatesAutoresizingMaskIntoConstraints="NO" id="waE-tO-BYQ">
+                                <rect key="frame" x="20" y="50" width="440" height="20"/>
+                            </progressIndicator>
+                            <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="d7T-fs-P4e">
+                                <rect key="frame" x="18" y="29" width="444" height="14"/>
+                                <textFieldCell key="cell" controlSize="mini" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="Multiline Label" id="M3H-aQ-Bmd">
+                                    <font key="font" metaFont="smallSystem"/>
+                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                        </subviews>
+                        <constraints>
+                            <constraint firstItem="waE-tO-BYQ" firstAttribute="centerY" secondItem="8QK-JN-J9I" secondAttribute="centerY" id="25B-64-sv3"/>
+                            <constraint firstItem="waE-tO-BYQ" firstAttribute="leading" secondItem="8QK-JN-J9I" secondAttribute="leading" constant="20" id="9I7-7u-7R6"/>
+                            <constraint firstItem="d7T-fs-P4e" firstAttribute="leading" secondItem="8QK-JN-J9I" secondAttribute="leading" constant="20" id="ECx-ew-uHj"/>
+                            <constraint firstItem="d7T-fs-P4e" firstAttribute="top" secondItem="waE-tO-BYQ" secondAttribute="bottom" constant="8" id="SwL-BH-n6p"/>
+                            <constraint firstAttribute="trailing" secondItem="waE-tO-BYQ" secondAttribute="trailing" constant="20" id="YPn-iJ-p0V"/>
+                            <constraint firstAttribute="trailing" secondItem="d7T-fs-P4e" secondAttribute="trailing" constant="20" id="vPP-j3-khf"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="fileLabel" destination="d7T-fs-P4e" id="hZd-RY-2go"/>
+                        <outlet property="progressIndicator" destination="waE-tO-BYQ" id="KyZ-qi-edb"/>
+                    </connections>
+                </viewController>
+                <customObject id="Ms9-NN-SRP" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="874" y="-722.5"/>
+        </scene>
         <!--Application-->
         <scene sceneID="JPo-4y-FX3">
             <objects>
@@ -387,94 +446,6 @@
                 <customObject id="6f7-a7-6o1" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="360.5" y="196"/>
-        </scene>
-        <!--Window Controller-->
-        <scene sceneID="tbZ-BF-JG0">
-            <objects>
-                <windowController storyboardIdentifier="glyphLookupWindowController" id="5N2-vg-6ys" customClass="GlyphLookupWindowController" sceneMemberID="viewController">
-                    <window key="window" title="Find Glyphs" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" hidesOnDeactivate="YES" oneShot="NO" releasedWhenClosed="NO" showsToolbarButton="NO" visibleAtLaunch="NO" animationBehavior="alertPanel" frameAutosaveName="" id="w3e-64-aaJ" customClass="NSPanel">
-                        <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES" utility="YES" HUD="YES"/>
-                        <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
-                        <rect key="contentRect" x="1734" y="62" width="338" height="205"/>
-                        <rect key="screenRect" x="1440" y="-300" width="1920" height="1177"/>
-                        <connections>
-                            <outlet property="delegate" destination="5N2-vg-6ys" id="uG5-O1-ooI"/>
-                        </connections>
-                    </window>
-                    <connections>
-                        <segue destination="NB2-zk-ETc" kind="relationship" relationship="window.shadowedContentViewController" id="8aw-zB-Wj8"/>
-                    </connections>
-                </windowController>
-                <customObject id="TNm-Cn-C24" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="1135" y="593"/>
-        </scene>
-        <!--Glyph Lookup View Controller-->
-        <scene sceneID="C3y-d1-qlg">
-            <objects>
-                <viewController id="NB2-zk-ETc" customClass="GlyphLookupViewController" sceneMemberID="viewController">
-                    <view key="view" id="e2M-Uj-h5H">
-                        <rect key="frame" x="0.0" y="0.0" width="279" height="106"/>
-                        <autoresizingMask key="autoresizingMask"/>
-                        <subviews>
-                            <segmentedControl verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="gO4-aN-dir">
-                                <rect key="frame" x="16" y="71" width="248" height="24"/>
-                                <segmentedCell key="cell" borderStyle="border" alignment="left" style="rounded" trackingMode="selectOne" id="0f7-rY-Sv9">
-                                    <font key="font" metaFont="smallSystem"/>
-                                    <segments>
-                                        <segment label="Smart" toolTip="Lookup by character code/ unicode, by U+/0x or octal notition" selected="YES"/>
-                                        <segment label="Charcode" tag="1"/>
-                                        <segment label="Index" toolTip="Lookup by character code/ unicode, by U+/0x or octal notition" tag="2"/>
-                                        <segment label="Name"/>
-                                    </segments>
-                                </segmentedCell>
-                                <connections>
-                                    <action selector="doChangeLookupType:" target="NB2-zk-ETc" id="30u-Km-Lwr"/>
-                                </connections>
-                            </segmentedControl>
-                            <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="94u-ys-UaL">
-                                <rect key="frame" x="12" y="44" width="255" height="19"/>
-                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="XF2-Fg-D2U">
-                                    <font key="font" metaFont="smallSystem"/>
-                                    <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
-                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                </textFieldCell>
-                            </textField>
-                            <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="kPN-UT-dPR">
-                                <rect key="frame" x="201" y="5" width="72" height="32"/>
-                                <constraints>
-                                    <constraint firstAttribute="width" constant="60" id="HFg-oI-P7b"/>
-                                </constraints>
-                                <buttonCell key="cell" type="push" title="Find" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="5P9-j5-io2">
-                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                    <font key="font" metaFont="smallSystem"/>
-                                    <string key="keyEquivalent" base64-UTF8="YES">
-DQ
-</string>
-                                </buttonCell>
-                                <connections>
-                                    <action selector="doLookup:" target="NB2-zk-ETc" id="ZiF-rF-3BX"/>
-                                </connections>
-                            </button>
-                        </subviews>
-                        <constraints>
-                            <constraint firstItem="gO4-aN-dir" firstAttribute="centerX" secondItem="e2M-Uj-h5H" secondAttribute="centerX" id="3Sc-3r-udV"/>
-                            <constraint firstAttribute="trailing" secondItem="94u-ys-UaL" secondAttribute="trailing" constant="12" id="JbQ-G7-1ZJ"/>
-                            <constraint firstItem="94u-ys-UaL" firstAttribute="leading" secondItem="e2M-Uj-h5H" secondAttribute="leading" constant="12" id="Mdc-HI-3Fh"/>
-                            <constraint firstItem="94u-ys-UaL" firstAttribute="top" secondItem="gO4-aN-dir" secondAttribute="bottom" constant="10" id="Zl1-Bc-fMp"/>
-                            <constraint firstAttribute="bottom" secondItem="kPN-UT-dPR" secondAttribute="bottom" constant="12" id="dWR-B8-Ahc"/>
-                            <constraint firstItem="gO4-aN-dir" firstAttribute="top" secondItem="e2M-Uj-h5H" secondAttribute="top" constant="12" id="mFN-Eb-mCd"/>
-                            <constraint firstAttribute="trailing" secondItem="kPN-UT-dPR" secondAttribute="trailing" constant="12" id="oo1-dc-zKM"/>
-                        </constraints>
-                    </view>
-                    <connections>
-                        <outlet property="lookupTypeSegments" destination="gO4-aN-dir" id="mcD-YT-mNJ"/>
-                        <outlet property="lookupValueTextEdit" destination="94u-ys-UaL" id="KDX-Fv-fIo"/>
-                    </connections>
-                </viewController>
-                <customObject id="Wu5-Qv-eXa" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="1571.5" y="586"/>
         </scene>
         <!--Glyph Collection View Controller-->
         <scene sceneID="8oE-7z-eNP">

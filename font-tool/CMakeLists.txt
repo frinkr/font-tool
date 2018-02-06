@@ -97,7 +97,6 @@ set(NIB_FILES
   TypefaceVariation.storyboard
   ShapingWindow.storyboard
   GlyphTableWindow.storyboard
-  ToolBox.storyboard
   GlyphCollectionViewItem.xib
   GlyphCollectionViewHeader.xib
   TBColorConstantsViewItem.xib
