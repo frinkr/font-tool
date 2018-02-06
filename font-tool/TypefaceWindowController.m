@@ -276,10 +276,17 @@
         return @[];
     }
     
+    NSRegularExpression * regex = [NSRegularExpression regularExpressionWithPattern:[NSString stringWithFormat:@"U\\+%@", UNI_CODEPOINT_REGEX]
+                                                                            options:NSRegularExpressionCaseInsensitive
+                                                                              error:nil];
+    
     for (NSString * string in possibleStrings) {
-        NSRange range = [string rangeOfString:self.lastEntry options:NSAnchoredSearch|NSCaseInsensitiveSearch];
-        if (range.location == 0 && range.length == self.lastEntry.length)
-            [suggestions addObject:string];
+        NSRange range = [regex rangeOfFirstMatchInString:string options:0 range:NSMakeRange(0, string.length)];
+        if (range.length == 0) { // don't include artificial names
+            range = [string rangeOfString:self.lastEntry options:NSAnchoredSearch|NSCaseInsensitiveSearch];
+            if (range.location == 0 && range.length == self.lastEntry.length)
+                [suggestions addObject:string];
+        }
     }
     
     return suggestions;
