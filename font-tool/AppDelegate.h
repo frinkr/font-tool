@@ -11,5 +11,4 @@
 @property (assign) IBOutlet FontDocumentController *fontDocumentController;
 
 - (void)openURL:(NSURL*)url;
-- (IBAction)lookupGlyph:(id)sender;
 @end

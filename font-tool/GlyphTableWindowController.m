@@ -11,7 +11,6 @@
 #import "TypefaceDocument.h"
 #import "CharEncoding.h"
 #import "GlyphImageView.h"
-#import "ToolBox.h"
 
 @interface GlyphTableWindowController ()
 @end

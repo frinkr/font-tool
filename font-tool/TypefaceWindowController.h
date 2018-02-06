@@ -10,13 +10,13 @@
 #import "GlyphCollectionViewController.h"
 #import "GlyphInfoViewController.h"
 
-@interface TypefaceWindowController : NSWindowController<GlyphCollectionViewControllerDelegate, NSComboBoxDataSource>
+@interface TypefaceWindowController : NSWindowController<GlyphCollectionViewControllerDelegate, NSComboBoxDataSource, NSControlTextEditingDelegate, NSTextFieldDelegate>
 
 - (IBAction)changeGlyphsLabel:(id )sender;
 - (IBAction)changeGlyphList:(id )sender;
 - (IBAction)changeCMap:(id )sender;
 - (IBAction)lookupCharacter:(id )sender;
-
+- (IBAction)doLookup:(id)sender;
 - (NSInteger)numberOfItemsInComboBox:(NSComboBox *)comboBox;
 - (id)comboBox:(NSComboBox *)comboBox objectValueForItemAtIndex:(NSInteger)index;
 

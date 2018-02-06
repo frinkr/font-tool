@@ -5,7 +5,6 @@
 //  Created by Yuqing Jiang on 5/16/17.
 //
 //
-#import "GlyphLookupWindowController.h"
 #import "GlyphCollectionViewController.h"
 #import "GlyphInfoViewController.h"
 #import "GlyphTableWindowController.h"
@@ -20,6 +19,11 @@
 @interface TypefaceWindowController () <GlyphTableDelegate>
 @property (assign) IBOutlet NSComboBox * glyphListCombobox;
 @property (weak) IBOutlet NSPopUpButton *cmapPopupButton;
+@property (weak) IBOutlet NSSearchField *searchField;
+
+@property (nonatomic) BOOL isAutocompleting;
+@property (nonatomic, strong) NSString * lastEntry;
+@property (nonatomic) BOOL backspaceKey;
 
 @property (nonatomic, getter=glyphCollectionViewController) GlyphCollectionViewController * glyphCollectionViewController;
 @property (nonatomic, getter=typefaceDocument) TypefaceDocument * typefaceDocument;
@@ -102,11 +106,14 @@
 
 - (IBAction)changeCMap:(id)sender {
     [self selectCMapAtIndex:[self.cmapPopupButton indexOfSelectedItem]];
-    //[self selectCMapAtIndex:[self.cmapCombobox indexOfSelectedItem]];
 }
 
 - (IBAction)lookupCharacter:(id)sender {
-    [(AppDelegate*)NSApp.delegate lookupGlyph:sender];
+    [self.window makeFirstResponder:self.searchField];
+}
+
+- (IBAction)doLookup:(id)sender {
+    [self lookupGlyphWithType:-1 /*smart*/ value:self.searchField.stringValue];
 }
 
 - (IBAction)doShapping:(id)sender {
@@ -227,6 +234,55 @@
                                              inSection:sectionIndex
                                         scrollPosition:NSCollectionViewScrollPositionCenteredVertically];
     });
+}
+
+#pragma mark *** Search field ***
+-(void)controlTextDidChange:(NSNotification *)obj{
+    NSTextView * fieldEditor = [[obj userInfo] objectForKey:@"NSFieldEditor"];
+    
+    if (self.isAutocompleting == NO  && !self.backspaceKey) {
+        self.isAutocompleting = YES;
+        self.lastEntry = [[[fieldEditor string] uppercaseString] copy];
+        [fieldEditor complete:nil];
+        self.isAutocompleting = NO;
+    }
+    
+    if (self.backspaceKey) {
+        self.backspaceKey = NO;
+    }
+}
+
+- (void)controlTextDidEndEditing:(NSNotification *)notification {
+    if (notification.object == self.searchField) {
+        [self doLookup:self.searchField];
+    }
+}
+
+-(BOOL)control:(NSControl *)control textView:(NSTextView *)textView doCommandBySelector:(SEL)commandSelector{
+    if (commandSelector == @selector(deleteBackward:)) {
+        self.backspaceKey = YES;
+    }
+    return NO;
+}
+
+-(NSArray *)control:(NSControl *)control textView:(NSTextView *)textView completions:(NSArray *)words forPartialWordRange:(NSRange)charRange indexOfSelectedItem:(NSInteger *)index{
+    
+    Typeface * tf = self.typefaceDocument.typeface;
+    
+    NSMutableArray * suggestions = [NSMutableArray array];
+    NSArray * possibleStrings = tf.glyphNames;
+    
+    if (!self.lastEntry || !possibleStrings) {
+        return @[];
+    }
+    
+    for (NSString * string in possibleStrings) {
+        NSRange range = [string rangeOfString:self.lastEntry options:NSAnchoredSearch|NSCaseInsensitiveSearch];
+        if (range.location == 0 && range.length == self.lastEntry.length)
+            [suggestions addObject:string];
+    }
+    
+    return suggestions;
 }
 
 #pragma mark *** Getters ***

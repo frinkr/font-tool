@@ -56,7 +56,6 @@ set(SOURCE_FILES
   Common.m
   HtmlTableView.m
   GlyphImageView.m
-  GlyphLookupWindowController.m
   GlyphCollectionViewController.m
   GlyphCollectionViewItem.m
   GlyphInfoViewController.m
@@ -74,7 +73,6 @@ set(SOURCE_FILES
   TypefaceStylesWindowController.m
   TypefaceSelectorWindowController.m
   TypefaceVariationViewController.m
-  ToolBox.m
   LuaScript.mm
   LuaScriptConsole.m
   SourceTextView.m

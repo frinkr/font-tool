@@ -679,14 +679,4 @@ typedef NS_ENUM(NSInteger, TypefaceVariationFlavor) {
     return (TypefaceSelectorFilterWindowController*)self.view.window.windowController;
 }
 
-- (void)showAlertWithMessage:(NSString*)message {
-    NSAlert *alert = [[NSAlert alloc] init];
-    [alert addButtonWithTitle:@"OK"];
-    [alert setMessageText:message];
-    [alert setAlertStyle:NSCriticalAlertStyle];
-    [self.view.window beginSheet:alert completionHandler:^(NSModalResponse returnCode) {
-        
-    }];
-}
-
 @end

@@ -3,9 +3,7 @@
 #import "Typeface.h"
 #import "TypefaceManager.h"
 #import "TypefaceDocumentController.h"
-#import "GlyphLookupWindowController.h"
 #import "TypefaceWindowController.h"
-#import "ToolBox.h"
 #import "LuaScriptConsole.h"
 
 @interface TMProgressViewController ()
@@ -44,7 +42,6 @@
     
     [[TypefaceManager defaultManager] initFTLib];
     
-    [self loadDevLinksSubMenu];
     [self loadDevLinkSubMenu];
 }
 
@@ -106,31 +103,6 @@
     [[[LuaScriptConsoleWindowController sharedWindowController] window] makeKeyAndOrderFront:sender];
 }
 
-- (IBAction)lookupGlyph:(id)sender {
-    GlyphLookupWindowController * lookup = [GlyphLookupWindowController sharedGlyphLookupWindowController];
-    [lookup toggleWindow:sender];
-}
-
-- (void)loadDevLinksSubMenu {
-    NSArray<NSString*> * tools = @[
-                                   @"NSColor Constants", @"showNSColorWindow",
-                                   @"NSColor Constants (Dark)", @"showNSColorDarkWindow",
-                                   @"NSColor Constants (HUD)", @"showNSColorHUDWindow",
-                                   @"NSImage Standard Names", @"showNSImageStandardImages",
-                                   @"Glyph Metrics", @"showGlyphMetricsImages"
-                                   ];
-    
-    for (NSUInteger i = 0; i < tools.count; i += 2) {
-        NSString * name = tools[i];
-        NSString * action = tools[i+1];
-        NSMenuItem * item = [self.devKitsMenu addItemWithTitle:name
-                                                        action:@selector(doOpenDevTool:)
-                                                keyEquivalent:@""];
-        [item setRepresentedObject:action];
-    }
-    
-}
-
 - (void)loadDevLinkSubMenu {
     NSString * path = [[NSBundle mainBundle] pathForResource:@"DevLinks" ofType:@"plist"];
     if (!path) return;
@@ -146,17 +118,6 @@
         [item setRepresentedObject:url];
     }
     
-}
-
-- (IBAction)doOpenDevTool:(id)sender {
-    if ([[sender class] isSubclassOfClass:[NSMenuItem class]]) {
-        NSMenuItem * item = (NSMenuItem*)sender;
-        NSString * action = item.representedObject;
-        
-        SEL selector = NSSelectorFromString(action);
-        if ([[ToolBox class] respondsToSelector:selector])
-            [[ToolBox class] performSelector:selector];
-    }
 }
 
 - (IBAction)doOpenDevLink:(id)sender {

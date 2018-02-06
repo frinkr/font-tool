@@ -147,11 +147,6 @@
                                                 <action selector="showLuaConsole:" target="Voe-Tx-rLC" id="LX5-pM-KFO"/>
                                             </connections>
                                         </menuItem>
-                                        <menuItem isSeparatorItem="YES" id="c2c-2i-8lx"/>
-                                        <menuItem title="Dev Kits" id="3q6-Gu-UCB" userLabel="Dev Kits">
-                                            <modifierMask key="keyEquivalentModifierMask"/>
-                                            <menu key="submenu" title="Dev Kits" id="JhY-dj-ejW"/>
-                                        </menuItem>
                                     </items>
                                 </menu>
                             </menuItem>
@@ -256,7 +251,6 @@
                 </application>
                 <customObject id="Voe-Tx-rLC" customClass="AppDelegate">
                     <connections>
-                        <outlet property="devKitsMenu" destination="JhY-dj-ejW" id="QVi-Yb-4eO"/>
                         <outlet property="devLinksMenu" destination="NIj-ip-Nwz" id="i0m-T9-6QO"/>
                     </connections>
                 </customObject>
@@ -285,10 +279,10 @@
                                 </toolbarItem>
                                 <toolbarItem implicitItemIdentifier="20EEC4D2-AA18-4971-8BF2-DAD37E068898" label="Character Block" paletteLabel="Character Block" id="ScC-02-6uu">
                                     <nil key="toolTip"/>
-                                    <size key="minSize" width="99" height="26"/>
-                                    <size key="maxSize" width="266" height="26"/>
+                                    <size key="minSize" width="92" height="26"/>
+                                    <size key="maxSize" width="220" height="26"/>
                                     <comboBox key="view" verticalHuggingPriority="750" id="hWE-Sq-d5u">
-                                        <rect key="frame" x="0.0" y="14" width="180" height="26"/>
+                                        <rect key="frame" x="0.0" y="14" width="92" height="26"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                         <comboBoxCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" drawsBackground="YES" usesSingleLineMode="YES" completes="NO" usesDataSource="YES" numberOfVisibleItems="10" id="XWQ-sk-7bE">
                                             <font key="font" metaFont="smallSystem"/>
@@ -317,11 +311,6 @@
                                         <action selector="selectVariant:" target="jGA-0Y-lOj" id="UjL-G4-BVr"/>
                                     </connections>
                                 </toolbarItem>
-                                <toolbarItem implicitItemIdentifier="4CEF58AF-2B9B-43A5-A47D-F58BA8E7C89F" label="Find" paletteLabel="Find" tag="-1" image="Search" id="6Ts-mD-YSf">
-                                    <connections>
-                                        <action selector="lookupCharacter:" target="jGA-0Y-lOj" id="BiP-ra-wXy"/>
-                                    </connections>
-                                </toolbarItem>
                                 <toolbarItem implicitItemIdentifier="CA099A5E-A3AC-4F34-9EAE-75F336215893" label="Shape" paletteLabel="Shape" tag="-1" image="Shape" id="KYu-qR-J3p">
                                     <connections>
                                         <action selector="doShapping:" target="jGA-0Y-lOj" id="E4H-nz-XFS"/>
@@ -334,10 +323,10 @@
                                 </toolbarItem>
                                 <toolbarItem implicitItemIdentifier="00057537-CDE9-4F97-8AF3-9A66A2A6EDE1" label="Character Map" paletteLabel="Character Map" id="eaY-fc-Hzc">
                                     <nil key="toolTip"/>
-                                    <size key="minSize" width="100" height="28"/>
-                                    <size key="maxSize" width="220" height="28"/>
+                                    <size key="minSize" width="73" height="28"/>
+                                    <size key="maxSize" width="180" height="28"/>
                                     <popUpButton key="view" verticalHuggingPriority="750" id="L9A-JU-bgT">
-                                        <rect key="frame" x="0.0" y="14" width="128" height="28"/>
+                                        <rect key="frame" x="6" y="14" width="73" height="28"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                         <popUpButtonCell key="cell" type="roundTextured" title="Item 1" bezelStyle="texturedRounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" arrowPosition="arrowAtCenter" autoenablesItems="NO" selectedItem="Li0-X6-Pxh" id="kMQ-jq-MlH">
                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -355,16 +344,33 @@
                                         </connections>
                                     </popUpButton>
                                 </toolbarItem>
+                                <toolbarItem implicitItemIdentifier="A3C2544D-A5F2-4891-8B44-17A9F8EA7594" label="Search" paletteLabel="Search" id="XEE-uf-EI0">
+                                    <nil key="toolTip"/>
+                                    <size key="minSize" width="60" height="22"/>
+                                    <size key="maxSize" width="100" height="22"/>
+                                    <searchField key="view" wantsLayer="YES" verticalHuggingPriority="750" textCompletion="NO" id="xc5-ch-P55">
+                                        <rect key="frame" x="0.0" y="14" width="60" height="22"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                        <searchFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" borderStyle="bezel" usesSingleLineMode="YES" bezelStyle="round" id="4yB-ow-x7U">
+                                            <font key="font" metaFont="system"/>
+                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                        </searchFieldCell>
+                                        <connections>
+                                            <outlet property="delegate" destination="jGA-0Y-lOj" id="eQN-f6-9iN"/>
+                                        </connections>
+                                    </searchField>
+                                </toolbarItem>
                             </allowedToolbarItems>
                             <defaultToolbarItems>
                                 <toolbarItem reference="eaY-fc-Hzc"/>
                                 <toolbarItem reference="ScC-02-6uu"/>
                                 <toolbarItem reference="Yk9-xR-zhD"/>
-                                <toolbarItem reference="6Ts-mD-YSf"/>
                                 <toolbarItem reference="KYu-qR-J3p"/>
                                 <toolbarItem reference="oL9-fT-OML"/>
-                                <toolbarItem reference="OBJ-gk-vHa"/>
                                 <toolbarItem reference="B3e-Vs-hXg"/>
+                                <toolbarItem reference="OBJ-gk-vHa"/>
+                                <toolbarItem reference="XEE-uf-EI0"/>
                             </defaultToolbarItems>
                         </toolbar>
                         <connections>
@@ -374,42 +380,13 @@
                     <connections>
                         <outlet property="cmapPopupButton" destination="L9A-JU-bgT" id="Tbk-ZG-3GJ"/>
                         <outlet property="glyphListCombobox" destination="hWE-Sq-d5u" id="8dA-Zh-7u3"/>
+                        <outlet property="searchField" destination="xc5-ch-P55" id="fkf-hq-9G3"/>
                         <segue destination="Sgs-dL-3FM" kind="relationship" relationship="window.shadowedContentViewController" id="Bzt-rc-UPn"/>
                     </connections>
                 </windowController>
                 <customObject id="6f7-a7-6o1" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="360.5" y="196"/>
-        </scene>
-        <!--View Controller-->
-        <scene sceneID="pbH-sB-mn4">
-            <objects>
-                <viewController id="bTJ-Qw-UeK" sceneMemberID="viewController">
-                    <view key="view" id="k0V-UR-79x">
-                        <rect key="frame" x="0.0" y="0.0" width="450" height="300"/>
-                        <autoresizingMask key="autoresizingMask"/>
-                        <subviews>
-                            <popUpButton verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="gza-Dd-y9e">
-                                <rect key="frame" x="142" y="174" width="179" height="26"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <popUpButtonCell key="cell" type="push" title="Item 1" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="28A-Ll-MH1" id="qQc-ms-GL4">
-                                    <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
-                                    <font key="font" metaFont="menu"/>
-                                    <menu key="menu" id="NDz-8u-jNN">
-                                        <items>
-                                            <menuItem title="Item 1" state="on" id="28A-Ll-MH1"/>
-                                            <menuItem title="Item 2" state="on" id="8G0-Zk-YM2"/>
-                                            <menuItem title="Item 3" id="S21-0m-tv3"/>
-                                        </items>
-                                    </menu>
-                                </popUpButtonCell>
-                            </popUpButton>
-                        </subviews>
-                    </view>
-                </viewController>
-                <customObject id="3RN-9V-TpC" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="1034" y="8"/>
         </scene>
         <!--Window Controller-->
         <scene sceneID="tbZ-BF-JG0">
@@ -578,7 +555,7 @@ DQ
                     </items>
                 </menu>
             </objects>
-            <point key="canvasLocation" x="361" y="947"/>
+            <point key="canvasLocation" x="360.5" y="946.5"/>
         </scene>
         <!--Glyph Info View Controller-->
         <scene sceneID="Cwg-Lv-OeN">
@@ -615,7 +592,6 @@ DQ
     <resources>
         <image name="NSFontPanel" width="32" height="32"/>
         <image name="NSInfo" width="32" height="32"/>
-        <image name="Search" width="256" height="256"/>
         <image name="Shape" width="575" height="575"/>
         <image name="Table" width="512" height="512"/>
     </resources>
