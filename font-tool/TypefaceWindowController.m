@@ -45,12 +45,17 @@
                                options:NSKeyValueObservingOptionNew
                                context:nil];
     
+    // build cmap list
     [self.cmapPopupButton removeAllItems];
     for (NSUInteger index = 0; index < self.typefaceDocument.cmaps.count; ++ index) {
         TypefaceCMap * cm = [self.typefaceDocument.cmaps objectAtIndex:index];
         [self.cmapPopupButton addItemWithTitle:cm.name];
     }
     [self selectCMapAtIndex: 0];
+    
+    // switch to unicode labels if font doesn't have glyph names
+    if (!self.typefaceDocument.typeface.hasCanonicalGlyphNames)
+        self.glyphCollectionViewController.glyphLabelCategory = GlyphLabelByCode;
 }
 
 - (BOOL)shouldCloseDocument {
