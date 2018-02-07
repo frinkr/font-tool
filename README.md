@@ -11,8 +11,8 @@ manage the packages.
 ### Usage
 Intuited & Simple
 
-![Alt text](http://i.imgur.com/vLdAfgh.png "Select Typeface")
-![Alt text](http://i.imgur.com/fLJft9h.png "Main Window")
+![Alt text](http://i.imgur.com/xJNubF4.png "Select Typeface")
+![Alt text](http://i.imgur.com/LE1mEfS.png "Main Window")
 
 ### License
 MIT
