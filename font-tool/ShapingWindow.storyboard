@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="12121" systemVersion="17A358a" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="Kwg-7l-2JQ">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="13196" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="Kwg-7l-2JQ">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="12121"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="13196"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -11,7 +11,7 @@
             <objects>
                 <windowController storyboardIdentifier="shappingWindowController" id="Kwg-7l-2JQ" customClass="ShapingWindowController" sceneMemberID="viewController">
                     <window key="window" title="Shape" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" oneShot="NO" releasedWhenClosed="NO" showsToolbarButton="NO" visibleAtLaunch="NO" animationBehavior="documentWindow" frameAutosaveName="" id="jzk-fA-EMt">
-                        <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES" unifiedTitleAndToolbar="YES"/>
+                        <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
                         <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
                         <rect key="contentRect" x="1734" y="62" width="576" height="360"/>
                         <rect key="screenRect" x="1440" y="-300" width="1920" height="1177"/>
@@ -23,7 +23,7 @@
                                     <nil key="toolTip"/>
                                     <size key="minSize" width="99" height="26"/>
                                     <size key="maxSize" width="140" height="26"/>
-                                    <comboBox key="view" verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="LZb-86-idG">
+                                    <comboBox key="view" verticalHuggingPriority="750" id="LZb-86-idG">
                                         <rect key="frame" x="0.0" y="14" width="140" height="26"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                         <comboBoxCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" title="120" drawsBackground="YES" completes="NO" numberOfVisibleItems="5" id="1yL-SX-li8">
@@ -77,9 +77,9 @@
                                 <toolbarItem implicitItemIdentifier="9411B49C-351D-47B3-94B9-69569B548ECC" label="Direction" paletteLabel="Direction" id="2rh-JY-m9e">
                                     <nil key="toolTip"/>
                                     <size key="minSize" width="100" height="28"/>
-                                    <size key="maxSize" width="100" height="28"/>
+                                    <size key="maxSize" width="156" height="28"/>
                                     <popUpButton key="view" verticalHuggingPriority="750" id="f04-zX-IMG">
-                                        <rect key="frame" x="0.0" y="14" width="100" height="28"/>
+                                        <rect key="frame" x="0.0" y="14" width="156" height="28"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                         <popUpButtonCell key="cell" type="roundTextured" title="Left To Right" bezelStyle="texturedRounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="border" tag="4" imageScaling="proportionallyDown" inset="2" selectedItem="NoK-jv-0GJ" id="B0M-5W-hKG">
                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -103,16 +103,25 @@
                                         </connections>
                                     </popUpButton>
                                 </toolbarItem>
+                                <toolbarItem implicitItemIdentifier="3A94E067-2F23-4F38-809A-986DC471E9B8" label="Copy Text" paletteLabel="Copy Text" toolTip="Copy text to pasteboard" tag="-1" image="CopyText" id="moJ-sT-RE4">
+                                    <connections>
+                                        <action selector="doCopyText:" target="Kwg-7l-2JQ" id="gnr-eO-PUC"/>
+                                    </connections>
+                                </toolbarItem>
                             </allowedToolbarItems>
                             <defaultToolbarItems>
                                 <toolbarItem reference="qgq-yt-Njk"/>
                                 <toolbarItem reference="t9g-5N-qLa"/>
                                 <toolbarItem reference="Xpv-Fw-F9d"/>
                                 <toolbarItem reference="2rh-JY-m9e"/>
+                                <toolbarItem reference="moJ-sT-RE4"/>
                                 <toolbarItem reference="5Ri-HK-VLT"/>
                                 <toolbarItem reference="XJv-99-dXF"/>
                             </defaultToolbarItems>
                         </toolbar>
+                        <connections>
+                            <outlet property="delegate" destination="Kwg-7l-2JQ" id="jRG-R5-WL9"/>
+                        </connections>
                     </window>
                     <connections>
                         <outlet property="directionPopUpButton" destination="f04-zX-IMG" id="dc5-CY-AgD"/>
@@ -136,7 +145,7 @@
                         <rect key="frame" x="0.0" y="0.0" width="793" height="397"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
-                            <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Vfc-i9-dww">
+                            <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Vfc-i9-dww">
                                 <rect key="frame" x="148" y="355" width="625" height="22"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" title="AVffl123" drawsBackground="YES" id="CFM-xu-eCN">
                                     <font key="font" metaFont="system"/>
@@ -272,8 +281,9 @@
         </scene>
     </scenes>
     <resources>
-        <image name="ShapingShowLines" width="69.120002746582031" height="69.120002746582031"/>
-        <image name="ShapingShowOrigin" width="69.120002746582031" height="69.120002746582031"/>
-        <image name="ShapingText" width="69.120002746582031" height="69.120002746582031"/>
+        <image name="CopyText" width="291" height="291"/>
+        <image name="ShapingShowLines" width="34.560001373291016" height="34.560001373291016"/>
+        <image name="ShapingShowOrigin" width="34.560001373291016" height="34.560001373291016"/>
+        <image name="ShapingText" width="34.560001373291016" height="34.560001373291016"/>
     </resources>
 </document>

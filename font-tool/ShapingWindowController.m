@@ -753,12 +753,33 @@ typedef struct {
     
 }
 
+- (IBAction)doCopyText:(id)sender {
+    NSString * selected = self.shapingViewController.textInputField.stringValue;
+    NSRange range = self.shapingViewController.textInputField.currentEditor.selectedRange;
+    if ((range.location != NSNotFound) && range.length)
+        selected = [selected substringWithRange:range];
+    
+    NSString * text = [CharEncoding decodeUnicodeMixed:selected];
+    NSPasteboard *pasteBoard = [NSPasteboard generalPasteboard];
+    [pasteBoard declareTypes:[NSArray arrayWithObjects:NSStringPboardType, nil] owner:nil];
+    [pasteBoard setString:text forType:NSStringPboardType];
+    
+    [self postNotificationWithTitle:@"Text has been copied to pasteboard"  message:text];
+}
+
 - (ShapingViewController*)shapingViewController {
     return (ShapingViewController*)(self.contentViewController);
 }
 
 - (ShapingView*)shapingView {
     return [self shapingViewController].shapingView;
+}
+
+- (void)postNotificationWithTitle:(NSString*) title message:(NSString*)message {
+    NSUserNotification * notification = [[NSUserNotification alloc] init];
+    notification.title = title;
+    notification.informativeText = message;
+    [[NSUserNotificationCenter defaultUserNotificationCenter] deliverNotification:notification];
 }
 
 + (instancetype)createWithDocument:(TypefaceDocument*)document parentWindow:(NSWindow*)parentWindow bringFront:(BOOL)bringFront {
