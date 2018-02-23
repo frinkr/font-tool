@@ -657,3 +657,15 @@ static UnicodeDatabase *standardUnicodDatabase = nil;
 
 @end
 
+NSString * ICUVersion() {
+    return [NSString stringWithFormat:@"%d.%d.%d.%d",
+            U_ICU_VERSION_MAJOR_NUM,
+            U_ICU_VERSION_MINOR_NUM,
+            U_ICU_VERSION_PATCHLEVEL_NUM,
+            U_ICU_VERSION_BUILDLEVEL_NUM];
+}
+
+NSString * ICUDataVersion() {
+    return [NSString stringWithCString:U_ICU_DATA_VERSION
+                              encoding:NSASCIIStringEncoding];
+}

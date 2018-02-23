@@ -20,6 +20,10 @@ typedef NS_ENUM(NSInteger, ShapingDirection) {
     ShappingDirectionBTT
 };
 
+FT_BEGIN_DECLS
+NSString * HarfbuzzVersion();
+FT_END_DECLS
+
 @interface Shapper : NSObject
 @property (strong, readonly) Typeface * typeface;
 

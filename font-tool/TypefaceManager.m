@@ -301,6 +301,12 @@ static TypefaceManager * defaultTypefaceManager;
     return ftLib;
 }
 
+-(NSString*)ftLibVersion {
+    FT_Int major, minor, patch;
+    FT_Library_Version(ftLib, &major, &minor, &patch);
+    return [NSString stringWithFormat:@"%d.%d.%d", major, minor, patch];
+}
+
 -(NSArray<NSString*> *)listFacesOfURL:(NSURL*)url {
     NSMutableArray<NSString*> * faces = [[NSMutableArray<NSString*> alloc] init];
     
@@ -430,4 +436,8 @@ FT_Error TMFaceRequester(FTC_FaceID  face_id,
     TMTypeface * face = [tm.idTypefaceMapping objectForKey:[NSNumber numberWithUnsignedInteger:(NSUInteger)face_id]];
     TypefaceDescriptor * descriptor = face.fileDescriptor;
     return FT_New_Face(tm.ftLib, [descriptor.fileURL.path UTF8String], descriptor.faceIndex, aface);
+}
+
+NSString * FreeTypeVersion() {
+    return [[TypefaceManager defaultManager] ftLibVersion];
 }

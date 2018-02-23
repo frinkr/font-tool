@@ -5,6 +5,8 @@
 #import "TypefaceDocumentController.h"
 #import "TypefaceWindowController.h"
 #import "LuaScriptConsole.h"
+#import "Shapper.h"
+#import "CharEncoding.h"
 
 @interface TMProgressViewController ()
 @property (weak) IBOutlet NSProgressIndicator *progressIndicator;
@@ -93,6 +95,23 @@
 
 - (BOOL)application:(NSApplication *)sender openFile:(NSString *)filename {
     return [(TypefaceDocumentController*)[NSDocumentController sharedDocumentController] openFontFromFilePath:[NSURL fileURLWithPath:filename]];
+}
+
+- (IBAction)orderFrontStandardAboutPanel:(id)sender {
+    NSString * creditsStr = [NSString stringWithFormat:@"FreeType: %@\nHarfbuzz: %@\nICU: %@",
+                          FreeTypeVersion(),
+                          HarfbuzzVersion(),
+                          ICUVersion()];
+    NSMutableParagraphStyle *paragraphStyle = [[NSMutableParagraphStyle alloc] init];
+    paragraphStyle.alignment = NSTextAlignmentCenter;
+    NSDictionary *atts = @{NSParagraphStyleAttributeName: paragraphStyle,
+                           NSFontAttributeName: [NSFont systemFontOfSize:10]
+                           };
+
+    NSMutableAttributedString * credits = [[NSMutableAttributedString alloc] initWithString:creditsStr attributes:atts];
+    [credits applyFontTraits:NSItalicFontMask range:NSMakeRange(0, creditsStr.length)];
+    
+    [NSApp orderFrontStandardAboutPanelWithOptions:@{ @"Credits": credits }];
 }
 
 - (BOOL)userNotificationCenter:(NSUserNotificationCenter *)center shouldPresentNotification:(NSUserNotification *)notification {

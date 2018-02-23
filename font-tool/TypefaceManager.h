@@ -62,6 +62,7 @@ extern NSString * TMProgressNotificationCurrentKey;
 -(void)initFTLib;
 -(void)doneFTLib;
 -(OpaqueFTLibrary)ftLib;
+-(NSString*)ftLibVersion;
 
 -(NSArray<TMTypefaceFamily*>*)availableTypefaceFamilies;
 -(NSArray<TMTypeface*>*)availableFaces;
@@ -81,3 +82,7 @@ extern NSString * TMProgressNotificationCurrentKey;
 
 + (instancetype) defaultManager;
 @end
+
+FT_BEGIN_DECLS
+NSString * FreeTypeVersion();
+FT_END_DECLS

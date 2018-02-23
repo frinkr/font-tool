@@ -128,3 +128,8 @@ typedef UnicodeBlock UnicodePropListBlock;
 
 @interface UnicodeData : NSObject
 @end
+
+FT_BEGIN_DECLS
+NSString * ICUVersion();
+NSString * ICUDataVersion();
+FT_END_DECLS

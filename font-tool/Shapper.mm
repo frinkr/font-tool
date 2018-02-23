@@ -23,6 +23,12 @@
 #include <hb-ft.h>
 #include <hb-ot.h>
 
+NSString * HarfbuzzVersion() {
+    unsigned int major, minor, macro;
+    hb_version(&major, &minor, &macro);
+    return [NSString stringWithFormat:@"%d.%d.%d", major, minor, macro];
+}
+
 constexpr unsigned int LANGSYS_DEFAUL_INDEX = 0xFFFFu;
 constexpr unsigned int LANGSYS_MISSING_INDEX = -2;
 constexpr ot_tag_t OT_MERGED_GSUB_GPOS  = MAKE_TAG4('m', 'e', 'g', 'r'); // face
