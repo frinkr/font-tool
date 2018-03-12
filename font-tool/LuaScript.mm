@@ -149,6 +149,12 @@ namespace elua {
             TMTypeface * face = (__bridge TMTypeface*)tmFace;
             return [face containsChar:unicodeChar];
         }
+        
+        bool containsTable(const std::string & table) {
+            TMTypeface * face = (__bridge TMTypeface*)tmFace;
+            return [face containsTable:toNSString(table)];
+        }
+        
     public:
         std::string postscriptName;
         int numGlyphs;
@@ -248,6 +254,7 @@ namespace elua {
         
         .addFunction("dump", &Font::Dump)
         .addFunction("containsChar", &Font::containsChar)
+        .addFunction("containsTable", &Font::containsTable)
         
         .endClass()
         .endNamespace();

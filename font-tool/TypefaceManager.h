@@ -36,6 +36,7 @@ extern NSString * TMProgressNotificationCurrentKey;
 - (NSString*) UIFullName;
 
 - (BOOL)containsChar:(uint32_t) unicodeChar;
+- (BOOL)containsTable:(NSString*)table;
 
 - (NSComparisonResult)compare:(TMTypeface*)other;
 - (Typeface*)createTypeface;
@@ -73,6 +74,7 @@ extern NSString * TMProgressNotificationCurrentKey;
 -(NSString*)styleNameAtIndex:(NSUInteger)index ofURL:(NSURL*)url;
 
 - (NSUInteger)lookupGlyphOfChar:(NSUInteger) charcode withCMapIndex:(NSInteger) cmapIndex inFace:(NSUInteger)faceId;
+- (BOOL)containsTable:(NSString*)table inFace:(NSUInteger)faceId;
 - (TypefaceDescriptor*)fileDescriptorFromNameDescriptor:(TypefaceDescriptor*)nameDescriptor;
 
 - (void)enumurateFacesOfURL:(NSURL*)url handler:(BOOL (^)(OpaqueFTFace opaqueFace, NSUInteger index))hander;

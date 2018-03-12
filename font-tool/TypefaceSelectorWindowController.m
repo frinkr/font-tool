@@ -500,6 +500,7 @@ typedef NS_ENUM(NSInteger, TypefaceVariationFlavor) {
         NSMutableArray<NSString*> * names = [[NSMutableArray alloc] init];
         [names addObjectsFromArray:face.attributes.localizedFamilyNames.allValues];
         [names addObject:face.UIFamilyName];
+        [names addObject:face.attributes.postscriptName];
         for (NSString * name in names ) {
             NSRange range = [name rangeOfString:object.stringValue options:NSCaseInsensitiveSearch];
             if (range.location != NSNotFound)

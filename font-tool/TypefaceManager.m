@@ -53,6 +53,10 @@ static  FT_Error TMFaceRequester(FTC_FaceID  face_id,
     return gid != 0;
 }
 
+- (BOOL)containsTable:(NSString *)table {
+    return [[TypefaceManager defaultManager] containsTable:table inFace:self.faceId];
+}
+
 - (NSComparisonResult)compare:(TMTypeface*)other {
     NSComparisonResult result = [self.familyName compare:other.familyName];
     if (result == NSOrderedSame) {
@@ -350,6 +354,16 @@ static TypefaceManager * defaultTypefaceManager;
 
 - (NSUInteger)lookupGlyphOfChar:(NSUInteger)charcode withCMapIndex:(NSInteger)cmapIndex inFace:(NSUInteger)faceId {
     return FTC_CMapCache_Lookup(ftCMapCache, faceId, cmapIndex, charcode);
+}
+
+- (BOOL)containsTable:(NSString*)table inFace:(NSUInteger)faceId {
+    FT_Face face;
+    if (!FTC_Manager_LookupFace(ftcMgr, faceId, &face)) {
+        FT_ULong  length = 0;
+        FT_Load_Sfnt_Table(face, [TypefaceTag textToCode:table], 0, NULL, &length);
+        return length;
+    }
+    return NO;
 }
 
 - (TypefaceDescriptor*)fileDescriptorFromNameDescriptor:(TypefaceDescriptor*)nameDescriptor {
