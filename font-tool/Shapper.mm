@@ -173,7 +173,7 @@ static hb_bool_t hb_buffer_message(hb_buffer_t *buffer,
     
     // shape
     
-    const char * shappers[] = {"ot", nullptr};//hb_shape_list_shapers();
+    const char ** shappers = hb_shape_list_shapers();
     
     hbPlan = hb_shape_plan_create_cached(hbFace,
                                          &segment_props,
