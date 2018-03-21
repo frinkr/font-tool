@@ -20,7 +20,12 @@ if(BUILD_FREETYPE_HARFBUZZ)
   pkg_check_modules(PC_HBFT REQUIRED harfbuzz-icu-freetype)
   include_directories(AFTER ${PC_HBFT_INCLUDE_DIRS})
   list(APPEND THIRD_PARTY_LIBS ${PC_HBFT_LIBRARIES})
-  
+
+  # icu
+  pkg_check_modules(ICU REQUIRED icu-uc)
+  include_directories(${ICU_INCLUDE_DIRS})
+  list(APPEND THIRD_PARTY_LIBS ${ICU_LDFLAGS})
+
 else()
   
   # Freeetype

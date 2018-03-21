@@ -172,6 +172,7 @@ typedef NS_ENUM(NSInteger, TypefaceFormat) {
 @property (strong) NSDictionary<NSString*, NSString*> * localizedFamilyNames;
 @property (strong) NSDictionary<NSString*, NSString*> * localizedStyleNames;
 @property (strong) NSDictionary<NSString*, NSString*> * localizedFullNames;
+@property (strong) NSDictionary<NSString*, NSString*> * localizedPSNames;
 
 // lanuages
 @property (strong) NSArray<NSString*> * designLanguages;
@@ -234,9 +235,7 @@ typedef NS_ENUM(NSInteger, TypefaceFormat) {
 @property (nonatomic, readonly, getter=getBBox) CGRect bbox;
 @property (nonatomic, readonly, getter=getNumberOfGlyphs) NSUInteger numberOfGlyphs;
 
-// names
-@property (readonly) NSString * familyName;
-@property (readonly) NSString * styleName;
+// file
 @property (readonly) NSURL    * fileURL;
 @property (readonly) NSUInteger faceIndex;
 

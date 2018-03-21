@@ -24,7 +24,7 @@ NSString * TMProgressNotificationFileKey = @"TMProgressNotificationFileKey";
 NSString * TMProgressNotificationTotalKey = @"TMProgressNotificationTotalKey";
 NSString * TMProgressNotificationCurrentKey = @"TMProgressNotificationCurrentKey";
 
-NSInteger TypefaceFontListVersion = 5;
+NSInteger TypefaceFontListVersion = 9;
 
 static  FT_Error TMFaceRequester(FTC_FaceID  face_id,
                                  FT_Library  library,
@@ -237,6 +237,9 @@ static TypefaceManager * defaultTypefaceManager;
         NSMutableDictionary<NSString*, TMTypefaceFamily*> * familiesMap = [[NSMutableDictionary<NSString*, TMTypefaceFamily*> alloc] init];
         for (TypefaceDescriptor * fileDescriptor in _fileDescriptorAttributesMapping) {
             TypefaceAttributes * attributes = [_fileDescriptorAttributesMapping objectForKey:fileDescriptor];
+            
+            if (!attributes.familyName || !attributes.styleName)
+                continue;
             
             TMTypefaceFamily * family = [familiesMap objectForKey:attributes.familyName];
             if (!family) {

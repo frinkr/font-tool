@@ -475,6 +475,7 @@ typedef struct {
     [coder encodeObject:_localizedFamilyNames forKey:@"localizedFamilyNames"];
     [coder encodeObject:_localizedStyleNames forKey:@"localizedStyleNames"];
     [coder encodeObject:_localizedFullNames forKey:@"localizedFullNames"];
+    [coder encodeObject:_localizedPSNames forKey:@"localizedPSNames"];
     [coder encodeObject:_designLanguages forKey:@"designLanguages"];
     [coder encodeObject:_format forKey:@"format"];
     [coder encodeBool:_isCID forKey:@"isCID"];
@@ -505,6 +506,7 @@ typedef struct {
         _localizedFamilyNames = [decoder decodeObjectForKey:@"localizedFamilyNames"];
         _localizedStyleNames = [decoder decodeObjectForKey:@"localizedStyleNames"];
         _localizedFullNames = [decoder decodeObjectForKey:@"localizedFullNames"];
+        _localizedPSNames = [decoder decodeObjectForKey:@"localizedPSNames"];
         _designLanguages = [decoder decodeObjectForKey:@"designLanguages"];
         _format = [decoder decodeObjectForKey:@"format"];
         _isCID = [decoder decodeBoolForKey:@"isCID"];
@@ -804,8 +806,8 @@ typedef struct {
     self.fontSize = FT_DEFAULT_FONTSIZE;
     
     // info
-    _familyName = [NSString stringWithUTF8StringNilFallback:face->family_name];
-    _styleName = [NSString stringWithUTF8StringNilFallback:face->style_name];
+    //_familyName = [NSString stringWithUTF8StringNilFallback:face->family_name];
+    //_styleName = [NSString stringWithUTF8StringNilFallback:face->style_name];
     _fileURL = fileURL;
     _faceIndex = face->face_index;
 
@@ -1258,11 +1260,14 @@ typedef struct {
         TT_NAME_ID_FONT_SUBFAMILY,
         TT_NAME_ID_TRADEMARK,
         TT_NAME_ID_MANUFACTURER,
+        TT_NAME_ID_PS_NAME,
+        TT_NAME_ID_CID_FINDFONT_NAME
     };
     
     NSMutableDictionary<NSString*, NSString*> *localizedFamilyNames = [[NSMutableDictionary<NSString*, NSString*> alloc] init];
     NSMutableDictionary<NSString*, NSString*> *localizedStyleNames = [[NSMutableDictionary<NSString*, NSString*> alloc] init];
     NSMutableDictionary<NSString*, NSString*> *localizedFullNames = [[NSMutableDictionary<NSString*, NSString*> alloc] init];
+    NSMutableDictionary<NSString*, NSString*> *localizedPSNames = [[NSMutableDictionary<NSString*, NSString*> alloc] init];
 
     for (FT_UShort nameId : nameIDOrder) {
         for (FT_UInt i = 0; i < count; ++ i) {
@@ -1296,6 +1301,12 @@ typedef struct {
                 case TT_NAME_ID_FULL_NAME:
                     if (![localizedFullNames objectForKey:lang])
                         [localizedFullNames setObject:SFNTNameGetValue(&sfntName) forKey:lang];
+                    break;
+                    
+                case TT_NAME_ID_PS_NAME:
+                case TT_NAME_ID_CID_FINDFONT_NAME:
+                    if (![localizedPSNames objectForKey:lang])
+                        [localizedPSNames setObject:SFNTNameGetValue(&sfntName) forKey:lang];
                     break;
             }
             
@@ -1338,6 +1349,7 @@ typedef struct {
     attributes.localizedFamilyNames = localizedFamilyNames;
     attributes.localizedStyleNames = localizedStyleNames;
     attributes.localizedFullNames = localizedFullNames;
+    attributes.localizedPSNames = localizedPSNames;
     
     NSString * (^searchLocalizedName)(NSDictionary<NSString*, NSString*> *, NSString *, NSString**) = ^(NSDictionary<NSString*, NSString*> * nameDict, NSString * preferedLang, NSString** outLang) {
         NSString * name = nil;
@@ -1364,6 +1376,21 @@ typedef struct {
     attributes.preferedLocalizedFamilyName = searchLocalizedName(attributes.localizedFamilyNames, nil, &familyLang);
     attributes.preferedLocalizedStyleName = searchLocalizedName(attributes.localizedStyleNames, familyLang, nil);
     attributes.preferedLocalizedFullName = searchLocalizedName(attributes.localizedFullNames, familyLang, nil);
+    
+    NSString * preferedPSName = searchLocalizedName(attributes.localizedPSNames, familyLang, nil);
+    
+    if (!attributes.familyName)
+        attributes.familyName = attributes.preferedLocalizedFamilyName;
+    if (!attributes.familyName && localizedFamilyNames.count)
+        attributes.familyName = [localizedFamilyNames.allValues objectAtIndex:0];
+    if (!attributes.styleName)
+        attributes.styleName = attributes.preferedLocalizedStyleName;
+    if (!attributes.styleName && localizedStyleNames.count)
+        attributes.styleName = [localizedStyleNames.allValues objectAtIndex:0];
+    if (!attributes.postscriptName && preferedPSName)
+        attributes.postscriptName = preferedPSName;
+    if (!attributes.postscriptName && localizedPSNames.count)
+        attributes.postscriptName = [localizedPSNames.allValues objectAtIndex:0];
     
     if (!attributes.preferedLocalizedFamilyName)
         attributes.preferedLocalizedFamilyName = attributes.familyName;

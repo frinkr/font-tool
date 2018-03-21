@@ -150,8 +150,8 @@
     NSUInteger infoIndex = 0;
     for (NSUInteger i = 0; i < _recentDocumentsInfo.count; ++ i) {
         TypefaceRecentDocumentInfo * aInfo = [_recentDocumentsInfo objectAtIndex:i];
-        if ([aInfo.family isEqualToString:tface.familyName] &&
-            [aInfo.style isEqualToString:tface.styleName] &&
+        if ([aInfo.family isEqualToString:tface.attributes.familyName] &&
+            [aInfo.style isEqualToString:tface.attributes.styleName] &&
             [aInfo.file isEqualToString:tface.fileURL.path] &&
             aInfo.index == tface.faceIndex) {
             
@@ -170,8 +170,8 @@
         }
     }
     else {
-        info = [[TypefaceRecentDocumentInfo alloc] initWithFamily:tface.familyName
-                                                            style:tface.styleName
+        info = [[TypefaceRecentDocumentInfo alloc] initWithFamily:tface.attributes.familyName
+                                                            style:tface.attributes.styleName
                                                 localizedFullName:[NSString stringWithFormat:@"%@ %@", tface.attributes.preferedLocalizedFamilyName, tface.attributes.preferedLocalizedStyleName]
                                                             index:tface.faceIndex
                                                              file:tface.fileURL.path];
