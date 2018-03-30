@@ -155,6 +155,11 @@ namespace elua {
             return [face containsTable:toNSString(table)];
         }
         
+        bool isLastResortFont() {
+            TMTypeface * face = (__bridge TMTypeface*)tmFace;
+            return face.isLastResortFont;
+        }
+        
     public:
         std::string postscriptName;
         int numGlyphs;
@@ -255,7 +260,7 @@ namespace elua {
         .addFunction("dump", &Font::Dump)
         .addFunction("containsChar", &Font::containsChar)
         .addFunction("containsTable", &Font::containsTable)
-        
+        .addFunction("isLastResortFont", &Font::isLastResortFont)
         .endClass()
         .endNamespace();
     }

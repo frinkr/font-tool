@@ -411,7 +411,7 @@ typedef NS_ENUM(NSInteger, TypefaceVariationFlavor) {
 
 - (void)selectFaceByUIFullName:(NSString*)uiFullName {
     [self.typefaceCombobox selectItemWithObjectValue:uiFullName];
-    if (self.typefaceCombobox.indexOfSelectedItem == -1)
+    if (self.typefaceCombobox.indexOfSelectedItem == -1 && self.typefaceCombobox.numberOfItems)
         [self selectFaceAtIndex:0];
     else
         [self updateTypefaceInformation];

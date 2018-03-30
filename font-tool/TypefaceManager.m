@@ -57,6 +57,16 @@ static  FT_Error TMFaceRequester(FTC_FaceID  face_id,
     return [[TypefaceManager defaultManager] containsTable:table inFace:self.faceId];
 }
 
+- (BOOL)isLastResortFont {
+    OpaqueFTFace face = [TypefaceManager.defaultManager getFTFaceFromId:self.faceId];
+    if (face) {
+        TT_Header * head = (TT_Header *)FT_Get_Sfnt_Table(face, FT_SFNT_HEAD);
+        if (head)
+            return head->Flags & (1 << 14);
+    }
+    return NO;
+}
+
 - (NSComparisonResult)compare:(TMTypeface*)other {
     NSComparisonResult result = [self.familyName compare:other.familyName];
     if (result == NSOrderedSame) {
@@ -367,6 +377,13 @@ static TypefaceManager * defaultTypefaceManager;
         return length;
     }
     return NO;
+}
+
+-(OpaqueFTFace)getFTFaceFromId:(NSUInteger)faceId {
+    FT_Face face;
+    if (!FTC_Manager_LookupFace(ftcMgr, faceId, &face))
+        return face;
+    return NULL;
 }
 
 - (TypefaceDescriptor*)fileDescriptorFromNameDescriptor:(TypefaceDescriptor*)nameDescriptor {

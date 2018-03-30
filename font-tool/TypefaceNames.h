@@ -27,6 +27,7 @@ extern NSString * FTGetPlatformLanguageName(FT_UShort platformId, FT_UShort enco
 
 extern NSString * SFNTNameGetName(FT_SfntName * sfntName); //
 extern NSString * SFNTNameGetValue(FT_SfntName * sfntName); //
+extern NSString * SFNTNameGetPlatform(FT_SfntName * sfntName);
 extern NSString * SFNTNameGetLanguage(FT_SfntName *sfntName, FT_Face face); // language id
 
 extern BOOL       SFNTNameGetFromId(FT_Face face, NSUInteger nameId, FT_SfntName * sfnt);
@@ -36,15 +37,28 @@ extern NSString * SFNTTagName(FT_ULong tagValue);
 extern FT_ULong * SFNTTagValue(NSString * tagName);
 
 extern NSString * HeadGetFlagFullDescription(uint16_t flag);
+extern NSString * HeadGetMacStyleDescription(uint16_t flag);
 
 extern NSString * OS2GetWeightClassName(uint16_t value);
 extern NSString * OS2GetWidthClassName(uint16_t value);
+extern NSString * OS2GetFsTypeDescription(uint16_t value);
 
 extern NSString * OS2GetFamilyClassName(uint16_t value);
 extern NSString * OS2GetSubFamilyClassName(uint16_t value);
 extern NSString * OS2GetFamilyClassFullName(uint16_t value);
 
-extern NSString * OS2GetFsSelectionNames(uint16_t value);
+extern NSString * OS2GetPanoseFamilyType(uint8_t value);
+extern NSString * OS2GetPanoseSerifType(uint8_t value);
+extern NSString * OS2GetPanoseWeight(uint8_t value);
+extern NSString * OS2GetPanoseProportion(uint8_t value);
+extern NSString * OS2GetPanoseContrast(uint8_t value);
+extern NSString * OS2GetPanoseStrokeVariation(uint8_t value);
+extern NSString * OS2GetPanoseArmStyle(uint8_t value);
+extern NSString * OS2GetPanoseLetterform(uint8_t value);
+extern NSString * OS2GetPanoseMidline(uint8_t value);
+extern NSString * OS2GetPanoseXHeight(uint8_t value);
+
+extern NSString * OS2GetFsSelectionDescription(uint16_t value);
 
 extern NSString * OTGetScriptFullName(NSString * script);
 extern NSString * OTGetLanguageFullName(NSString * language);

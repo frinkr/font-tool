@@ -37,6 +37,7 @@ extern NSString * TMProgressNotificationCurrentKey;
 
 - (BOOL)containsChar:(uint32_t) unicodeChar;
 - (BOOL)containsTable:(NSString*)table;
+- (BOOL)isLastResortFont;
 
 - (NSComparisonResult)compare:(TMTypeface*)other;
 - (Typeface*)createTypeface;
@@ -68,6 +69,7 @@ extern NSString * TMProgressNotificationCurrentKey;
 -(NSArray<TMTypefaceFamily*>*)availableTypefaceFamilies;
 -(NSArray<TMTypeface*>*)availableFaces;
 
+-(OpaqueFTFace)getFTFaceFromId:(NSUInteger)faceId;
 -(NSArray<NSString*> *)listFacesOfURL:(NSURL*)url;
 -(NSString*)faceNameAtIndex:(NSUInteger)index ofURL:(NSURL*)url;
 -(NSString*)familyNameAtIndex:(NSUInteger)index ofURL:(NSURL*)url;

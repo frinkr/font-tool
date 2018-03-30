@@ -520,7 +520,7 @@ NSString* FixedArrayToString(NSArray<NSNumber*> * array) {
         [items addRowWithKey:@"CheckSum Adjustment" uint32HexValue:head->CheckSum_Adjust withPrefix:@"0x"];
         [items addRowWithKey:@"Magic Number" uint32HexValue:head->Magic_Number withPrefix:@"0x"];
         
-        [items addRowWithKey:@"Flags" stringValue:[NSString stringWithFormat:@"0x%08hX<br/>%@",
+        [items addRowWithKey:@"Flags" stringValue:[NSString stringWithFormat:@"0x%04hX<br/>%@",
                                                    head->Flags,
                                                    [HeadGetFlagFullDescription(head->Flags) stringByReplacingOccurrencesOfString:@";" withString:@"<br/>"]]];
         
@@ -536,7 +536,9 @@ NSString* FixedArrayToString(NSArray<NSNumber*> * array) {
         [items addRowWithKey:@"xMax" integerValue:head->xMax];
         [items addRowWithKey:@"yMax" integerValue:head->yMax];
         
-        [items addRowWithKey:@"Mac Style" integerValue:head->Mac_Style];
+        [items addRowWithKey:@"Mac Style" stringValue:[NSString stringWithFormat:@"0x%04hX (%@)",
+                                                       head->Mac_Style,
+                                                       HeadGetMacStyleDescription(head->Mac_Style)]];
         [items addRowWithKey:@"Lowest Rec PPEM" integerValue:head->Lowest_Rec_PPEM];
         [items addRowWithKey:@"Font Direction" integerValue:head->Font_Direction];
         [items addRowWithKey:@"Index To Loc Format" integerValue:head->Index_To_Loc_Format];
@@ -679,7 +681,9 @@ NSString* FixedArrayToString(NSArray<NSNumber*> * array) {
         [items addRowWithKey:@"xAvgCharWidth" integerValue:os2->xAvgCharWidth];
         [items addRowWithKey:@"usWeightClass" stringValue:[NSString stringWithFormat:@"%d, %@", os2->usWeightClass, OS2GetWeightClassName(os2->usWeightClass)]];
         [items addRowWithKey:@"usWidthClass" stringValue:[NSString stringWithFormat:@"%d, %@", os2->usWidthClass, OS2GetWidthClassName(os2->usWidthClass)]];
-        [items addRowWithKey:@"fsType" unsignedIntegerValue:os2->fsType];
+        [items addRowWithKey:@"fsType" stringValue:[NSString stringWithFormat:@"0x%04hX <br> %@", os2->fsType,
+                                                    [OS2GetFsTypeDescription(os2->fsType) stringByReplacingOccurrencesOfString:@";" withString:@"<br>"]]]
+        ;
         [items addRowWithKey:@"ySubscriptXSize" integerValue:os2->ySubscriptXSize];
         [items addRowWithKey:@"ySubscriptYSize" integerValue:os2->ySubscriptYSize];
         [items addRowWithKey:@"ySubscriptXOffset" integerValue:os2->ySubscriptXOffset];
@@ -701,7 +705,27 @@ NSString* FixedArrayToString(NSArray<NSNumber*> * array) {
                                                         OS2GetFamilyClassFullName(os2->sFamilyClass)]];
         
         // panose
-        
+        {
+            NSMutableArray<NSString*> * panose = [[NSMutableArray<NSString*> alloc] init];
+            NSMutableString * hex = [[NSMutableString alloc] init];
+            for (NSUInteger i = 0; i < 10; ++ i) {
+                if (i) [hex appendString:@" "];
+                [hex appendFormat:@"%02hX", (unsigned short)os2->panose[i]];
+            }
+            [panose addObject:hex];
+            [panose addObject:[NSString stringWithFormat:@"Family: %@", OS2GetPanoseFamilyType(os2->panose[0])]];
+            [panose addObject:[NSString stringWithFormat:@"Serif: %@", OS2GetPanoseSerifType(os2->panose[1])]];
+            [panose addObject:[NSString stringWithFormat:@"Weight: %@", OS2GetPanoseWeight(os2->panose[2])]];
+            [panose addObject:[NSString stringWithFormat:@"Proportion: %@", OS2GetPanoseProportion(os2->panose[3])]];
+            [panose addObject:[NSString stringWithFormat:@"Contrast: %@", OS2GetPanoseContrast(os2->panose[4])]];
+            [panose addObject:[NSString stringWithFormat:@"Stroke Variation: %@", OS2GetPanoseStrokeVariation(os2->panose[5])]];
+            [panose addObject:[NSString stringWithFormat:@"Arm: %@", OS2GetPanoseArmStyle(os2->panose[6])]];
+            [panose addObject:[NSString stringWithFormat:@"Letter: %@", OS2GetPanoseLetterform(os2->panose[7])]];
+            [panose addObject:[NSString stringWithFormat:@"Midline: %@", OS2GetPanoseMidline(os2->panose[8])]];
+            [panose addObject:[NSString stringWithFormat:@"X Height: %@", OS2GetPanoseXHeight(os2->panose[9])]];
+            
+            [items addRowWithKey:@"PANOSE" stringValue:[panose componentsJoinedByString:@"<br>"]];
+        }
         
         // unicode range
         [items addRowWithKey:@"ulUnicodeRange1" bitsValue:os2->ulUnicodeRange1 count:32];
@@ -718,7 +742,7 @@ NSString* FixedArrayToString(NSArray<NSNumber*> * array) {
         // Vender
         [items addRowWithKey:@"achVendID" stringValue:[[NSString alloc] initWithBytes:os2->achVendID length:4 encoding:NSASCIIStringEncoding]];
         
-        [items addRowWithKey:@"fsSelection" stringValue: [NSString stringWithFormat:@"%d (%@)", os2->fsSelection, OS2GetFsSelectionNames(os2->fsSelection)]];
+        [items addRowWithKey:@"fsSelection" stringValue: [NSString stringWithFormat:@"0x%04hX (%@)", os2->fsSelection, OS2GetFsSelectionDescription(os2->fsSelection)]];
         [items addRowWithKey:@"usFirstCharIndex" unsignedIntegerValue:os2->usFirstCharIndex];
         [items addRowWithKey:@"usLastCharIndex" unsignedIntegerValue:os2->usLastCharIndex];
         [items addRowWithKey:@"sTypoAscender" integerValue:os2->sTypoAscender];
@@ -751,8 +775,6 @@ NSString* FixedArrayToString(NSArray<NSNumber*> * array) {
     
     return items;
 }
-
-
 
 - (HtmlTableRows*)loadNameTableOfFace:(Typeface*)face ftFace:(FT_Face)ftFace {
     HtmlTableRows * items = [[HtmlTableRows alloc] init];

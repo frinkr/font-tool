@@ -143,7 +143,10 @@ static hb_bool_t hb_buffer_message(hb_buffer_t *buffer,
     hb_buffer_set_message_func(hbBuffer, &hb_buffer_message, NULL, NULL);
     
     hb_buffer_set_direction(hbBuffer, (hb_direction_t)direction);
-    hb_buffer_set_script(hbBuffer, (hb_script_t)(script.code - 0x20000000)); // first char to upper case
+    if (script.code == MAKE_TAG('DFLT'))
+        hb_buffer_set_script(hbBuffer, HB_SCRIPT_COMMON);
+    else
+        hb_buffer_set_script(hbBuffer, hb_ot_tag_to_script(script.code));
 
     char utf8Text[1024] = {0};
     [text getCString:utf8Text maxLength:1024 encoding:NSUTF8StringEncoding];
@@ -154,7 +157,6 @@ static hb_bool_t hb_buffer_message(hb_buffer_t *buffer,
     hb_segment_properties_t segment_props;
     hb_buffer_guess_segment_properties(hbBuffer);
     hb_buffer_get_segment_properties(hbBuffer, &segment_props);
-    
     
     // features. Harfbuzz has enabled some features by default, we need to turn them off
     NSMutableSet<OpenTypeFeatureTag*> * offFeatures = [self.allFeatures mutableCopy];

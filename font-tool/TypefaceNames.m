@@ -21,7 +21,7 @@ typedef struct {
 
 // Copy from fontconfig
 static const FtLanguage   ftLanguages[] = {
-    {  TT_PLATFORM_APPLE_UNICODE,	TT_LANGUAGE_DONT_CARE,		    "" },
+    {  TT_PLATFORM_APPLE_UNICODE,	TT_LANGUAGE_DONT_CARE,		    "unicode" },
     {  TT_PLATFORM_MACINTOSH,	TT_MAC_LANGID_ENGLISH,		    "en" },
     {  TT_PLATFORM_MACINTOSH,	TT_MAC_LANGID_FRENCH,		    "fr" },
     {  TT_PLATFORM_MACINTOSH,	TT_MAC_LANGID_GERMAN,		    "de" },
@@ -700,6 +700,17 @@ NSString * SFNTNameGetValue(FT_SfntName * sfntName) {
     return FTGetUnicodeString(sfntName->platform_id, sfntName->encoding_id, sfntName->string, sfntName->string_len);
 }
 
+NSString * SFNTNameGetPlatform(FT_SfntName * sfntName) {
+    switch (sfntName->platform_id) {
+        case TT_PLATFORM_APPLE_UNICODE: return  @"apple";
+        case TT_PLATFORM_MACINTOSH: return @"macintosh";
+        case TT_PLATFORM_ISO: return @"iso";
+        case TT_PLATFORM_MICROSOFT: return @"ms";
+        case TT_PLATFORM_ADOBE: return @"adobe";
+        default: return @"Unknown Platform";
+    }
+}
+
 NSString * SFNTNameGetLanguage(FT_SfntName *sfntName, FT_Face face) {
     if (sfntName->language_id >= 0x8000) {
         FT_SfntLangTag langTag;
@@ -753,6 +764,17 @@ NSString * HeadGetFlagFullDescription(uint16_t flag) {
     return description;
 }
 
+NSString * HeadGetMacStyleDescription(uint16_t flag) {
+    NSMutableArray<NSString*> * description = [[NSMutableArray<NSString*> alloc] init];
+    NSArray<NSString *> * style = @[@"Bold", @"Italic", @"Underline", @"Outline", @"Shadow", @"Condensed", @"Extended"];
+    
+    for (NSUInteger i = 0; i < style.count; ++ i) {
+        if (flag &(1 << i))
+            [description addObject:[style objectAtIndex:i]];
+    }
+    return [description componentsJoinedByString:@", "];
+}
+
 NSString * OS2GetWeightClassName(uint16_t value) {
     switch (value) {
         case 100: return @"Thin";
@@ -783,6 +805,21 @@ NSString * OS2GetWidthClassName(uint16_t value) {
     }
 }
 
+NSString * OS2GetFsTypeDescription(uint16_t value) {
+    if (!value)
+        return @"Installable Embedding";
+    
+    NSMutableArray<NSString*> * names = [[NSMutableArray<NSString*> alloc] init];
+    
+    if (value & (1 << 1)) [names addObject:@"Restricted License Embedding"];
+    if (value & (1 << 2)) [names addObject:@"Preview & Print Embedding"];
+    if (value & (1 << 3)) [names addObject:@"Editable Embedding"];
+    if (value & (1 << 8)) [names addObject:@"No Subsetting"];
+    if (value & (1 << 9)) [names addObject:@"Bitmap Embedding Only"];
+    
+    
+    return [names componentsJoinedByString:@";"];
+}
 
 NSString * OS2GetFamilyClassName(uint16_t value) {
     NSUInteger family = ((value & 0xFF00) >> 8);
@@ -999,7 +1036,180 @@ NSString * OS2GetFamilyClassFullName(uint16_t value) {
     return [NSString stringWithFormat:@"%@, %@", OS2GetFamilyClassName(value), OS2GetSubFamilyClassName(value)];
 }
 
-NSString * OS2GetFsSelectionNames(uint16_t value) {
+static NSString* OS2PanoseSearchInArray(uint8_t value, NSArray<NSString*> * array) {
+    if (array.count >= value)
+        return [array objectAtIndex: value];
+    return nil;
+}
+
+NSString * OS2GetPanoseFamilyType(uint8_t value) {
+    return OS2PanoseSearchInArray(value, @[
+                                           @"Any",
+                                           @"No Fit",
+                                           @"Text and Display",
+                                           @"Script",
+                                           @"Decorative",
+                                           @"Pictorial",
+                                           
+                                           ]);
+    
+}
+
+NSString * OS2GetPanoseSerifType(uint8_t value) {
+    return OS2PanoseSearchInArray(value, @[
+                                           @"Any",
+                                           @"No Fit",
+                                           @"Cove",
+                                           @"Obtuse Cove",
+                                           @"Square Cove",
+                                           @"Obtuse Square Cove",
+                                           @"Square",
+                                           @"Thin",
+                                           @"Bone",
+                                           @"Exaggerated",
+                                           @"Triangle",
+                                           @"Normal Sans",
+                                           @"Obtuse Sans",
+                                           @"Perp Sans",
+                                           @"Flared",
+                                           @"Rounded",
+                                           ]);
+}
+
+NSString * OS2GetPanoseWeight(uint8_t value) {
+    return OS2PanoseSearchInArray(value, @[
+                                           @"Any",
+                                           @"No Fit",
+                                           @"Very Light",
+                                           @"Light",
+                                           @"Thin",
+                                           @"Book",
+                                           @"Medium",
+                                           @"Demi",
+                                           @"Bold",
+                                           @"Heavy",
+                                           @"Black",
+                                           @"Nord",
+                                           
+                                           ]);
+}
+
+NSString * OS2GetPanoseProportion(uint8_t value) {
+    return OS2PanoseSearchInArray(value, @[
+                                           @"Any",
+                                           @"No Fit",
+                                           @"Old Style",
+                                           @"Modern",
+                                           @"Even Width",
+                                           @"Expanded",
+                                           @"Condensed",
+                                           @"Very Expanded",
+                                           @"Very Condensed",
+                                           @"Monospaced",
+                                           
+                                           ]);
+}
+NSString * OS2GetPanoseContrast(uint8_t value) {
+    return OS2PanoseSearchInArray(value, @[
+                                           @"Any",
+                                           @"No Fit",
+                                           @"None",
+                                           @"Very Low",
+                                           @"Low",
+                                           @"Medium Low",
+                                           @"Medium",
+                                           @"Medium High",
+                                           @"High",
+                                           @"Very High",
+                                           
+                                           ]);
+}
+NSString * OS2GetPanoseStrokeVariation(uint8_t value) {
+    return OS2PanoseSearchInArray(value, @[
+                                           @"Any",
+                                           @"No Fit",
+                                           @"Gradual/Diagonal",
+                                           @"Gradual/Transitional",
+                                           @"Gradual/Vertical",
+                                           @"Gradual/Horizontal",
+                                           @"Rapid/Vertical",
+                                           @"Rapid/Horizontal",
+                                           @"Instant/Vertical",
+                                           
+                                           ]);
+}
+NSString * OS2GetPanoseArmStyle(uint8_t value) {
+    return OS2PanoseSearchInArray(value, @[
+                                           @"Any",
+                                           @"No Fit",
+                                           @"Straight Arms/Horizontal",
+                                           @"Straight Arms/Wedge",
+                                           @"Straight Arms/Vertical",
+                                           @"Straight Arms/Single Serif",
+                                           @"Straight Arms/Double Serif",
+                                           @"Non-Straight Arms/Horizontal",
+                                           @"Non-Straight Arms/Wedge",
+                                           @"Non-Straight Arms/Vertical",
+                                           @"Non-Straight Arms/Single Serif",
+                                           @"Non-Straight Arms/Double Serif",
+                                           
+                                           ]);
+}
+NSString * OS2GetPanoseLetterform(uint8_t value) {
+    return OS2PanoseSearchInArray(value, @[
+                                           @"Any",
+                                           @"No Fit",
+                                           @"Normal/Contact",
+                                           @"Normal/Weighted",
+                                           @"Normal/Boxed",
+                                           @"Normal/Flattened",
+                                           @"Normal/Rounded",
+                                           @"Normal/Off Center",
+                                           @"Normal/Square",
+                                           @"Oblique/Contact",
+                                           @"Oblique/Weighted",
+                                           @"Oblique/Boxed",
+                                           @"Oblique/Flattened",
+                                           @"Oblique/Rounded",
+                                           @"Oblique/Off Center",
+                                           @"Oblique/Square",
+                                           
+                                           ]);
+}
+NSString * OS2GetPanoseMidline(uint8_t value) {
+    return OS2PanoseSearchInArray(value, @[
+                                           @"Any",
+                                           @"No Fit",
+                                           @"Standard/Trimmed",
+                                           @"Standard/Pointed",
+                                           @"Standard/Serifed",
+                                           @"High/Trimmed",
+                                           @"High/Pointed",
+                                           @"High/Serifed",
+                                           @"Constant/Trimmed",
+                                           @"Constant/Pointed",
+                                           @"Constant/Serifed",
+                                           @"Low/Trimmed",
+                                           @"Low/Pointed",
+                                           @"Low/Serifed",
+                                           
+                                           ]);
+}
+NSString * OS2GetPanoseXHeight(uint8_t value) {
+    return OS2PanoseSearchInArray(value, @[
+                                           @"Any",
+                                           @"No Fit",
+                                           @"Constant/Small",
+                                           @"Constant/Standard",
+                                           @"Constant/Large",
+                                           @"Ducking/Small",
+                                           @"Ducking/Standard",
+                                           @"Ducking/Large",
+                                           
+                                           ]);
+}
+
+NSString * OS2GetFsSelectionDescription(uint16_t value) {
     NSMutableArray<NSString*> * names = [[NSMutableArray<NSString*> alloc] init];
     
     if (value & (1 << 0)) [names addObject:@"Italic"];
