@@ -405,7 +405,7 @@ static hb_bool_t hb_buffer_message(hb_buffer_t *buffer,
                 if (!hb_ot_layout_language_get_required_feature(hbFace, table, script_index, language_index, &required_feature_index, &required_feature_tag))
                     required_feature_index = 0xFFFF;
                 
-                std::vector<hb_tag_t> required_feature_tags = {OT_TAG_KERN, OT_TAG_LIGA, required_feature_tag};
+                std::vector<hb_tag_t> required_feature_tags = {OT_TAG_KERN, OT_TAG_LIGA, OT_TAG_LOCL, required_feature_tag};
                 NSMutableArray<OTFeature*> * langFeatures = [[NSMutableArray<OTFeature*> alloc] init];
                 for (size_t index = 0; index < feature_count; ++ index) {
                     hb_tag_t feature_tag = feature_tags[index];

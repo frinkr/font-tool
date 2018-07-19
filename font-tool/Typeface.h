@@ -20,6 +20,7 @@ typedef uint32_t ot_tag_t;
 #define OT_TAG_LANGSYS_DEFAULT MAKE_TAG4('d', 'l', 'f', 't')
 #define OT_TAG_KERN MAKE_TAG4('k', 'e', 'r', 'n')
 #define OT_TAG_LIGA MAKE_TAG4('l', 'i', 'g', 'a')
+#define OT_TAG_LOCL MAKE_TAG4('l', 'o', 'c', 'l')
 
 
 #define INVALID_FACE_INDEX -1

@@ -201,18 +201,19 @@ static NSImage * UNASSIGNED_CODEPOINT_IMAGE = nil;
                                       glyph.image.size.width * glyphImageScale,
                                       glyph.image.size.height * glyphImageScale);
         
-        if (glyph.GID == 0)
+        bool drawGlyphImage = glyph.GID || (glyph.codepoint == 0);
+        if (!drawGlyphImage)
             glyphImage = nil;//[glyphImage gaussianBlurOfRadius:3];
         [glyphImage drawInRect:imageRect
                       fromRect:NSZeroRect
                      operation:NSCompositeSourceOver
                       fraction:1];
         
-        // let's draw system font if gid is 0
-        if (glyph.GID == 0) {
+        // let's draw the codepoint using system font
+        if (!drawGlyphImage) {
             UInt32 cp = glyph.codepoint;
             if ([UnicodeDatabase.standardDatabase isAssigned:cp]) {
-                NSString * unicodeString = [[NSString alloc] initWithBytes:&cp length:sizeof(cp) encoding:NSUTF32LittleEndianStringEncoding];
+                NSString * unicodeString = [[NSString alloc] initWithBytes:&cp length:sizeof(cp) encoding:NSUTF32StringEncoding];
                 
                 NSMutableParagraphStyle *style = [[NSParagraphStyle defaultParagraphStyle] mutableCopy];
                 style.alignment = NSTextAlignmentCenter;
