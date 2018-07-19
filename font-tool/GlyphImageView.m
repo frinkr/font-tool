@@ -213,7 +213,7 @@ static NSImage * UNASSIGNED_CODEPOINT_IMAGE = nil;
         if (!drawGlyphImage) {
             UInt32 cp = glyph.codepoint;
             if ([UnicodeDatabase.standardDatabase isAssigned:cp]) {
-                NSString * unicodeString = [[NSString alloc] initWithBytes:&cp length:sizeof(cp) encoding:NSUTF32StringEncoding];
+                NSString * unicodeString = [[NSString alloc] initWithBytes:&cp length:sizeof(cp) encoding:NSUTF32LittleEndianStringEncoding];
                 
                 NSMutableParagraphStyle *style = [[NSParagraphStyle defaultParagraphStyle] mutableCopy];
                 style.alignment = NSTextAlignmentCenter;
