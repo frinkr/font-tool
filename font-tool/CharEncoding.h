@@ -119,8 +119,10 @@ typedef UnicodeBlock UnicodePropListBlock;
 - (NSString*)propListOfChar:(codepoint_t)unicode;
 - (BOOL)isPUA:(codepoint_t)unicode;
 - (BOOL)isAssigned:(codepoint_t)unicode;
+- (BOOL)isControl:(codepoint_t)unicode;
+- (BOOL)isPrintable:(codepoint_t)unicode;
 
-- (uint32_t)codepointFromName:(NSString*)charName;
+- (codepoint_t)codepointFromName:(NSString*)charName;
 
 @end
 

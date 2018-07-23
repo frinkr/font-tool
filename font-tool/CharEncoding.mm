@@ -519,11 +519,19 @@ static UnicodeDatabase *standardUnicodDatabase = nil;
     return u_isdefined(unicode);
 }
 
+- (BOOL)isControl:(codepoint_t)unicode {
+    return u_iscntrl(unicode);
+}
+
+- (BOOL)isPrintable:(codepoint_t)unicode {
+    return u_isprint(unicode);
+}
+
 - (NSString*)propListOfChar:(codepoint_t)unicode {
     return [self linearSearchUnicode:unicode inBlocks:self.propListBlocks].name;
 }
 
-- (uint32_t)codepointFromName:(NSString*)charName {
+- (codepoint_t)codepointFromName:(NSString*)charName {
     return [self.nameCodeMapping objectForKey:charName].integerValue;
 }
 

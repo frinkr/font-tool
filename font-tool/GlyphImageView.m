@@ -201,28 +201,33 @@ static NSImage * UNASSIGNED_CODEPOINT_IMAGE = nil;
                                       glyph.image.size.width * glyphImageScale,
                                       glyph.image.size.height * glyphImageScale);
         
-        bool drawGlyphImage = glyph.GID || (glyph.codepoint == 0);
-        if (!drawGlyphImage)
-            glyphImage = nil;//[glyphImage gaussianBlurOfRadius:3];
-        [glyphImage drawInRect:imageRect
-                      fromRect:NSZeroRect
-                     operation:NSCompositeSourceOver
-                      fraction:1];
-        
+        if (glyph.GID) {
+            [glyphImage drawInRect:imageRect
+                          fromRect:NSZeroRect
+                         operation:NSCompositeSourceOver
+                          fraction:1];
+        }
         // let's draw the codepoint using system font
-        if (!drawGlyphImage) {
+        else {
             UInt32 cp = glyph.codepoint;
             if ([UnicodeDatabase.standardDatabase isAssigned:cp]) {
-                NSString * unicodeString = [[NSString alloc] initWithBytes:&cp length:sizeof(cp) encoding:NSUTF32LittleEndianStringEncoding];
-                
-                NSMutableParagraphStyle *style = [[NSParagraphStyle defaultParagraphStyle] mutableCopy];
-                style.alignment = NSTextAlignmentCenter;
-                
-                CGFloat fontSize = MIN(imageRect.size.height, imageRect.size.width);
-                NSDictionary * attributes = [NSDictionary dictionaryWithObjects: @[[NSFont systemFontOfSize:fontSize], [NSColor redColor], style]
-                                                                        forKeys: @[NSFontAttributeName, NSForegroundColorAttributeName, NSParagraphStyleAttributeName]];
-                
-                [unicodeString drawInRect:emBox withAttributes:attributes];
+                if (![UnicodeDatabase.standardDatabase isControl:cp]) {
+                    NSString * unicodeString = [[NSString alloc] initWithBytes:&cp length:sizeof(cp) encoding:NSUTF32LittleEndianStringEncoding];
+                    NSMutableParagraphStyle *style = [[NSParagraphStyle defaultParagraphStyle] mutableCopy];
+                    style.alignment = NSTextAlignmentCenter;
+                    
+                    CGFloat fontSize = MIN(imageRect.size.height, imageRect.size.width);
+                    NSDictionary * attributes = [NSDictionary dictionaryWithObjects: @[[NSFont systemFontOfSize:fontSize], [NSColor redColor], style]
+                                                                            forKeys: @[NSFontAttributeName, NSForegroundColorAttributeName, NSParagraphStyleAttributeName]];
+                    
+                    [unicodeString drawInRect:emBox withAttributes:attributes];
+                }
+                else {
+                    [glyphImage drawInRect:imageRect
+                                  fromRect:NSZeroRect
+                                 operation:NSCompositeSourceOver
+                                  fraction:1];
+                }
             }
             else {
                 if (!typeface.isBitmap && foreground && ![foreground isEqual:[NSColor blackColor]]) {
