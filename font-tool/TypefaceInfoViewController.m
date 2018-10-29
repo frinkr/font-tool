@@ -47,7 +47,7 @@
 
 
 
-NSSet<NSNumber*> * HBSet2NSSet(hb_set_t *set) {
+static NSSet<NSNumber*> * HBSet2NSSet(hb_set_t *set) {
     NSMutableSet<NSNumber*>* newSet = [[NSMutableSet<NSNumber*> alloc] init];
     hb_codepoint_t c = HB_SET_VALUE_INVALID;
     while (hb_set_next(set, &c)) {
@@ -56,7 +56,7 @@ NSSet<NSNumber*> * HBSet2NSSet(hb_set_t *set) {
     return newSet;
 }
 
-NSString* FixedArrayToString(NSArray<NSNumber*> * array) {
+static NSString* FixedArrayToString(NSArray<NSNumber*> * array) {
     NSMutableArray<NSNumber*> * converted = [[NSMutableArray<NSNumber*> alloc] init];
     for (NSNumber* n in array) {
         [converted addObject:@(FixedToFloat([n intValue]))];
@@ -64,7 +64,12 @@ NSString* FixedArrayToString(NSArray<NSNumber*> * array) {
     return [converted componentsJoinedByString:@", "];
 }
 
-
+static BOOL isDarkMode() {
+    NSAppearance *appearance = NSAppearance.currentAppearance;
+    if (@available(*, macOS 10.14))
+        return appearance.name == NSAppearanceNameDarkAqua;
+        return NO;
+}
 @interface TypefaceInfoWindowController()
 
 @end
@@ -1033,7 +1038,7 @@ NSString* FixedArrayToString(NSArray<NSNumber*> * array) {
 
 -(HtmlTableViewAppearance*)appearanceOfHtmlTableView:(HtmlTableView *)view {
     HtmlTableViewAppearance * appearance = [[HtmlTableViewAppearance alloc] init];
-    appearance.dark = NO;
+    appearance.dark = isDarkMode();
     appearance.keyColumnSize = 30;
     return appearance;
 }

@@ -128,8 +128,8 @@ static NSImage * UNASSIGNED_CODEPOINT_IMAGE = nil;
     {
         TypefaceGlyph * glyph = self.glyph;
         Typeface* typeface = glyph.typeface;
-        NSColor * background = self.background;
-        NSColor * foreground = self.foreground;
+        NSColor * background = self.background? self.background: [NSColor controlColor];
+        NSColor * foreground = self.foreground? self.foreground: [NSColor textColor];
         
         CGFloat imageFontSize = glyph.imageFontSize;
         

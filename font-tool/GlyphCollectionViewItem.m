@@ -33,7 +33,7 @@
     }
     else {
         self.view.layer.backgroundColor = [[NSColor clearColor] CGColor];
-        [self.glyphNameLabel setTextColor:[NSColor keyboardFocusIndicatorColor]];
+        [self.glyphNameLabel setTextColor:[NSColor linkColor]];
         [self.glyphImageView setForeground:nil];
     }
     
