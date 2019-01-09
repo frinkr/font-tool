@@ -5,6 +5,7 @@
 //  Created by Yuqing Jiang on 6/15/17.
 //
 //
+#import <Carbon/Carbon.h>
 #include <ft2build.h>
 #include FT_FREETYPE_H
 #include FT_CID_H
@@ -153,6 +154,24 @@ static TypefaceManager * defaultTypefaceManager;
 
 @end
 
+static bool ScanShiftPressed() {
+    UInt32 mod = GetCurrentKeyModifiers();
+    
+    return
+    (mod & (1 << shiftKeyBit) || mod & (1 << rightShiftKeyBit));
+}
+
+static bool AskForResetDatabase() {
+    NSAlert *alert = [[NSAlert alloc] init];
+    [alert setMessageText:@"Reset the font dabase?"];
+    [alert setInformativeText:@"Clear and rebuild the font database may fix some issues, i.e crashing."];
+    [alert addButtonWithTitle:@"Cancel"];
+    [alert addButtonWithTitle:@"Ok"];
+    [alert setAlertStyle:NSAlertStyleWarning];
+    NSInteger code = [alert runModal];
+    return code == NSAlertSecondButtonReturn;
+}
+
 @implementation TypefaceManager
 
 - (instancetype)init {
@@ -164,6 +183,12 @@ static TypefaceManager * defaultTypefaceManager;
 }
 
 -(void)loadFontDatabase {
+    if (ScanShiftPressed() && AskForResetDatabase()) {
+        [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"TypefaceFontListVersion"];
+        [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"TypefaceFontList"];
+        [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"TypefaceFontListHash"];
+    }
+    
     NSUInteger databaseVersion = [[NSUserDefaults standardUserDefaults] integerForKey:@"TypefaceFontListVersion"];
     
     NSData *serialized = [[NSUserDefaults standardUserDefaults] objectForKey:@"TypefaceFontList"];

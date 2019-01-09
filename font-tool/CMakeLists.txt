@@ -157,6 +157,7 @@ set_target_properties(
 )
 
 target_link_libraries(${PROJECT_NAME}
+    "-framework Carbon"
     "-framework Cocoa"
     "-framework AppKit"
     "-framework CoreData"
